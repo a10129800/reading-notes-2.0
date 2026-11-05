@@ -172,3 +172,36 @@ export interface DashboardStats {
   recentBooks: Book[];
 }
 
+export interface PublishPipelineStage {
+  id: string;
+  name: string;
+  status: 'pending' | 'in_progress' | 'success' | 'failed' | 'skipped';
+  message?: string;
+  details?: any;
+}
+
+export interface PublishPipelineResult {
+  success: boolean;
+  timestamp: string;
+  stages: Record<string, PublishPipelineStage>;
+  summary: {
+    publishedBooks: string[];
+    publishedCount: number;
+    removedCount: number;
+    commitHash?: string;
+    pushed: boolean;
+    actionsUrl?: string;
+    pagesUrl: string;
+  };
+  error?: string;
+}
+
+export interface DeploymentStatus {
+  status: 'idle' | 'queued' | 'in_progress' | 'completed' | 'unknown';
+  conclusion?: 'success' | 'failure' | 'cancelled' | null;
+  runId?: number;
+  commitHash?: string;
+  htmlUrl?: string;
+  updatedAt?: string;
+}
+

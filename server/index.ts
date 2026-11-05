@@ -18,6 +18,7 @@ import {
   PRIVATE_DATA_DIR,
   PUBLIC_CONTENT_DIR,
 } from './storage';
+import { executePublishPipeline, fetchDeploymentStatus } from './gitPublisher';
 import { formatChapterToMarkdown } from '../src/utils/template';
 
 const app = express();
@@ -225,7 +226,7 @@ app.get('/api/publish/preview', (_req: Request, res: Response) => {
   });
 });
 
-// Trigger safe whitelist publishing
+// Trigger safe whitelist publishing (Local only)
 app.post('/api/publish', (_req: Request, res: Response) => {
   try {
     const result = publishWhitelistedBooks();
@@ -236,6 +237,30 @@ app.post('/api/publish', (_req: Request, res: Response) => {
     });
   } catch (err: any) {
     res.status(500).json({ error: `Publishing failed: ${sanitizeErrorMessage(err.message)}` });
+  }
+});
+
+// Trigger complete end-to-end publish pipeline (Local Sync + Security + Build + Git Stage + Commit + Push + Deployment)
+app.post('/api/publish/pipeline', async (req: Request, res: Response) => {
+  try {
+    const commitAndPush = req.body?.commitAndPush !== false;
+    const result = await executePublishPipeline({ commitAndPush });
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: sanitizeErrorMessage(err.message),
+    });
+  }
+});
+
+// Query live GitHub Actions deployment status
+app.get('/api/publish/deployment-status', async (_req: Request, res: Response) => {
+  try {
+    const status = await fetchDeploymentStatus();
+    res.json(status);
+  } catch (err: any) {
+    res.status(500).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 

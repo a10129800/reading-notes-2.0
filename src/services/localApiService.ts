@@ -1,4 +1,4 @@
-import { Book, ChapterDetail, DashboardStats } from '../types';
+import { Book, ChapterDetail, DashboardStats, PublishPipelineResult, DeploymentStatus } from '../types';
 
 class LocalApiService {
   private baseUrl = '/api';
@@ -111,6 +111,25 @@ class LocalApiService {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Publishing failed');
     }
+    return res.json();
+  }
+
+  async publishPipeline(commitAndPush = true): Promise<PublishPipelineResult> {
+    const res = await fetch(`${this.baseUrl}/publish/pipeline`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ commitAndPush }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Publish pipeline failed');
+    }
+    return res.json();
+  }
+
+  async getDeploymentStatus(): Promise<DeploymentStatus> {
+    const res = await fetch(`${this.baseUrl}/publish/deployment-status`);
+    if (!res.ok) throw new Error('Failed to fetch deployment status');
     return res.json();
   }
 

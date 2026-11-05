@@ -45,6 +45,16 @@ jobs:
       - name: 6. Run Unit, Security & Capacity Test Suite
         run: npm run test
 
+      - name: 6.1 Enforce Public Content Integrity & Test Sandbox Isolation
+        run: |
+          DIFF=$(git status --porcelain content/public-books/)
+          if [ -n "$DIFF" ]; then
+            echo "::error::[CI ERROR] Tests mutated public books content! Sandbox isolation failed."
+            echo "$DIFF"
+            exit 1
+          fi
+          echo "[CI CHECK PASSED] Sandbox isolation verified: content/public-books/ remains pristine after tests."
+
       - name: 7. Build Public Static Site
         run: npm run build
 

@@ -127,4 +127,96 @@ describe('Publish Pipeline Security & Git Flow Tests', () => {
     expect(remoteCheck.diverged).toBe(false);
     expect(remoteCheck.remoteAhead).toBe(false);
   });
+
+  it('7. regression: verifies real repository content/public-books/51ml602210 integrity and manifest inclusion', () => {
+    const repoPublicDir = path.resolve(process.cwd(), 'content/public-books');
+    const book51Dir = path.join(repoPublicDir, '51ml602210');
+    expect(fs.existsSync(book51Dir)).toBe(true);
+
+    const bookJsonPath = path.join(book51Dir, 'book.json');
+    expect(fs.existsSync(bookJsonPath)).toBe(true);
+    const bookData = JSON.parse(fs.readFileSync(bookJsonPath, 'utf-8'));
+    expect(bookData.id).toBe('51ml602210');
+    expect(bookData.title).toBe('刑法總則（圖說）');
+    expect(bookData.status).toBe('public');
+
+    const chapterPath = path.join(book51Dir, 'intro-crime-concept.json');
+    expect(fs.existsSync(chapterPath)).toBe(true);
+    const chapterData = JSON.parse(fs.readFileSync(chapterPath, 'utf-8'));
+    expect(chapterData.id).toBe('intro-crime-concept');
+    expect(chapterData.bookId).toBe('51ml602210');
+
+    // Verify manifest in repo lists 51ml602210
+    const manifestPath = path.join(repoPublicDir, 'books-manifest.json');
+    expect(fs.existsSync(manifestPath)).toBe(true);
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    const found = manifest.books.find((b: any) => b.id === '51ml602210');
+    expect(found).toBeDefined();
+    expect(found.title).toBe('刑法總則（圖說）');
+    expect(found.status).toBe('public');
+  });
+
+  it('8. regression: publishWhitelistedBooks operates strictly in sandbox and NEVER touches repo content/public-books', () => {
+    const repoPublicDir = path.resolve(process.cwd(), 'content/public-books');
+    const repoFilesBefore = fs.readdirSync(repoPublicDir);
+    const book51Before = fs.readdirSync(path.join(repoPublicDir, '51ml602210'));
+
+    // Execute publish in test sandbox
+    const result = publishWhitelistedBooks();
+    expect(result).toBeDefined();
+
+    // Verify sandbox public dir has the published content
+    expect(fs.existsSync(PUBLIC_CONTENT_DIR)).toBe(true);
+
+    // Verify repository public content has ZERO changes
+    const repoFilesAfter = fs.readdirSync(repoPublicDir);
+    expect(repoFilesAfter).toEqual(repoFilesBefore);
+
+    const book51After = fs.readdirSync(path.join(repoPublicDir, '51ml602210'));
+    expect(book51After).toEqual(book51Before);
+  });
+
+  it('9. regression: demotion purge logic functions properly inside sandbox without affecting real repo', () => {
+    const demoteBookId = 'test-demote-sandbox-book';
+    const sandboxBook: Book = {
+      id: demoteBookId,
+      title: 'Sandbox Demotion Book',
+      author: 'Tester',
+      publisher: 'Test Press',
+      publishDate: '2026-01-01',
+      isbn: '978-0-12-345678-9',
+      category: 'Test',
+      status: 'public',
+      readingStatus: 'reading',
+      progress: 50,
+      motivation: 'Test',
+      introduction: 'Test',
+      coreIdea: 'Test',
+      tags: ['test'],
+      chapters: [],
+      startDate: '2026-01-01',
+      coverImage: '',
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    };
+
+    // 1. Save in sandbox private and publish
+    saveMasterBook(sandboxBook);
+    const res1 = publishWhitelistedBooks();
+    expect(res1.publishedBooks).toContain('Sandbox Demotion Book');
+    expect(fs.existsSync(path.join(PUBLIC_CONTENT_DIR, demoteBookId))).toBe(true);
+
+    // 2. Demote to private
+    sandboxBook.status = 'private';
+    saveMasterBook(sandboxBook);
+    const res2 = publishWhitelistedBooks();
+    expect(res2.removedCount).toBeGreaterThanOrEqual(1);
+
+    // 3. Verify purged from sandbox public
+    expect(fs.existsSync(path.join(PUBLIC_CONTENT_DIR, demoteBookId))).toBe(false);
+
+    // 4. Verify repo content/public-books is completely untouched and 51ml602210 remains intact
+    const repo51Path = path.resolve(process.cwd(), 'content/public-books/51ml602210/book.json');
+    expect(fs.existsSync(repo51Path)).toBe(true);
+  });
 });

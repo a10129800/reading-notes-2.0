@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 console.log('========================================================');
-console.log(' Reading Notes 2.0 - Security & Zero-Leakage Verifier');
+console.log(' Reading Notes 2.0 - Security, Zero-Leakage & Integrity Verifier');
 console.log('========================================================');
 
 const publicContentDir = path.resolve(process.cwd(), 'content/public-books');
@@ -17,6 +17,7 @@ if (!fs.existsSync(manifestPath)) {
 }
 
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+const manifestBookIds = new Set((manifest.books || []).map((b: any) => b.id));
 
 // 2. Validate every book in manifest
 console.log(`[Verification] Inspecting ${manifest.books?.length || 0} books in public manifest...`);
@@ -25,21 +26,55 @@ for (const book of (manifest.books || [])) {
     console.error(`[SECURITY VIOLATION] Book "${book.title}" (${book.id}) has status "${book.status}" in public manifest! Only "public" is allowed!`);
     hasViolations = true;
   }
+
+  // Ensure book directory and book.json exist in content/public-books
+  const bookDir = path.join(publicContentDir, book.id);
+  const bookJsonPath = path.join(bookDir, 'book.json');
+  if (!fs.existsSync(bookDir) || !fs.existsSync(bookJsonPath)) {
+    console.error(`[INTEGRITY ERROR] Book "${book.title}" (${book.id}) is listed in manifest but missing on disk at ${bookDir}!`);
+    hasViolations = true;
+  } else {
+    // Check chapter files
+    for (const ch of (book.chapters || [])) {
+      const chPath = path.join(bookDir, `${ch.id}.json`);
+      if (!fs.existsSync(chPath)) {
+        console.error(`[INTEGRITY ERROR] Chapter "${ch.title}" (${ch.id}) for book "${book.id}" is missing on disk at ${chPath}!`);
+        hasViolations = true;
+      }
+    }
+  }
 }
 
 // 3. Scan directories in content/public-books/
 const entries = fs.readdirSync(publicContentDir, { withFileTypes: true });
 for (const entry of entries) {
   if (entry.isDirectory()) {
-    const bookJsonPath = path.join(publicContentDir, entry.name, 'book.json');
+    const bookDir = path.join(publicContentDir, entry.name);
+    const bookJsonPath = path.join(bookDir, 'book.json');
     if (!fs.existsSync(bookJsonPath)) {
       console.error(`[SECURITY WARNING] Directory "${entry.name}" lacks book.json!`);
+      hasViolations = true;
       continue;
     }
     const bookData = JSON.parse(fs.readFileSync(bookJsonPath, 'utf-8'));
     if (bookData.status !== 'public') {
       console.error(`[SECURITY VIOLATION] Directory "${entry.name}" contains non-public status: "${bookData.status}"!`);
       hasViolations = true;
+    }
+
+    if (!manifestBookIds.has(entry.name)) {
+      console.error(`[INTEGRITY ERROR] Directory "${entry.name}" exists in content/public-books/ but is NOT registered in books-manifest.json!`);
+      hasViolations = true;
+    }
+
+    // Inspect files inside book directory for forbidden raw media / scan files
+    const bookFiles = fs.readdirSync(bookDir);
+    for (const f of bookFiles) {
+      const ext = path.extname(f).toLowerCase();
+      if (['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.pdf', '.zip'].includes(ext)) {
+        console.error(`[SECURITY VIOLATION] Prohibited attachment or raw image found in public book directory: ${path.join(entry.name, f)}`);
+        hasViolations = true;
+      }
     }
   }
 }
@@ -55,23 +90,74 @@ const forbiddenPaths = [
 for (const fp of forbiddenPaths) {
   const full = path.resolve(process.cwd(), fp);
   if (fs.existsSync(full)) {
-    // Check if tracked by git
     console.warn(`[DEFENSE CHECK] Checking if ${fp} is tracked by git...`);
   }
 }
 
-// 5. If dist directory exists, inspect dist output
+// 5. Inspect production build artifacts in dist/ if dist exists (Zero-Loss & Zero-Leakage)
 const distDir = path.resolve(process.cwd(), 'dist');
 if (fs.existsSync(distDir)) {
-  console.log('[Verification] Inspecting production build artifacts in dist/ ...');
-  // Check dist/content/public-books/
-  const distManifestPath = path.join(distDir, 'content/public-books/books-manifest.json');
-  if (fs.existsSync(distManifestPath)) {
+  console.log('[Verification] Inspecting production build artifacts in dist/ (Zero-Loss & Zero-Leakage)...');
+
+  const distPublicDir = path.join(distDir, 'content/public-books');
+  const distManifestPath = path.join(distPublicDir, 'books-manifest.json');
+
+  if (!fs.existsSync(distManifestPath)) {
+    console.error('[CRITICAL LOSS] dist/content/public-books/books-manifest.json is missing in build output!');
+    hasViolations = true;
+  } else {
     const distManifest = JSON.parse(fs.readFileSync(distManifestPath, 'utf-8'));
+    const distBookMap = new Map((distManifest.books || []).map((b: any) => [b.id, b]));
+
+    // Check zero-leakage in dist manifest
     for (const b of (distManifest.books || [])) {
       if (b.status !== 'public') {
         console.error(`[CRITICAL SECURITY LEAK] Dist manifest contains non-public book: ${b.title}`);
         hasViolations = true;
+      }
+    }
+
+    // ZERO-LOSS VERIFICATION: Ensure EVERY book in source manifest is present in dist manifest
+    for (const sourceBook of (manifest.books || [])) {
+      if (!distBookMap.has(sourceBook.id)) {
+        console.error(`[ZERO-LOSS VIOLATION] Book "${sourceBook.title}" (${sourceBook.id}) was NOT included in dist manifest!`);
+        hasViolations = true;
+      }
+    }
+
+    if ((distManifest.books || []).length !== (manifest.books || []).length) {
+      console.error(`[ZERO-LOSS VIOLATION] Manifest count mismatch! Source: ${(manifest.books || []).length}, Dist: ${(distManifest.books || []).length}`);
+      hasViolations = true;
+    }
+  }
+
+  // ZERO-LOSS VERIFICATION: Ensure EVERY public book folder and chapter JSON is in dist/
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const srcBookDir = path.join(publicContentDir, entry.name);
+      const dstBookDir = path.join(distPublicDir, entry.name);
+
+      if (!fs.existsSync(dstBookDir)) {
+        console.error(`[ZERO-LOSS VIOLATION] Public book directory "${entry.name}" missing from dist output!`);
+        hasViolations = true;
+        continue;
+      }
+
+      const srcFiles = fs.readdirSync(srcBookDir);
+      for (const file of srcFiles) {
+        if (file.endsWith('.json')) {
+          const dstFile = path.join(dstBookDir, file);
+          if (!fs.existsSync(dstFile)) {
+            console.error(`[ZERO-LOSS VIOLATION] Essential public file "${file}" missing from dist for book "${entry.name}"!`);
+            hasViolations = true;
+          } else {
+            const stat = fs.statSync(dstFile);
+            if (stat.size === 0) {
+              console.error(`[ZERO-LOSS VIOLATION] Public file "${file}" in dist is empty (0 bytes)!`);
+              hasViolations = true;
+            }
+          }
+        }
       }
     }
   }
@@ -85,6 +171,10 @@ if (fs.existsSync(distDir)) {
         console.error(`[CRITICAL SECURITY LEAK] Forbidden artifact in dist: ${full}`);
         hasViolations = true;
       }
+      if (item.name.endsWith('.private.json') || item.name.endsWith('.private.md')) {
+        console.error(`[CRITICAL SECURITY LEAK] Forbidden private file in dist: ${full}`);
+        hasViolations = true;
+      }
       if (item.isDirectory()) {
         scanDist(full);
       }
@@ -94,10 +184,9 @@ if (fs.existsSync(distDir)) {
 }
 
 if (hasViolations) {
-  console.error('\n❌ SECURITY VERIFICATION FAILED: Potential private data leakage detected!');
+  console.error('\n❌ SECURITY & INTEGRITY VERIFICATION FAILED: Violations or lost data detected!');
   process.exit(1);
 } else {
-  console.log('\n✅ SECURITY VERIFICATION PASSED: All public assets strictly verified. Zero private data leak.');
+  console.log('\n✅ SECURITY & INTEGRITY VERIFICATION PASSED: All public assets verified. Zero private data leak & zero public content loss.');
   process.exit(0);
 }
-

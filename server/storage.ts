@@ -4,24 +4,37 @@ import { Book, ChapterDetail, PublicBooksManifest, BookStatus } from '../src/typ
 import { createDefaultChapterSections, formatChapterToMarkdown } from '../src/utils/template';
 
 // Sibling directory outside public Git repository
-const DEFAULT_PRIVATE_DIR = path.resolve(process.cwd(), '../Reading-Notes-Private');
-export const PRIVATE_DATA_DIR = process.env.PRIVATE_DATA_DIR || DEFAULT_PRIVATE_DIR;
+export const DEFAULT_PRIVATE_DIR = path.resolve(process.cwd(), '../Reading-Notes-Private');
+export const getPrivateDataDir = () => process.env.PRIVATE_DATA_DIR || DEFAULT_PRIVATE_DIR;
+export let PRIVATE_DATA_DIR = getPrivateDataDir();
 
 // Public books destination in the public repository
-export const PUBLIC_CONTENT_DIR = path.resolve(process.cwd(), 'content/public-books');
+export const DEFAULT_PUBLIC_DIR = path.resolve(process.cwd(), 'content/public-books');
+export const getPublicContentDir = () => process.env.PUBLIC_CONTENT_DIR || DEFAULT_PUBLIC_DIR;
+export let PUBLIC_CONTENT_DIR = getPublicContentDir();
+
+/**
+ * Refresh exported path constants if environment variables changed at runtime
+ */
+export function refreshStoragePaths() {
+  PRIVATE_DATA_DIR = getPrivateDataDir();
+  PUBLIC_CONTENT_DIR = getPublicContentDir();
+}
 
 /**
  * Initialize directories if they don't exist
  */
 export function initPrivateStorage() {
+  const privateDir = getPrivateDataDir();
+  const publicDir = getPublicContentDir();
   const dirs = [
-    PRIVATE_DATA_DIR,
-    path.join(PRIVATE_DATA_DIR, 'books'),
-    path.join(PRIVATE_DATA_DIR, 'drafts'),
-    path.join(PRIVATE_DATA_DIR, 'images'),
-    path.join(PRIVATE_DATA_DIR, 'attachments'),
-    path.join(PRIVATE_DATA_DIR, 'backups'),
-    PUBLIC_CONTENT_DIR,
+    privateDir,
+    path.join(privateDir, 'books'),
+    path.join(privateDir, 'drafts'),
+    path.join(privateDir, 'images'),
+    path.join(privateDir, 'attachments'),
+    path.join(privateDir, 'backups'),
+    publicDir,
   ];
 
   for (const dir of dirs) {
@@ -31,10 +44,10 @@ export function initPrivateStorage() {
   }
 
   // Seed sample book into private storage if missing
-  const booksDir = path.join(PRIVATE_DATA_DIR, 'books');
+  const booksDir = path.join(privateDir, 'books');
   const targetDir = path.join(booksDir, 'the-effective-executive');
   if (!fs.existsSync(targetDir)) {
-    const samplePublicBook = path.join(PUBLIC_CONTENT_DIR, 'the-effective-executive');
+    const samplePublicBook = path.join(DEFAULT_PUBLIC_DIR, 'the-effective-executive');
     if (fs.existsSync(samplePublicBook)) {
       try {
         fs.cpSync(samplePublicBook, targetDir, { recursive: true });
@@ -69,7 +82,7 @@ export function safeResolve(baseDir: string, ...segments: string[]): string {
  */
 export function listMasterBooks(): Book[] {
   initPrivateStorage();
-  const booksDir = path.join(PRIVATE_DATA_DIR, 'books');
+  const booksDir = path.join(getPrivateDataDir(), 'books');
   const entries = fs.readdirSync(booksDir, { withFileTypes: true });
   const books: Book[] = [];
 
@@ -96,7 +109,7 @@ export function listMasterBooks(): Book[] {
  */
 export function getMasterBook(bookId: string): Book | null {
   initPrivateStorage();
-  const bookDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), bookId);
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
   const bookJson = path.join(bookDir, 'book.json');
   if (!fs.existsSync(bookJson)) return null;
   return JSON.parse(fs.readFileSync(bookJson, 'utf-8'));
@@ -122,7 +135,7 @@ export function saveMasterBook(book: Book): Book {
     throw new Error('Invalid Book ID after sanitization.');
   }
 
-  const bookDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), sanitizedId);
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), sanitizedId);
 
   if (!fs.existsSync(bookDir)) {
     fs.mkdirSync(bookDir, { recursive: true });
@@ -157,7 +170,7 @@ export function saveMasterBook(book: Book): Book {
  */
 export function deleteMasterBook(bookId: string): boolean {
   initPrivateStorage();
-  const bookDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), bookId);
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
   if (fs.existsSync(bookDir)) {
     fs.rmSync(bookDir, { recursive: true, force: true });
     return true;
@@ -170,7 +183,7 @@ export function deleteMasterBook(bookId: string): boolean {
  */
 export function getMasterChapter(bookId: string, chapterId: string): ChapterDetail | null {
   initPrivateStorage();
-  const bookDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), bookId);
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
   const chJson = safeResolve(bookDir, `${chapterId}.json`);
   if (!fs.existsSync(chJson)) return null;
   return JSON.parse(fs.readFileSync(chJson, 'utf-8'));
@@ -181,7 +194,7 @@ export function getMasterChapter(bookId: string, chapterId: string): ChapterDeta
  */
 export function saveMasterChapter(bookId: string, chapter: ChapterDetail): ChapterDetail {
   initPrivateStorage();
-  const bookDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), bookId);
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
   if (!fs.existsSync(bookDir)) {
     throw new Error(`Book ${bookId} not found`);
   }
@@ -241,7 +254,7 @@ export function saveMasterChapter(bookId: string, chapter: ChapterDetail): Chapt
  */
 export function deleteMasterChapter(bookId: string, chapterId: string): boolean {
   initPrivateStorage();
-  const bookDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), bookId);
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
   const chJson = safeResolve(bookDir, `${chapterId}.json`);
   const chMd = safeResolve(bookDir, `${chapterId}.md`);
 
@@ -299,30 +312,32 @@ export function publishWhitelistedBooks(): {
   removedCount: number;
 } {
   initPrivateStorage();
+  const publicDir = getPublicContentDir();
+  const privateDir = getPrivateDataDir();
   const allMasterBooks = listMasterBooks();
 
   // 1. Filter explicitly for 'public' books only
   const publicBooks = allMasterBooks.filter(b => b.status === 'public');
   const publicBookIds = new Set(publicBooks.map(b => b.id));
 
-  // 2. Scan existing content/public-books/ directories and clean up non-public ones
+  // 2. Scan existing public-books directories and clean up non-public ones
   let removedCount = 0;
-  if (fs.existsSync(PUBLIC_CONTENT_DIR)) {
-    const existingInPublic = fs.readdirSync(PUBLIC_CONTENT_DIR, { withFileTypes: true });
+  if (fs.existsSync(publicDir)) {
+    const existingInPublic = fs.readdirSync(publicDir, { withFileTypes: true });
     for (const item of existingInPublic) {
       if (item.isDirectory() && !publicBookIds.has(item.name)) {
         console.log(`[SafePublish] Removing demoted or non-public book directory: ${item.name}`);
-        fs.rmSync(path.join(PUBLIC_CONTENT_DIR, item.name), { recursive: true, force: true });
+        fs.rmSync(path.join(publicDir, item.name), { recursive: true, force: true });
         removedCount++;
       }
     }
   }
 
-  // 3. Copy only public books to PUBLIC_CONTENT_DIR
+  // 3. Copy only public books to publicDir
   const publishedBookNames: string[] = [];
   for (const book of publicBooks) {
-    const srcDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), book.id);
-    const destDir = path.join(PUBLIC_CONTENT_DIR, book.id);
+    const srcDir = safeResolve(path.join(privateDir, 'books'), book.id);
+    const destDir = path.join(publicDir, book.id);
 
     if (!fs.existsSync(destDir)) {
       fs.mkdirSync(destDir, { recursive: true });
@@ -358,7 +373,7 @@ export function publishWhitelistedBooks(): {
   };
 
   fs.writeFileSync(
-    path.join(PUBLIC_CONTENT_DIR, 'books-manifest.json'),
+    path.join(publicDir, 'books-manifest.json'),
     JSON.stringify(manifest, null, 2),
     'utf-8'
   );
@@ -376,7 +391,8 @@ export function publishWhitelistedBooks(): {
  */
 export function createBackup(): { filename: string; timestamp: string; sizeBytes: number } {
   initPrivateStorage();
-  const backupsDir = path.join(PRIVATE_DATA_DIR, 'backups');
+  const privateDir = getPrivateDataDir();
+  const backupsDir = path.join(privateDir, 'backups');
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filename = `backup-reading-notes-${timestamp}.json`;
   const targetPath = path.join(backupsDir, filename);
@@ -395,7 +411,7 @@ export function createBackup(): { filename: string; timestamp: string; sizeBytes
   }
 
   // Backup images as base64
-  const imagesDir = path.join(PRIVATE_DATA_DIR, 'images');
+  const imagesDir = path.join(privateDir, 'images');
   const imagesMap: Record<string, string> = {};
   if (fs.existsSync(imagesDir)) {
     const imgFiles = fs.readdirSync(imagesDir);
@@ -408,7 +424,7 @@ export function createBackup(): { filename: string; timestamp: string; sizeBytes
   }
 
   // Backup attachments as base64
-  const attachmentsDir = path.join(PRIVATE_DATA_DIR, 'attachments');
+  const attachmentsDir = path.join(privateDir, 'attachments');
   const attachmentsMap: Record<string, string> = {};
   if (fs.existsSync(attachmentsDir)) {
     const attFiles = fs.readdirSync(attachmentsDir);
@@ -444,7 +460,7 @@ export function createBackup(): { filename: string; timestamp: string; sizeBytes
  */
 export function listBackups(): Array<{ filename: string; sizeBytes: number; createdAt: string }> {
   initPrivateStorage();
-  const backupsDir = path.join(PRIVATE_DATA_DIR, 'backups');
+  const backupsDir = path.join(getPrivateDataDir(), 'backups');
   if (!fs.existsSync(backupsDir)) return [];
 
   const files = fs.readdirSync(backupsDir);
@@ -472,7 +488,8 @@ export function restoreBackup(filename: string): {
   restoredAttachments: number;
 } {
   initPrivateStorage();
-  const backupsDir = path.join(PRIVATE_DATA_DIR, 'backups');
+  const privateDir = getPrivateDataDir();
+  const backupsDir = path.join(privateDir, 'backups');
   // Sanitize filename to prevent directory traversal
   const sanitizedFilename = path.basename(filename);
   const fullPath = safeResolve(backupsDir, sanitizedFilename);
@@ -520,7 +537,7 @@ export function restoreBackup(filename: string): {
 
   // Restore images
   if (data.images && typeof data.images === 'object') {
-    const imagesDir = path.join(PRIVATE_DATA_DIR, 'images');
+    const imagesDir = path.join(privateDir, 'images');
     if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
     for (const [imgName, b64] of Object.entries(data.images)) {
       try {
@@ -536,7 +553,7 @@ export function restoreBackup(filename: string): {
 
   // Restore attachments
   if (data.attachments && typeof data.attachments === 'object') {
-    const attachmentsDir = path.join(PRIVATE_DATA_DIR, 'attachments');
+    const attachmentsDir = path.join(privateDir, 'attachments');
     if (!fs.existsSync(attachmentsDir)) fs.mkdirSync(attachmentsDir, { recursive: true });
     for (const [attName, b64] of Object.entries(data.attachments)) {
       try {

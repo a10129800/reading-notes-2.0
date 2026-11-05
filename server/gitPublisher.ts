@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
 import util from 'util';
-import { publishWhitelistedBooks, PUBLIC_CONTENT_DIR } from './storage';
+import { publishWhitelistedBooks, PUBLIC_CONTENT_DIR, getPublicContentDir } from './storage';
 import { PublishPipelineResult, DeploymentStatus } from '../src/types';
 
 const execFileAsync = util.promisify(execFile);
@@ -114,12 +114,13 @@ export async function checkRemoteSafety(): Promise<{
 }
 
 /**
- * Deep security verification for content/public-books
+ * Deep security verification for public books directory
  */
 export function verifyPublicBooksSecurity(): { valid: boolean; error?: string } {
-  const manifestPath = path.join(PUBLIC_CONTENT_DIR, 'books-manifest.json');
+  const publicDir = getPublicContentDir ? getPublicContentDir() : PUBLIC_CONTENT_DIR;
+  const manifestPath = path.join(publicDir, 'books-manifest.json');
   if (!fs.existsSync(manifestPath)) {
-    return { valid: false, error: 'books-manifest.json 不存在於 content/public-books/' };
+    return { valid: false, error: 'books-manifest.json 不存在於公開書籍目錄中' };
   }
 
   try {
@@ -130,10 +131,10 @@ export function verifyPublicBooksSecurity(): { valid: boolean; error?: string } 
       }
     }
 
-    const entries = fs.readdirSync(PUBLIC_CONTENT_DIR, { withFileTypes: true });
+    const entries = fs.readdirSync(publicDir, { withFileTypes: true });
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        const bookJsonPath = path.join(PUBLIC_CONTENT_DIR, entry.name, 'book.json');
+        const bookJsonPath = path.join(publicDir, entry.name, 'book.json');
         if (!fs.existsSync(bookJsonPath)) {
           return { valid: false, error: `安全警告：目錄 "${entry.name}" 缺少 book.json！` };
         }
@@ -143,7 +144,7 @@ export function verifyPublicBooksSecurity(): { valid: boolean; error?: string } 
         }
 
         // Check for forbidden raw images in public-books directory
-        const files = fs.readdirSync(path.join(PUBLIC_CONTENT_DIR, entry.name));
+        const files = fs.readdirSync(path.join(publicDir, entry.name));
         for (const file of files) {
           const ext = path.extname(file).toLowerCase();
           if (['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.pdf', '.zip'].includes(ext)) {

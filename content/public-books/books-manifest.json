@@ -1,19 +1,75 @@
 {
   "version": "2.0.0",
-  "generatedAt": "2026-11-05T10:26:11.835Z",
+  "generatedAt": "2026-11-05T11:58:25.008Z",
   "siteTitle": "Reading Notes 2.0 | 個人數位閱讀與知識整理平台",
   "siteDescription": "深度閱讀、知識內化與公開分享系統 — 堅持原書結構、8 步結構化筆記、零付費依賴",
-  "totalPublicBooks": 1,
+  "totalPublicBooks": 2,
   "categories": [
+    "刑事法學",
     "管理學與決策"
   ],
   "tags": [
+    "刑法總則",
+    "三階層體系論",
+    "犯罪概念",
+    "圖說法律",
+    "法律思維",
     "時間管理",
     "知識工作者",
     "決策思維",
     "自我管理"
   ],
   "books": [
+    {
+      "id": "51ml602210",
+      "title": "刑法總則（圖說）",
+      "author": "陳奕廷(易律師)",
+      "category": "刑事法學",
+      "status": "public",
+      "readingStatus": "reading",
+      "progress": 0,
+      "motivation": "",
+      "introduction": "本書由陳奕廷(易律師)所著，透過圖說與清晰體系，帶領讀者初步鳥瞰刑法全貌，掌握犯罪概念與三階層論罪體系。",
+      "coreIdea": "建立穩固且直觀的刑法三階層思維流程；法律不該是象牙塔裡的學問，而是人類生活經驗的縮影與結晶。",
+      "tags": [
+        "刑法總則",
+        "三階層體系論",
+        "犯罪概念",
+        "圖說法律",
+        "法律思維"
+      ],
+      "chapters": [
+        {
+          "id": "intro-crime-concept",
+          "bookId": "51ml602210",
+          "order": 1,
+          "title": "導論：犯罪概念與論罪結構",
+          "subtitle": "刑法的初步鳥瞰與三階層思維建立",
+          "completed": false,
+          "readingTimeMinutes": 10,
+          "quotesCount": 1,
+          "updatedAt": "2026-11-05T11:58:23.156Z"
+        }
+      ],
+      "startDate": "2026-11-05",
+      "coverImage": "",
+      "updatedAt": "2026-11-05T11:58:23.161Z",
+      "createdAt": "2026-11-05T10:27:22.287Z",
+      "quotes": [
+        {
+          "id": "q-51ml-01",
+          "quote": "法律不該是象牙塔裡的學問，而是人類生活經驗的縮影與結晶。",
+          "sourceChapterId": "intro-crime-concept",
+          "sourceChapterTitle": "導論：犯罪概念與論罪結構",
+          "page": "p.XVIII-1",
+          "note": "導論篇篇首導讀之核心精神宣言。",
+          "tags": [
+            "法理基礎",
+            "生活經驗"
+          ]
+        }
+      ]
+    },
     {
       "id": "the-effective-executive",
       "title": "卓有成效的管理者",
@@ -50,7 +106,7 @@
           "completed": true,
           "readingTimeMinutes": 18,
           "quotesCount": 2,
-          "updatedAt": "2026-11-05T10:26:09.560Z"
+          "updatedAt": "2026-11-05T11:58:23.146Z"
         },
         {
           "id": "chapter-02",
@@ -61,7 +117,7 @@
           "completed": true,
           "readingTimeMinutes": 22,
           "quotesCount": 2,
-          "updatedAt": "2026-11-05T10:26:09.566Z"
+          "updatedAt": "2026-11-05T11:58:23.151Z"
         }
       ],
       "quotes": [
@@ -91,7 +147,7 @@
         }
       ],
       "createdAt": "2026-01-10T08:00:00.000Z",
-      "updatedAt": "2026-11-05T10:26:09.570Z"
+      "updatedAt": "2026-11-05T11:58:23.154Z"
     }
   ]
 }

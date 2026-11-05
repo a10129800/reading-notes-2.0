@@ -34,7 +34,7 @@
       "completed": true,
       "readingTimeMinutes": 18,
       "quotesCount": 2,
-      "updatedAt": "2026-11-05T08:57:36.132Z"
+      "updatedAt": "2026-11-05T09:06:33.486Z"
     },
     {
       "id": "chapter-02",
@@ -45,7 +45,7 @@
       "completed": true,
       "readingTimeMinutes": 22,
       "quotesCount": 2,
-      "updatedAt": "2026-11-05T08:57:36.136Z"
+      "updatedAt": "2026-11-05T09:06:33.492Z"
     }
   ],
   "quotes": [
@@ -75,5 +75,5 @@
     }
   ],
   "createdAt": "2026-01-10T08:00:00.000Z",
-  "updatedAt": "2026-11-05T08:57:36.139Z"
+  "updatedAt": "2026-11-05T09:06:33.497Z"
 }

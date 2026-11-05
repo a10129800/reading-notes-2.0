@@ -171,3 +171,4 @@ export interface DashboardStats {
   categoriesCount: Record<string, number>;
   recentBooks: Book[];
 }
+

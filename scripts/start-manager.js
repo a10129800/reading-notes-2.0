@@ -5,44 +5,83 @@ console.log('===========================================================');
 console.log(' Reading Notes 2.0 - Starting Local Management Studio');
 console.log('===========================================================');
 
-// 1. Spawn Backend Express Server
-const serverProcess = spawn('npx', ['tsx', 'server/index.ts'], {
-  stdio: 'inherit',
-  shell: true,
-  env: { ...process.env, PORT: '4000', HOST: '127.0.0.1' },
-});
-
-// 2. Spawn Vite Frontend
-const viteProcess = spawn('npx', ['vite', '--port', '3000'], {
-  stdio: 'inherit',
-  shell: true,
-});
-
 // Helper to open browser
 function openBrowser(url) {
   const startCmd = process.platform === 'win32' ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
   spawn(startCmd, [url], { shell: true });
 }
 
-// Wait for frontend and backend to become ready, then open browser
-let browserOpened = false;
-const checkInterval = setInterval(() => {
-  http.get('http://127.0.0.1:4000/api/health', (res) => {
-    if (res.statusCode === 200 && !browserOpened) {
-      browserOpened = true;
-      clearInterval(checkInterval);
-      console.log('\n>>> Servers are ready! Opening Local Manager in browser: http://localhost:3000/#/manager <<<\n');
-      setTimeout(() => {
-        openBrowser('http://localhost:3000/#/manager');
-      }, 1000);
-    }
-  }).on('error', () => {
-    // Keep waiting
+// Check if server is already running (e.g. repeated launch)
+function checkPortInUse(port, host = '127.0.0.1') {
+  return new Promise((resolve) => {
+    const req = http.get(`http://${host}:${port}/api/health`, (res) => {
+      resolve(res.statusCode === 200);
+    });
+    req.on('error', () => resolve(false));
+    req.setTimeout(600, () => {
+      req.destroy();
+      resolve(false);
+    });
   });
-}, 800);
+}
 
-process.on('SIGINT', () => {
-  serverProcess.kill();
-  viteProcess.kill();
-  process.exit(0);
+async function start() {
+  const backendAlreadyLive = await checkPortInUse(4000);
+
+  let serverProcess = null;
+  let viteProcess = null;
+
+  if (backendAlreadyLive) {
+    console.log('[提示] 偵測到本機後端服務已在背景執行中 (127.0.0.1:4000)。');
+    console.log('>>> 正在直接為您開啟工作台瀏覽器: http://localhost:3000/#/manager <<<\n');
+    openBrowser('http://localhost:3000/#/manager');
+    return;
+  }
+
+  // 1. Spawn Backend Express Server
+  serverProcess = spawn('npx', ['tsx', 'server/index.ts'], {
+    stdio: 'inherit',
+    shell: true,
+    env: { ...process.env, PORT: '4000', HOST: '127.0.0.1' },
+  });
+
+  // 2. Spawn Vite Frontend
+  viteProcess = spawn('npx', ['vite', '--port', '3000'], {
+    stdio: 'inherit',
+    shell: true,
+  });
+
+  // Wait for frontend and backend to become ready, then open browser
+  let browserOpened = false;
+  const checkInterval = setInterval(() => {
+    http.get('http://127.0.0.1:4000/api/health', (res) => {
+      if (res.statusCode === 200 && !browserOpened) {
+        browserOpened = true;
+        clearInterval(checkInterval);
+        console.log('\n>>> 本機服務已啟動！正在為您開啟瀏覽器: http://localhost:3000/#/manager <<<\n');
+        setTimeout(() => {
+          openBrowser('http://localhost:3000/#/manager');
+        }, 800);
+      }
+    }).on('error', () => {
+      // Keep waiting
+    });
+  }, 600);
+
+  const cleanExit = () => {
+    clearInterval(checkInterval);
+    if (serverProcess) serverProcess.kill();
+    if (viteProcess) viteProcess.kill();
+    process.exit(0);
+  };
+
+  process.on('SIGINT', cleanExit);
+  process.on('SIGTERM', cleanExit);
+  process.on('exit', cleanExit);
+}
+
+start().catch(err => {
+  console.error('[啟動錯誤]', err);
+  process.exit(1);
 });
+

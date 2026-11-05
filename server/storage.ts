@@ -53,6 +53,13 @@ export function initPrivateStorage() {
  * Path traversal safety check
  */
 export function safeResolve(baseDir: string, ...segments: string[]): string {
+  // Check for null bytes or illegal characters
+  for (const seg of segments) {
+    if (typeof seg !== 'string' || seg.includes('\0')) {
+      throw new Error('Access denied: Illegal characters detected in path segment.');
+    }
+  }
+
   const resolved = path.resolve(baseDir, ...segments);
   const normalizedBase = path.normalize(baseDir);
   if (!resolved.startsWith(normalizedBase)) {
@@ -104,17 +111,42 @@ export function getMasterBook(bookId: string): Book | null {
  */
 export function saveMasterBook(book: Book): Book {
   initPrivateStorage();
-  // Sanitize id
-  const sanitizedId = book.id.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  if (!book || typeof book !== 'object') {
+    throw new Error('Invalid book payload: must be an object');
+  }
+
+  const rawId = String(book.id || '').trim();
+  if (!rawId) {
+    throw new Error('Book ID is required and cannot be empty.');
+  }
+
+  // Sanitize id: only lower-case alphanumerics and hyphens/underscores
+  const sanitizedId = rawId.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  if (!sanitizedId) {
+    throw new Error('Invalid Book ID after sanitization.');
+  }
+
   const bookDir = safeResolve(path.join(PRIVATE_DATA_DIR, 'books'), sanitizedId);
 
   if (!fs.existsSync(bookDir)) {
     fs.mkdirSync(bookDir, { recursive: true });
   }
 
+  // Strict status whitelist: default to 'draft' if missing or unrecognized
+  const validStatuses: BookStatus[] = ['public', 'private', 'draft'];
+  const sanitizedStatus: BookStatus = validStatuses.includes(book.status) ? book.status : 'draft';
+
   const updatedBook: Book = {
     ...book,
     id: sanitizedId,
+    title: String(book.title || '未命名書籍').trim(),
+    status: sanitizedStatus,
+    readingStatus: ['unread', 'reading', 'completed', 'abandoned'].includes(book.readingStatus)
+      ? book.readingStatus
+      : 'reading',
+    progress: typeof book.progress === 'number' ? Math.min(100, Math.max(0, book.progress)) : 0,
+    tags: Array.isArray(book.tags) ? book.tags : [],
+    chapters: Array.isArray(book.chapters) ? book.chapters : [],
     updatedAt: new Date().toISOString(),
     createdAt: book.createdAt || new Date().toISOString(),
   };
@@ -411,18 +443,33 @@ export function listBackups(): Array<{ filename: string; sizeBytes: number; crea
 export function restoreBackup(filename: string): { restoredBooks: number; restoredChapters: number } {
   initPrivateStorage();
   const backupsDir = path.join(PRIVATE_DATA_DIR, 'backups');
-  const fullPath = safeResolve(backupsDir, filename);
+  // Sanitize filename to prevent directory traversal
+  const sanitizedFilename = path.basename(filename);
+  const fullPath = safeResolve(backupsDir, sanitizedFilename);
 
   if (!fs.existsSync(fullPath)) {
-    throw new Error(`Backup file ${filename} not found.`);
+    throw new Error(`Backup file ${sanitizedFilename} not found.`);
   }
 
-  const raw = fs.readFileSync(fullPath, 'utf-8');
-  const data = JSON.parse(raw);
+  let data: any;
+  try {
+    const raw = fs.readFileSync(fullPath, 'utf-8');
+    data = JSON.parse(raw);
+  } catch (err: any) {
+    throw new Error(`Corrupted backup archive: Invalid JSON format (${err.message}).`);
+  }
 
-  // Validate format & version
-  if (!data.schemaVersion || !data.books || !Array.isArray(data.books)) {
-    throw new Error('Invalid backup schema or corrupted file.');
+  // Validate format & schema version
+  if (!data || typeof data !== 'object') {
+    throw new Error('Corrupted backup archive: Invalid payload structure.');
+  }
+
+  if (data.schemaVersion !== '2.0.0') {
+    throw new Error(`Incompatible backup schema version: "${data.schemaVersion || 'unknown'}". Expected "2.0.0".`);
+  }
+
+  if (!Array.isArray(data.books)) {
+    throw new Error('Corrupted backup archive: Missing or invalid books array.');
   }
 
   let restoredBooks = 0;

@@ -160,3 +160,4 @@ All endpoints reside under `/api` listening on `127.0.0.1:4000`:
 | `GET` | `/api/backups` | List all existing backups |
 | `POST` | `/api/restore` | Restore from a selected backup file |
 | `GET` | `/api/export/markdown/:bookId` | Download bundled Markdown document of entire book |
+

@@ -138,3 +138,4 @@ export const BookCard: React.FC<BookCardProps> = ({ book, showStatusBadge = fals
     </div>
   );
 };
+

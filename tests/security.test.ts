@@ -175,3 +175,4 @@ describe('Security, Path Traversal & Whitelist Leakage Tests', () => {
     expect(updatedIds).not.toContain(publicBookId);
   });
 });
+

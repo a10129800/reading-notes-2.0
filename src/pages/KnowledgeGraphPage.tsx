@@ -225,3 +225,4 @@ export const KnowledgeGraphPage: React.FC = () => {
     </div>
   );
 };
+

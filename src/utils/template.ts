@@ -188,3 +188,4 @@ ${sections.chapterSummary.conclusions}
 ${sections.chapterSummary.futureThoughts}
 `;
 }
+

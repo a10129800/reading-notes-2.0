@@ -18,3 +18,4 @@ try {
   console.error('[SafePublish] FATAL ERROR during publication:', err);
   process.exit(1);
 }
+

@@ -179,3 +179,4 @@ export const BookListPage: React.FC = () => {
     </div>
   );
 };
+

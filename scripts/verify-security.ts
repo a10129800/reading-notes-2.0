@@ -84,3 +84,4 @@ if (hasViolations) {
   console.log('\n✅ SECURITY VERIFICATION PASSED: All public assets strictly verified. Zero private data leak.');
   process.exit(0);
 }
+

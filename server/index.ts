@@ -24,6 +24,14 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
 const HOST = '127.0.0.1'; // STRICT REQUIREMENT: Only listen on 127.0.0.1
 
+// Path redaction helper to prevent leaking physical server filesystem paths
+export function sanitizeErrorMessage(msg: string): string {
+  if (!msg) return 'An error occurred';
+  return msg
+    .replace(/[a-zA-Z]:\\[^"'\n\r]*/g, '[LOCAL_PATH]')
+    .replace(/\/[\w.-]+(\/[\w.-]+)+/g, '[LOCAL_PATH]');
+}
+
 // CORS restricted to local development origins
 const allowedOrigins = [
   'http://localhost:3000',
@@ -59,19 +67,19 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 initPrivateStorage();
 
 // Health check
-app.get('/api/health', (req: Request, res: Response) => {
+app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     version: '2.0.0',
     localOnly: true,
     host: HOST,
-    privateStorage: PRIVATE_DATA_DIR,
-    publicTarget: PUBLIC_CONTENT_DIR,
+    privateStorage: '[CONFIGURED_PRIVATE_STORAGE]',
+    publicTarget: '[CONFIGURED_PUBLIC_STORAGE]',
   });
 });
 
 // Manager Dashboard Stats (returns private, draft, AND public stats)
-app.get('/api/stats', (req: Request, res: Response) => {
+app.get('/api/stats', (_req: Request, res: Response) => {
   const allBooks = listMasterBooks();
   const publicBooks = allBooks.filter(b => b.status === 'public');
   const privateBooks = allBooks.filter(b => b.status === 'private');
@@ -101,7 +109,7 @@ app.get('/api/stats', (req: Request, res: Response) => {
 });
 
 // List all master books
-app.get('/api/books', (req: Request, res: Response) => {
+app.get('/api/books', (_req: Request, res: Response) => {
   const books = listMasterBooks();
   res.json(books);
 });
@@ -116,7 +124,7 @@ app.get('/api/books/:id', (req: Request, res: Response) => {
     }
     res.json(book);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
@@ -124,14 +132,14 @@ app.get('/api/books/:id', (req: Request, res: Response) => {
 app.post('/api/books', (req: Request, res: Response) => {
   try {
     const book = req.body;
-    if (!book.id || !book.title) {
+    if (!book || !book.id || !book.title) {
       res.status(400).json({ error: 'Book ID and Title are required' });
       return;
     }
     const saved = saveMasterBook(book);
     res.json(saved);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
@@ -145,7 +153,7 @@ app.delete('/api/books/:id', (req: Request, res: Response) => {
     }
     res.json({ success: true, message: `Book ${req.params.id} deleted` });
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
@@ -159,7 +167,7 @@ app.get('/api/books/:bookId/chapters/:chapterId', (req: Request, res: Response) 
     }
     res.json(ch);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
@@ -167,14 +175,14 @@ app.get('/api/books/:bookId/chapters/:chapterId', (req: Request, res: Response) 
 app.post('/api/books/:bookId/chapters', (req: Request, res: Response) => {
   try {
     const chapter = req.body;
-    if (!chapter.id || !chapter.title) {
+    if (!chapter || !chapter.id || !chapter.title) {
       res.status(400).json({ error: 'Chapter ID and Title are required' });
       return;
     }
     const saved = saveMasterChapter(req.params.bookId as string, chapter);
     res.json(saved);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
@@ -184,7 +192,7 @@ app.delete('/api/books/:bookId/chapters/:chapterId', (req: Request, res: Respons
     const ok = deleteMasterChapter(req.params.bookId as string, req.params.chapterId as string);
     res.json({ success: ok });
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
@@ -199,16 +207,16 @@ app.post('/api/books/:bookId/reorder', (req: Request, res: Response) => {
     const updated = reorderMasterChapters(req.params.bookId as string, chapterIds);
     res.json(updated);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
 // Publish preview
-app.get('/api/publish/preview', (req: Request, res: Response) => {
-  const allBooks = listMasterBooks();
-  const willPublish = allBooks.filter(b => b.status === 'public');
-  const willKeepPrivate = allBooks.filter(b => b.status === 'private');
-  const willKeepDraft = allBooks.filter(b => b.status === 'draft');
+app.get('/api/publish/preview', (_req: Request, res: Response) => {
+  const allMasterBooks = listMasterBooks();
+  const willPublish = allMasterBooks.filter(b => b.status === 'public');
+  const willKeepPrivate = allMasterBooks.filter(b => b.status === 'private');
+  const willKeepDraft = allMasterBooks.filter(b => b.status === 'draft');
 
   res.json({
     willPublish: willPublish.map(b => ({ id: b.id, title: b.title, chaptersCount: b.chapters?.length || 0 })),
@@ -218,7 +226,7 @@ app.get('/api/publish/preview', (req: Request, res: Response) => {
 });
 
 // Trigger safe whitelist publishing
-app.post('/api/publish', (req: Request, res: Response) => {
+app.post('/api/publish', (_req: Request, res: Response) => {
   try {
     const result = publishWhitelistedBooks();
     res.json({
@@ -227,22 +235,22 @@ app.post('/api/publish', (req: Request, res: Response) => {
       timestamp: new Date().toISOString(),
     });
   } catch (err: any) {
-    res.status(500).json({ error: `Publishing failed: ${err.message}` });
+    res.status(500).json({ error: `Publishing failed: ${sanitizeErrorMessage(err.message)}` });
   }
 });
 
 // Create backup
-app.post('/api/backup', (req: Request, res: Response) => {
+app.post('/api/backup', (_req: Request, res: Response) => {
   try {
     const info = createBackup();
     res.json({ success: true, backup: info });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
 // List backups
-app.get('/api/backups', (req: Request, res: Response) => {
+app.get('/api/backups', (_req: Request, res: Response) => {
   res.json(listBackups());
 });
 
@@ -257,7 +265,7 @@ app.post('/api/restore', (req: Request, res: Response) => {
     const result = restoreBackup(filename);
     res.json({ success: true, ...result });
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
@@ -292,14 +300,14 @@ app.get('/api/export/markdown/:bookId', (req: Request, res: Response) => {
     res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(book.id)}-full-notes.md"`);
     res.send(bundle);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }
 });
 
 // Error handling middleware
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error('Server error:', err);
-  res.status(500).json({ error: err.message || 'Internal Server Error' });
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('Server error:', sanitizeErrorMessage(err.message));
+  res.status(500).json({ error: sanitizeErrorMessage(err.message) || 'Internal Server Error' });
 });
 
 // Start listening strictly on 127.0.0.1

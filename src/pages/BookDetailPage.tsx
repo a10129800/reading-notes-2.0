@@ -319,3 +319,4 @@ export const BookDetailPage: React.FC = () => {
     </div>
   );
 };
+

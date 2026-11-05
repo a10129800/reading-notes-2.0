@@ -30,20 +30,16 @@ export function initPrivateStorage() {
     }
   }
 
-  // Seed sample book into private storage if empty
+  // Seed sample book into private storage if missing
   const booksDir = path.join(PRIVATE_DATA_DIR, 'books');
-  const existingBooks = fs.readdirSync(booksDir);
-  if (existingBooks.length === 0) {
-    // If public-books already has the sample book, copy it as starter master
+  const targetDir = path.join(booksDir, 'the-effective-executive');
+  if (!fs.existsSync(targetDir)) {
     const samplePublicBook = path.join(PUBLIC_CONTENT_DIR, 'the-effective-executive');
     if (fs.existsSync(samplePublicBook)) {
-      const targetDir = path.join(booksDir, 'the-effective-executive');
-      if (!fs.existsSync(targetDir)) {
-        try {
-          fs.cpSync(samplePublicBook, targetDir, { recursive: true });
-        } catch {
-          // Ignore copy conflict if already created
-        }
+      try {
+        fs.cpSync(samplePublicBook, targetDir, { recursive: true });
+      } catch {
+        // Ignore copy conflict if already created
       }
     }
   }

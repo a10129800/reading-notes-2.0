@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-paper: #FAF8F5;
+    --text-primary: #1F1E1D;
+    --text-secondary: #66635E;
+    --border-color: #E8E3DA;
+    --accent-gold: #B48234;
+  }
+
+  .dark {
+    --bg-paper: #121316;
+    --text-primary: #EDEDED;
+    --text-secondary: #9E9A95;
+    --border-color: #282A2E;
+    --accent-gold: #DCA259;
+  }
+
+  body {
+    background-color: var(--bg-paper);
+    color: var(--text-primary);
+    font-feature-settings: "palt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Academic Serif Headers */
+  h1, h2, h3, .font-editorial {
+    font-family: 'Noto Serif TC', 'Songti TC', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 135, 125, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 135, 125, 0.45);
+}
+
+/* Print styles for clean reading export */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .prose {
+    max-width: 100% !important;
+  }
+}

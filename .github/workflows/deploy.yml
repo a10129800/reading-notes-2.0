@@ -1,0 +1,63 @@
+name: Deploy Reading Notes 2.0 to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-verify:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 3. Install Dependencies
+        run: npm ci
+
+      - name: 4. Safe Content Permission & Whitelist Pre-Check
+        run: npx tsx scripts/verify-security.ts
+
+      - name: 5. Execute TypeScript Type Check
+        run: npm run lint
+
+      - name: 6. Run Unit & Security Test Suite
+        run: npm run test
+
+      - name: 7. Build Public Static Site
+        run: npm run build
+
+      - name: 8. Execute Post-Build Artifact Security Check (Zero-Leakage Assurance)
+        run: npx tsx scripts/verify-security.ts
+
+      - name: 9. Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: 10. Upload Artifact to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: 11. Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,97 @@
+{
+  "version": "2.0.0",
+  "generatedAt": "2026-11-05T08:57:38.002Z",
+  "siteTitle": "Reading Notes 2.0 | 個人數位閱讀與知識整理平台",
+  "siteDescription": "深度閱讀、知識內化與公開分享系統 — 堅持原書結構、8 步結構化筆記、零付費依賴",
+  "totalPublicBooks": 1,
+  "categories": [
+    "管理學與決策"
+  ],
+  "tags": [
+    "時間管理",
+    "知識工作者",
+    "決策思維",
+    "自我管理"
+  ],
+  "books": [
+    {
+      "id": "the-effective-executive",
+      "title": "卓有成效的管理者",
+      "subtitle": "The Effective Executive: The Definitive Guide to Getting the Right Things Done",
+      "author": "彼得·杜拉克 (Peter F. Drucker)",
+      "publisher": "天下雜誌",
+      "publishDate": "2015-05-27",
+      "isbn": "9789863980599",
+      "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
+      "category": "管理學與決策",
+      "tags": [
+        "時間管理",
+        "知識工作者",
+        "決策思維",
+        "自我管理"
+      ],
+      "startDate": "2026-01-10",
+      "finishDate": "2026-01-25",
+      "status": "public",
+      "readingStatus": "completed",
+      "progress": 100,
+      "totalPages": 256,
+      "currentPage": 256,
+      "motivation": "現代知識工作者最稀缺的並非專業能力，而是將成果轉化為外部效益的「成效力」。希望透過杜拉克半世紀前的經典，重新校準日常精力的投入方向。",
+      "introduction": "杜拉克在此經典中提出一個顛覆性的洞察：知識工作者無法被傳統「效率（Efficiency，把事情做對）」所度量，唯有「成效（Effectiveness，做對的事情）」才能衡量其貢獻。",
+      "coreIdea": "卓有成效是一種習慣，是任何人都可以透過刻意練習習得的一套思想與行動修養。",
+      "chapters": [
+        {
+          "id": "chapter-01",
+          "bookId": "the-effective-executive",
+          "order": 1,
+          "title": "第一章：卓有成效是可以學會的",
+          "subtitle": "為什麼需要卓有成效的管理者？",
+          "completed": true,
+          "readingTimeMinutes": 18,
+          "quotesCount": 2,
+          "updatedAt": "2026-11-05T08:57:36.132Z"
+        },
+        {
+          "id": "chapter-02",
+          "bookId": "the-effective-executive",
+          "order": 2,
+          "title": "第二章：掌握自己的時間",
+          "subtitle": "從記錄時間開始的系統性自我管理",
+          "completed": true,
+          "readingTimeMinutes": 22,
+          "quotesCount": 2,
+          "updatedAt": "2026-11-05T08:57:36.136Z"
+        }
+      ],
+      "quotes": [
+        {
+          "id": "q-01",
+          "quote": "有效性是一種後天的習慣，是一套實踐的綜合體。",
+          "sourceChapterId": "chapter-01",
+          "sourceChapterTitle": "第一章：卓有成效是可以學會的",
+          "page": "p.28",
+          "note": "明確指出成效並非天生稟賦，而是透過刻意訓練的習慣組合。",
+          "tags": [
+            "習慣",
+            "成效"
+          ]
+        },
+        {
+          "id": "q-02",
+          "quote": "時間是世界上最稀缺的資源。除非時間能夠被管理，否則任何事情都談不上管理。",
+          "sourceChapterId": "chapter-02",
+          "sourceChapterTitle": "第二章：掌握自己的時間",
+          "page": "p.51",
+          "note": "時間是唯一無法借貸、無法替代、無法儲存的剛性限制。",
+          "tags": [
+            "時間管理",
+            "資源"
+          ]
+        }
+      ],
+      "createdAt": "2026-01-10T08:00:00.000Z",
+      "updatedAt": "2026-11-05T08:57:36.139Z"
+    }
+  ]
+}

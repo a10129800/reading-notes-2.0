@@ -376,6 +376,7 @@ export function publishWhitelistedBooks(): {
 
 /**
  * Backup entire private data store into timestamped JSON bundle
+ * Includes books, chapters, images, and attachments
  */
 export function createBackup(): { filename: string; timestamp: string; sizeBytes: number } {
   initPrivateStorage();
@@ -397,11 +398,39 @@ export function createBackup(): { filename: string; timestamp: string; sizeBytes
     }
   }
 
+  // Backup images as base64
+  const imagesDir = path.join(PRIVATE_DATA_DIR, 'images');
+  const imagesMap: Record<string, string> = {};
+  if (fs.existsSync(imagesDir)) {
+    const imgFiles = fs.readdirSync(imagesDir);
+    for (const f of imgFiles) {
+      const full = path.join(imagesDir, f);
+      if (fs.statSync(full).isFile()) {
+        imagesMap[f] = fs.readFileSync(full).toString('base64');
+      }
+    }
+  }
+
+  // Backup attachments as base64
+  const attachmentsDir = path.join(PRIVATE_DATA_DIR, 'attachments');
+  const attachmentsMap: Record<string, string> = {};
+  if (fs.existsSync(attachmentsDir)) {
+    const attFiles = fs.readdirSync(attachmentsDir);
+    for (const f of attFiles) {
+      const full = path.join(attachmentsDir, f);
+      if (fs.statSync(full).isFile()) {
+        attachmentsMap[f] = fs.readFileSync(full).toString('base64');
+      }
+    }
+  }
+
   const backupPayload = {
     schemaVersion: '2.0.0',
     exportedAt: new Date().toISOString(),
     books: allBooks,
     chapters: chaptersMap,
+    images: imagesMap,
+    attachments: attachmentsMap,
   };
 
   const jsonStr = JSON.stringify(backupPayload, null, 2);
@@ -440,7 +469,12 @@ export function listBackups(): Array<{ filename: string; sizeBytes: number; crea
 /**
  * Restore from backup file
  */
-export function restoreBackup(filename: string): { restoredBooks: number; restoredChapters: number } {
+export function restoreBackup(filename: string): {
+  restoredBooks: number;
+  restoredChapters: number;
+  restoredImages: number;
+  restoredAttachments: number;
+} {
   initPrivateStorage();
   const backupsDir = path.join(PRIVATE_DATA_DIR, 'backups');
   // Sanitize filename to prevent directory traversal
@@ -474,6 +508,8 @@ export function restoreBackup(filename: string): { restoredBooks: number; restor
 
   let restoredBooks = 0;
   let restoredChapters = 0;
+  let restoredImages = 0;
+  let restoredAttachments = 0;
 
   for (const book of data.books) {
     saveMasterBook(book);
@@ -486,5 +522,37 @@ export function restoreBackup(filename: string): { restoredBooks: number; restor
     }
   }
 
-  return { restoredBooks, restoredChapters };
+  // Restore images
+  if (data.images && typeof data.images === 'object') {
+    const imagesDir = path.join(PRIVATE_DATA_DIR, 'images');
+    if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
+    for (const [imgName, b64] of Object.entries(data.images)) {
+      try {
+        const safeName = path.basename(imgName);
+        const dest = safeResolve(imagesDir, safeName);
+        fs.writeFileSync(dest, Buffer.from(b64 as string, 'base64'));
+        restoredImages++;
+      } catch (err) {
+        console.warn(`Failed to restore image ${imgName}:`, err);
+      }
+    }
+  }
+
+  // Restore attachments
+  if (data.attachments && typeof data.attachments === 'object') {
+    const attachmentsDir = path.join(PRIVATE_DATA_DIR, 'attachments');
+    if (!fs.existsSync(attachmentsDir)) fs.mkdirSync(attachmentsDir, { recursive: true });
+    for (const [attName, b64] of Object.entries(data.attachments)) {
+      try {
+        const safeName = path.basename(attName);
+        const dest = safeResolve(attachmentsDir, safeName);
+        fs.writeFileSync(dest, Buffer.from(b64 as string, 'base64'));
+        restoredAttachments++;
+      } catch (err) {
+        console.warn(`Failed to restore attachment ${attName}:`, err);
+      }
+    }
+  }
+
+  return { restoredBooks, restoredChapters, restoredImages, restoredAttachments };
 }

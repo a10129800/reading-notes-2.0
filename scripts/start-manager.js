@@ -1,5 +1,13 @@
 import { spawn } from 'child_process';
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PID_DIR = path.resolve(__dirname, '..', 'pids');
+const PID_FILE = path.join(PID_DIR, 'manager.json');
 
 console.log('===========================================================');
 console.log(' Reading Notes 2.0 - Starting Local Management Studio');
@@ -51,6 +59,18 @@ async function start() {
     shell: true,
   });
 
+  // Write PID metadata for safe shutdown verification
+  try {
+    if (!fs.existsSync(PID_DIR)) fs.mkdirSync(PID_DIR, { recursive: true });
+    fs.writeFileSync(PID_FILE, JSON.stringify({
+      managerPid: process.pid,
+      serverPid: serverProcess.pid,
+      vitePid: viteProcess.pid,
+      startedAt: new Date().toISOString(),
+      projectDir: path.resolve(__dirname, '..')
+    }, null, 2));
+  } catch {}
+
   // Wait for frontend and backend to become ready, then open browser
   let browserOpened = false;
   const checkInterval = setInterval(() => {
@@ -70,6 +90,9 @@ async function start() {
 
   const cleanExit = () => {
     clearInterval(checkInterval);
+    try {
+      if (fs.existsSync(PID_FILE)) fs.unlinkSync(PID_FILE);
+    } catch {}
     if (serverProcess) serverProcess.kill();
     if (viteProcess) viteProcess.kill();
     process.exit(0);

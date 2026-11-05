@@ -75,6 +75,22 @@ if (fs.existsSync(distDir)) {
       }
     }
   }
+
+  // Scan dist recursively for any forbidden private files
+  const scanDist = (currentDir: string) => {
+    const dirEntries = fs.readdirSync(currentDir, { withFileTypes: true });
+    for (const item of dirEntries) {
+      const full = path.join(currentDir, item.name);
+      if (item.name === 'Reading-Notes-Private' || item.name === 'backups' || item.name === '.env') {
+        console.error(`[CRITICAL SECURITY LEAK] Forbidden artifact in dist: ${full}`);
+        hasViolations = true;
+      }
+      if (item.isDirectory()) {
+        scanDist(full);
+      }
+    }
+  };
+  scanDist(distDir);
 }
 
 if (hasViolations) {

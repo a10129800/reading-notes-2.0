@@ -55,8 +55,11 @@ jobs:
           fi
           echo "[CI CHECK PASSED] Sandbox isolation verified: content/public-books/ remains pristine after tests."
 
-      - name: 7. Build Public Static Site
+      - name: 7. Build Public Static Site (Pure Reading Mode - Manager Strictly Isolated)
         run: npm run build
+        env:
+          VITE_ENABLE_MANAGER: 'false'
+          VITE_APP_MODE: 'public'
 
       - name: 8. Execute Post-Build Artifact Security Check (Zero-Leakage Assurance)
         run: npx tsx scripts/verify-security.ts

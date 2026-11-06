@@ -199,7 +199,7 @@ if (fs.existsSync(distDir)) {
     const dirEntries = fs.readdirSync(currentDir, { withFileTypes: true });
     for (const item of dirEntries) {
       const full = path.join(currentDir, item.name);
-      if (item.name === 'Reading-Notes-Private' || item.name === 'backups' || item.name === '.env') {
+      if (item.name === 'Reading-Notes-Private' || item.name === 'backups' || item.name === '.env' || item.name === '.env.development') {
         console.error(`[CRITICAL SECURITY LEAK] Forbidden artifact in dist: ${full}`);
         hasViolations = true;
       }
@@ -213,6 +213,30 @@ if (fs.existsSync(distDir)) {
     }
   };
   scanDist(distDir);
+
+  // 6. Strict Manager Code Exclusion & Pure Reading Mode Assurance
+  console.log('[Verification] Inspecting dist/assets JavaScript bundles for strict manager code exclusion...');
+  const assetsDir = path.join(distDir, 'assets');
+  if (fs.existsSync(assetsDir)) {
+    const jsFiles = fs.readdirSync(assetsDir).filter(f => f.endsWith('.js'));
+    const forbiddenManagerMarkers = [
+      '本機閱讀管理工作台',
+      '公開發布安全審核流水線',
+      '完整本機資料備份與還原',
+      '/api/publish',
+      '/api/backups/restore',
+    ];
+
+    for (const jsFile of jsFiles) {
+      const content = fs.readFileSync(path.join(assetsDir, jsFile), 'utf-8');
+      for (const marker of forbiddenManagerMarkers) {
+        if (content.includes(marker)) {
+          console.error(`[CRITICAL SECURITY LEAK] Management code marker "${marker}" detected inside public bundle: ${jsFile}`);
+          hasViolations = true;
+        }
+      }
+    }
+  }
 }
 
 if (hasViolations) {

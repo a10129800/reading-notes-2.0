@@ -9,12 +9,8 @@ import { ChapterReaderPage } from './pages/ChapterReaderPage';
 import { SearchPage } from './pages/SearchPage';
 import { KnowledgeGraphPage } from './pages/KnowledgeGraphPage';
 
-// Manager Pages
-import { ManagerDashboardPage } from './pages/manager/ManagerDashboardPage';
-import { BookEditorPage } from './pages/manager/BookEditorPage';
-import { ChapterEditorPage } from './pages/manager/ChapterEditorPage';
-import { PublishPage } from './pages/manager/PublishPage';
-import { BackupRestorePage } from './pages/manager/BackupRestorePage';
+// Manager Routes (Swapped with ManagerRoutes.public.tsx in public production builds)
+import { ManagerRoutes } from '@/routes/ManagerRoutes';
 
 export const App: React.FC = () => {
   return (
@@ -31,12 +27,8 @@ export const App: React.FC = () => {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/knowledge" element={<KnowledgeGraphPage />} />
 
-            {/* Local Manager Studio Routes */}
-            <Route path="/manager" element={<ManagerDashboardPage />} />
-            <Route path="/manager/books/:bookId" element={<BookEditorPage />} />
-            <Route path="/manager/books/:bookId/chapters/:chapterId" element={<ChapterEditorPage />} />
-            <Route path="/manager/publish" element={<PublishPage />} />
-            <Route path="/manager/backups" element={<BackupRestorePage />} />
+            {/* Manager Studio Routes (Active in local mode; safely blocked & redirected in public mode) */}
+            <Route path="/manager/*" element={<ManagerRoutes />} />
 
             {/* Fallback */}
             <Route path="*" element={<HomePage />} />
@@ -48,4 +40,3 @@ export const App: React.FC = () => {
 };
 
 export default App;
-

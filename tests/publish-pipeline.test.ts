@@ -119,6 +119,8 @@ describe('Publish Pipeline Security & Git Flow Tests', () => {
       const normalized = f.replace(/\\/g, '/');
       expect(normalized.startsWith('content/public-books/')).toBe(true);
     }
+    // Clean up staged state so automated testing leaves git index clean
+    await runGit(['restore', '--staged', 'content/public-books/']);
   });
 
   it('6. checkRemoteSafety correctly verifies local head against origin/master', async () => {

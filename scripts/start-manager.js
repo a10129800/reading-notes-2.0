@@ -53,10 +53,11 @@ async function start() {
     env: { ...process.env, PORT: '4000', HOST: '127.0.0.1' },
   });
 
-  // 2. Spawn Vite Frontend
-  viteProcess = spawn('npx', ['vite', '--port', '3000'], {
+  // 2. Spawn Vite Frontend with Manager Studio enabled
+  viteProcess = spawn('npx', ['vite', '--port', '3000', '--host', '127.0.0.1'], {
     stdio: 'inherit',
     shell: true,
+    env: { ...process.env, VITE_ENABLE_MANAGER: 'true', VITE_APP_MODE: 'manager' },
   });
 
   // Write PID metadata for safe shutdown verification

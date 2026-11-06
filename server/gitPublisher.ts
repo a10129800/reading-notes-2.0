@@ -31,6 +31,12 @@ export async function runViteBuild(): Promise<{ success: boolean; error?: string
       cwd: PROJECT_ROOT,
       windowsHide: true,
       maxBuffer: 10 * 1024 * 1024,
+      env: {
+        ...process.env,
+        VITE_ENABLE_MANAGER: 'false',
+        VITE_APP_MODE: 'public',
+        NODE_ENV: 'production',
+      },
     });
     return { success: true };
   } catch (err: any) {

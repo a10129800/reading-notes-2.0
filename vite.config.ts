@@ -39,40 +39,57 @@ function copyPublicContentPlugin() {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react(), copyPublicContentPlugin()],
-  base: './', // Ensures relative assets work smoothly on GitHub Pages subpaths
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+export default defineConfig(({ mode }) => {
+  // Check if this build is strictly for public reading (GitHub Pages)
+  const isPublic =
+    process.env.VITE_APP_MODE === 'public' ||
+    process.env.VITE_ENABLE_MANAGER === 'false' ||
+    (mode === 'production' && process.env.VITE_ENABLE_MANAGER !== 'true');
+
+  const managerRoutesTarget = isPublic
+    ? path.resolve(__dirname, './src/routes/ManagerRoutes.public.tsx')
+    : path.resolve(__dirname, './src/routes/ManagerRoutes.tsx');
+
+  console.log(`[vite.config] Mode: ${mode}, isPublic: ${isPublic}, managerRoutesTarget: ${managerRoutesTarget}`);
+
+  return {
+    plugins: [react(), copyPublicContentPlugin()],
+    base: './', // Ensures relative assets work smoothly on GitHub Pages subpaths
+    resolve: {
+      alias: [
+        { find: '@/routes/ManagerRoutes', replacement: managerRoutesTarget },
+        { find: '@', replacement: path.resolve(__dirname, './src') },
+      ],
     },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          markdown: ['react-markdown', 'remark-gfm'],
-          icons: ['lucide-react'],
+    build: {
+      emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+            markdown: ['react-markdown', 'remark-gfm'],
+            icons: ['lucide-react'],
+          },
         },
       },
     },
-  },
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:4000',
-        changeOrigin: true,
+    server: {
+      host: '127.0.0.1',
+      port: 3000,
+      proxy: {
+        '/api': {
+          target: 'http://127.0.0.1:4000',
+          changeOrigin: true,
+        },
       },
     },
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
-    fileParallelism: false,
-    include: ['tests/**/*.test.{ts,tsx}'],
-  },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['./tests/setup.ts'],
+      fileParallelism: false,
+      include: ['tests/**/*.test.{ts,tsx}'],
+    },
+  };
 });
 

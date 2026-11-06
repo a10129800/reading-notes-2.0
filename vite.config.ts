@@ -9,6 +9,11 @@ function copyPublicContentPlugin() {
   return {
     name: 'copy-public-content',
     configureServer(server: any) {
+      if (server.watcher) {
+        server.watcher.on('error', (err: any) => {
+          console.warn('[vite:watcher] Watcher warning handled safely:', err?.message || err);
+        });
+      }
       server.middlewares.use((req: any, res: any, next: any) => {
         if (req.url && (req.url.startsWith('/content/') || req.url.includes('/content/'))) {
           const cleanUrl = req.url.split('?')[0];
@@ -76,6 +81,14 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '127.0.0.1',
       port: 3000,
+      watch: {
+        ignored: [
+          '**/content/public-books/**',
+          '**/dist/**',
+          '**/.git/**',
+          '**/pids/**',
+        ],
+      },
       proxy: {
         '/api': {
           target: 'http://127.0.0.1:4000',

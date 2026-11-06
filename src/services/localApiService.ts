@@ -162,6 +162,52 @@ class LocalApiService {
   getExportMarkdownUrl(bookId: string): string {
     return `${this.baseUrl}/export/markdown/${encodeURIComponent(bookId)}`;
   }
+
+  getBookCoverApiUrl(bookId: string, timestamp?: number): string {
+    return `${this.baseUrl}/books/${encodeURIComponent(bookId)}/cover?t=${timestamp || Date.now()}`;
+  }
+
+  async uploadBookCover(bookId: string, file: File): Promise<{ success: boolean; coverImage: string; filename: string; size: number }> {
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const clean = result.includes(',') ? result.split(',')[1] : result;
+        resolve(clean);
+      };
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.readAsDataURL(file);
+    });
+
+    const res = await fetch(`${this.baseUrl}/books/${encodeURIComponent(bookId)}/cover`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: file.name,
+        base64,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to upload cover');
+    }
+
+    return res.json();
+  }
+
+  async deleteBookCover(bookId: string): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${this.baseUrl}/books/${encodeURIComponent(bookId)}/cover`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to delete cover');
+    }
+
+    return res.json();
+  }
 }
 
 export const localApiService = new LocalApiService();

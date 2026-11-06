@@ -13,6 +13,25 @@ export const DEFAULT_PUBLIC_DIR = path.resolve(process.cwd(), 'content/public-bo
 export const getPublicContentDir = () => process.env.PUBLIC_CONTENT_DIR || DEFAULT_PUBLIC_DIR;
 export let PUBLIC_CONTENT_DIR = getPublicContentDir();
 
+export {
+  MAX_COVER_SIZE,
+  MAX_COVER_WIDTH,
+  MAX_COVER_HEIGHT,
+  MAX_COVER_PIXELS,
+  MIN_COVER_WIDTH,
+  MIN_COVER_HEIGHT,
+  detectImageFormat,
+  inspectAndValidateImage,
+} from './imageValidator';
+import {
+  MAX_COVER_SIZE,
+  detectImageFormat,
+  inspectAndValidateImage,
+} from './imageValidator';
+
+export const ALLOWED_COVER_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'] as const;
+export const ALLOWED_COVER_FILENAMES = ['cover.jpg', 'cover.jpeg', 'cover.png', 'cover.webp'] as const;
+
 /**
  * Refresh exported path constants if environment variables changed at runtime
  */
@@ -301,6 +320,130 @@ export function reorderMasterChapters(bookId: string, chapterIds: string[]): Boo
 }
 
 /**
+ * Save book cover to private storage with atomic rename and signature validation
+ */
+export function saveBookCover(
+  bookId: string,
+  buffer: Buffer
+): { success: boolean; coverImage: string; filename: string; size: number } {
+  initPrivateStorage();
+  if (!buffer || buffer.length === 0) {
+    throw new Error('Image file is empty (0 bytes).');
+  }
+  if (buffer.length > MAX_COVER_SIZE) {
+    throw new Error(`Image file exceeds 5MB limit (${(buffer.length / (1024 * 1024)).toFixed(2)} MB).`);
+  }
+
+  const inspection = inspectAndValidateImage(buffer);
+  if (!inspection.valid) {
+    throw new Error(`Invalid image content: ${inspection.error}`);
+  }
+
+  const format = inspection.format!;
+
+  const book = getMasterBook(bookId);
+  if (!book) {
+    throw new Error(`Book "${bookId}" not found.`);
+  }
+
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
+  if (!fs.existsSync(bookDir)) {
+    fs.mkdirSync(bookDir, { recursive: true });
+  }
+
+  const targetFilename = `cover.${format}`;
+  const targetPath = safeResolve(bookDir, targetFilename);
+  const tempPath = safeResolve(bookDir, `.cover.tmp.${Date.now()}`);
+
+  // Atomic write via temp file
+  fs.writeFileSync(tempPath, buffer);
+  try {
+    if (fs.existsSync(targetPath)) {
+      fs.unlinkSync(targetPath);
+    }
+    fs.renameSync(tempPath, targetPath);
+  } catch (err) {
+    if (fs.existsSync(tempPath)) {
+      try { fs.unlinkSync(tempPath); } catch {}
+    }
+    throw err;
+  }
+
+  // Clean old cover files with other extensions
+  for (const ext of ALLOWED_COVER_EXTENSIONS) {
+    if (ext !== format) {
+      const oldPath = path.join(bookDir, `cover.${ext}`);
+      if (fs.existsSync(oldPath)) {
+        try { fs.unlinkSync(oldPath); } catch {}
+      }
+    }
+  }
+
+  // Update book.json with local cover reference
+  book.coverImage = targetFilename;
+  saveMasterBook(book);
+
+  return {
+    success: true,
+    coverImage: targetFilename,
+    filename: targetFilename,
+    size: buffer.length,
+  };
+}
+
+/**
+ * Get active book cover file path and MIME type from private storage
+ */
+export function getBookCoverPath(
+  bookId: string
+): { filePath: string; mime: string; filename: string } | null {
+  initPrivateStorage();
+  const book = getMasterBook(bookId);
+  if (!book) return null;
+
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
+  if (!fs.existsSync(bookDir)) return null;
+
+  for (const ext of ALLOWED_COVER_EXTENSIONS) {
+    const filename = `cover.${ext}`;
+    const filePath = path.join(bookDir, filename);
+    if (fs.existsSync(filePath)) {
+      const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+      return { filePath, mime, filename };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Delete book cover from private storage
+ */
+export function deleteBookCover(bookId: string): boolean {
+  initPrivateStorage();
+  const book = getMasterBook(bookId);
+  if (!book) return false;
+
+  const bookDir = safeResolve(path.join(getPrivateDataDir(), 'books'), bookId);
+  let removed = false;
+  if (fs.existsSync(bookDir)) {
+    for (const ext of ALLOWED_COVER_EXTENSIONS) {
+      const filePath = path.join(bookDir, `cover.${ext}`);
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+          removed = true;
+        } catch {}
+      }
+    }
+  }
+
+  book.coverImage = '';
+  saveMasterBook(book);
+  return removed;
+}
+
+/**
  * SAFE PUBLISHING WHITELIST PIPELINE
  * Only books with status === 'public' will be copied to content/public-books/
  * Unknown, private, or draft books are strictly excluded!
@@ -343,8 +486,38 @@ export function publishWhitelistedBooks(): {
       fs.mkdirSync(destDir, { recursive: true });
     }
 
-    // Write sanitized book.json
-    fs.writeFileSync(path.join(destDir, 'book.json'), JSON.stringify(book, null, 2), 'utf-8');
+    // Clean existing cover files in destDir first
+    for (const ext of ALLOWED_COVER_EXTENSIONS) {
+      const existingCoverInDest = path.join(destDir, `cover.${ext}`);
+      if (fs.existsSync(existingCoverInDest)) {
+        fs.unlinkSync(existingCoverInDest);
+      }
+    }
+
+    // Check if source book has a legitimate local cover
+    let publicCoverImage = book.coverImage || '';
+    let foundCoverFilename: string | null = null;
+    for (const ext of ALLOWED_COVER_EXTENSIONS) {
+      const srcCoverPath = path.join(srcDir, `cover.${ext}`);
+      if (fs.existsSync(srcCoverPath)) {
+        foundCoverFilename = `cover.${ext}`;
+        break;
+      }
+    }
+
+    if (foundCoverFilename) {
+      const srcCover = path.join(srcDir, foundCoverFilename);
+      const destCover = path.join(destDir, foundCoverFilename);
+      fs.copyFileSync(srcCover, destCover);
+      publicCoverImage = `content/public-books/${book.id}/${foundCoverFilename}`;
+    }
+
+    // Write sanitized book.json with resolved public coverImage
+    const publicBookPayload: Book = {
+      ...book,
+      coverImage: publicCoverImage,
+    };
+    fs.writeFileSync(path.join(destDir, 'book.json'), JSON.stringify(publicBookPayload, null, 2), 'utf-8');
 
     // Copy all chapter .json files for this public book
     const files = fs.readdirSync(srcDir);
@@ -436,6 +609,24 @@ export function createBackup(): { filename: string; timestamp: string; sizeBytes
     }
   }
 
+  // Backup book covers as base64
+  const bookCoversMap: Record<string, { filename: string; base64: string }> = {};
+  for (const b of allBooks) {
+    const bookDir = safeResolve(path.join(privateDir, 'books'), b.id);
+    if (fs.existsSync(bookDir)) {
+      for (const ext of ALLOWED_COVER_EXTENSIONS) {
+        const coverPath = path.join(bookDir, `cover.${ext}`);
+        if (fs.existsSync(coverPath)) {
+          bookCoversMap[b.id] = {
+            filename: `cover.${ext}`,
+            base64: fs.readFileSync(coverPath).toString('base64'),
+          };
+          break;
+        }
+      }
+    }
+  }
+
   const backupPayload = {
     schemaVersion: '2.0.0',
     exportedAt: new Date().toISOString(),
@@ -443,6 +634,7 @@ export function createBackup(): { filename: string; timestamp: string; sizeBytes
     chapters: chaptersMap,
     images: imagesMap,
     attachments: attachmentsMap,
+    bookCovers: bookCoversMap,
   };
 
   const jsonStr = JSON.stringify(backupPayload, null, 2);
@@ -486,6 +678,7 @@ export function restoreBackup(filename: string): {
   restoredChapters: number;
   restoredImages: number;
   restoredAttachments: number;
+  restoredCovers?: number;
 } {
   initPrivateStorage();
   const privateDir = getPrivateDataDir();
@@ -567,5 +760,26 @@ export function restoreBackup(filename: string): {
     }
   }
 
-  return { restoredBooks, restoredChapters, restoredImages, restoredAttachments };
+  // Restore book covers
+  let restoredCovers = 0;
+  if (data.bookCovers && typeof data.bookCovers === 'object') {
+    for (const [bookId, coverData] of Object.entries(data.bookCovers as Record<string, any>)) {
+      if (coverData && coverData.filename && coverData.base64) {
+        const safeName = path.basename(coverData.filename);
+        if (ALLOWED_COVER_FILENAMES.includes(safeName.toLowerCase() as any)) {
+          try {
+            const bookDir = safeResolve(path.join(privateDir, 'books'), bookId);
+            if (!fs.existsSync(bookDir)) fs.mkdirSync(bookDir, { recursive: true });
+            const dest = safeResolve(bookDir, safeName);
+            fs.writeFileSync(dest, Buffer.from(coverData.base64 as string, 'base64'));
+            restoredCovers++;
+          } catch (err) {
+            console.warn(`Failed to restore cover for ${bookId}:`, err);
+          }
+        }
+      }
+    }
+  }
+
+  return { restoredBooks, restoredChapters, restoredImages, restoredAttachments, restoredCovers };
 }

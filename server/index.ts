@@ -15,6 +15,9 @@ import {
   createBackup,
   listBackups,
   restoreBackup,
+  saveBookCover,
+  getBookCoverPath,
+  deleteBookCover,
   PRIVATE_DATA_DIR,
   PUBLIC_CONTENT_DIR,
 } from './storage';
@@ -153,6 +156,53 @@ app.delete('/api/books/:id', (req: Request, res: Response) => {
       return;
     }
     res.json({ success: true, message: `Book ${req.params.id} deleted` });
+  } catch (err: any) {
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
+  }
+});
+
+// Upload book cover
+app.post('/api/books/:id/cover', (req: Request, res: Response) => {
+  try {
+    const bookId = req.params.id as string;
+    const { base64 } = req.body;
+    if (!base64 || typeof base64 !== 'string') {
+      res.status(400).json({ error: 'base64 image payload is required' });
+      return;
+    }
+    const cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64;
+    const buffer = Buffer.from(cleanBase64, 'base64');
+    const result = saveBookCover(bookId, buffer);
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
+  }
+});
+
+// Get book cover image
+app.get('/api/books/:id/cover', (req: Request, res: Response) => {
+  try {
+    const bookId = req.params.id as string;
+    const coverInfo = getBookCoverPath(bookId);
+    if (!coverInfo) {
+      res.status(404).json({ error: 'No cover image found for this book' });
+      return;
+    }
+    res.setHeader('Content-Type', coverInfo.mime);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.sendFile(coverInfo.filePath);
+  } catch (err: any) {
+    res.status(400).json({ error: sanitizeErrorMessage(err.message) });
+  }
+});
+
+// Delete book cover image
+app.delete('/api/books/:id/cover', (req: Request, res: Response) => {
+  try {
+    const bookId = req.params.id as string;
+    const ok = deleteBookCover(bookId);
+    res.json({ success: ok, message: 'Cover removed successfully' });
   } catch (err: any) {
     res.status(400).json({ error: sanitizeErrorMessage(err.message) });
   }

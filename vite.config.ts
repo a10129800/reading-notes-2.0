@@ -15,7 +15,12 @@ function copyPublicContentPlugin() {
           const relativeContentPath = cleanUrl.substring(cleanUrl.indexOf('/content/') + 1);
           const fullPath = path.resolve(__dirname, relativeContentPath);
           if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
-            res.setHeader('Content-Type', fullPath.endsWith('.json') ? 'application/json' : 'text/plain');
+            let contentType = 'text/plain';
+            if (fullPath.endsWith('.json')) contentType = 'application/json';
+            else if (fullPath.endsWith('.jpg') || fullPath.endsWith('.jpeg')) contentType = 'image/jpeg';
+            else if (fullPath.endsWith('.png')) contentType = 'image/png';
+            else if (fullPath.endsWith('.webp')) contentType = 'image/webp';
+            res.setHeader('Content-Type', contentType);
             return fs.createReadStream(fullPath).pipe(res);
           }
         }

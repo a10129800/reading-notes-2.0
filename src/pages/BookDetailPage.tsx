@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Book } from '../types';
 import { publicDataService } from '../services/publicDataService';
 import { ProgressBar } from '../components/ProgressBar';
+import { resolveCoverUrl } from '../utils/url';
 import {
   BookOpen,
   Calendar,
@@ -102,7 +103,7 @@ export const BookDetailPage: React.FC = () => {
         <div className="w-full sm:w-56 shrink-0 bg-paper-200 dark:bg-ink-800 rounded-lg overflow-hidden shadow-md flex items-center justify-center">
           {book.coverImage ? (
             <img
-              src={book.coverImage}
+              src={resolveCoverUrl(book.coverImage)}
               alt={book.title}
               className="w-full h-full object-cover"
             />

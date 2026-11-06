@@ -2,7 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
 import util from 'util';
-import { publishWhitelistedBooks, PUBLIC_CONTENT_DIR, getPublicContentDir } from './storage';
+import {
+  publishWhitelistedBooks,
+  PUBLIC_CONTENT_DIR,
+  getPublicContentDir,
+  detectImageFormat,
+  ALLOWED_COVER_FILENAMES,
+  MAX_COVER_SIZE,
+} from './storage';
 import { PublishPipelineResult, DeploymentStatus } from '../src/types';
 
 const execFileAsync = util.promisify(execFile);
@@ -143,12 +150,38 @@ export function verifyPublicBooksSecurity(): { valid: boolean; error?: string } 
           return { valid: false, error: `安全違規：目錄 "${entry.name}" 內書籍狀態非 public ("${bData.status}")！` };
         }
 
-        // Check for forbidden raw images in public-books directory
+        // Check files in public-books directory (Strict single cover whitelist)
         const files = fs.readdirSync(path.join(publicDir, entry.name));
+        let coverCount = 0;
         for (const file of files) {
+          const filePath = path.join(publicDir, entry.name, file);
           const ext = path.extname(file).toLowerCase();
-          if (['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.pdf', '.zip'].includes(ext)) {
-            return { valid: false, error: `安全違規：公開資料夾中發現原始附件或圖片檔 "${file}"！` };
+          const lowerName = file.toLowerCase();
+
+          if (ALLOWED_COVER_FILENAMES.includes(lowerName as any)) {
+            coverCount++;
+            if (coverCount > 1) {
+              return { valid: false, error: `安全違規：目錄 "${entry.name}" 發現多於一個封面圖檔！` };
+            }
+            const stat = fs.statSync(filePath);
+            if (stat.size === 0) {
+              return { valid: false, error: `安全違規：封面檔案 "${file}" 為空檔案 (0 bytes)！` };
+            }
+            if (stat.size > MAX_COVER_SIZE) {
+              return { valid: false, error: `安全違規：封面檔案 "${file}" 超過 5MB 上限！` };
+            }
+            const buf = fs.readFileSync(filePath);
+            if (!detectImageFormat(buf)) {
+              return { valid: false, error: `安全違規：封面檔案 "${file}" 簽章無效，非合法之圖片檔案！` };
+            }
+            const expectedPath = `content/public-books/${entry.name}/${file}`;
+            if (bData.coverImage !== expectedPath && !bData.coverImage.endsWith(`/${file}`)) {
+              return { valid: false, error: `安全違規：書籍 "${entry.name}" book.json 的 coverImage 必須指向 "${expectedPath}"！` };
+            }
+          } else if (file === 'book.json' || file.endsWith('.json')) {
+            // Valid JSON file
+          } else {
+            return { valid: false, error: `安全違規：公開資料夾中發現未授權之附件或非封面圖片檔（原始附件或圖片檔 "${file}"）！` };
           }
         }
       }

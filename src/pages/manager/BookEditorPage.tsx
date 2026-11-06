@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Book, ChapterMeta, BookStatus, ReadingState } from '../../types';
 import { localApiService } from '../../services/localApiService';
@@ -17,7 +17,12 @@ import {
   Clock,
   Layers,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Upload,
+  Image as ImageIcon,
+  RefreshCw,
+  AlertCircle,
+  X
 } from 'lucide-react';
 
 export const BookEditorPage: React.FC = () => {
@@ -34,6 +39,123 @@ export const BookEditorPage: React.FC = () => {
   const [newChTitle, setNewChTitle] = useState('');
   const [newChSubtitle, setNewChSubtitle] = useState('');
   const [newChTime, setNewChTime] = useState(15);
+
+  // Book Cover Management state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [coverMode, setCoverMode] = useState<'local' | 'url'>('local');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFilePreview, setSelectedFilePreview] = useState<string | null>(null);
+  const [coverTimestamp, setCoverTimestamp] = useState<number>(Date.now());
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const [coverSuccess, setCoverSuccess] = useState<string | null>(null);
+
+  // Sync initial cover mode based on existing cover
+  useEffect(() => {
+    if (book?.coverImage) {
+      if (book.coverImage.startsWith('http://') || book.coverImage.startsWith('https://')) {
+        setCoverMode('url');
+      } else {
+        setCoverMode('local');
+      }
+    }
+  }, [book?.coverImage]);
+
+  // Cleanup object URL on unmount or change
+  useEffect(() => {
+    return () => {
+      if (selectedFilePreview && selectedFilePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(selectedFilePreview);
+      }
+    };
+  }, [selectedFilePreview]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCoverError(null);
+    setCoverSuccess(null);
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const validExts = ['jpg', 'jpeg', 'png', 'webp'];
+
+    if (!ext || !validExts.includes(ext)) {
+      setCoverError('不支援的檔案格式，僅允許 JPG, JPEG, PNG, WebP。');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setCoverError(`檔案大小超過 5MB 上限 (${(file.size / (1024 * 1024)).toFixed(2)} MB)，請壓縮後再選取。`);
+      e.target.value = '';
+      return;
+    }
+
+    if (selectedFilePreview && selectedFilePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(selectedFilePreview);
+    }
+
+    const preview = URL.createObjectURL(file);
+    setSelectedFile(file);
+    setSelectedFilePreview(preview);
+    setCoverSuccess(`已選取「${file.name}」(${(file.size / 1024).toFixed(1)} KB)，點擊「確認儲存封面」上傳。`);
+    e.target.value = '';
+  };
+
+  const handleCancelSelectedFile = () => {
+    if (selectedFilePreview && selectedFilePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(selectedFilePreview);
+    }
+    setSelectedFile(null);
+    setSelectedFilePreview(null);
+    setCoverError(null);
+    setCoverSuccess(null);
+  };
+
+  const handleUploadCover = async () => {
+    if (!book || !selectedFile) return;
+    setUploadingCover(true);
+    setCoverError(null);
+    setCoverSuccess(null);
+    try {
+      const res = await localApiService.uploadBookCover(book.id, selectedFile);
+      setBook({ ...book, coverImage: res.coverImage });
+      setCoverTimestamp(Date.now());
+      if (selectedFilePreview && selectedFilePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(selectedFilePreview);
+      }
+      setSelectedFile(null);
+      setSelectedFilePreview(null);
+      setCoverSuccess('本機封面已成功儲存！若此書為公開狀態，一鍵發布時將同步至 GitHub Pages。');
+    } catch (err: any) {
+      setCoverError(`上傳失敗：${err.message}`);
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
+  const handleDeleteCover = async () => {
+    if (!book) return;
+    if (!confirm('確定要移除此書籍的封面嗎？將還原為系統預設封面。')) return;
+    setUploadingCover(true);
+    setCoverError(null);
+    setCoverSuccess(null);
+    try {
+      await localApiService.deleteBookCover(book.id);
+      if (selectedFilePreview && selectedFilePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(selectedFilePreview);
+      }
+      setSelectedFile(null);
+      setSelectedFilePreview(null);
+      setBook({ ...book, coverImage: '' });
+      setCoverTimestamp(Date.now());
+      setCoverSuccess('封面已成功移除，現使用系統預設封面。');
+    } catch (err: any) {
+      setCoverError(`移除失敗：${err.message}`);
+    } finally {
+      setUploadingCover(false);
+    }
+  };
 
   useEffect(() => {
     if (!bookId) return;
@@ -272,15 +394,200 @@ export const BookEditorPage: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="font-bold text-ink-700 dark:text-ink-300 block mb-1">封面圖片網址 (URL)</label>
-            <input
-              type="text"
-              value={book.coverImage}
-              onChange={e => setBook({ ...book, coverImage: e.target.value })}
-              placeholder="https://... 或 public 目錄路徑"
-              className="w-full p-2.5 rounded-lg border border-academic-borderLight dark:border-academic-borderDark bg-paper-100 dark:bg-ink-800 text-ink-900 dark:text-ink-100"
-            />
+          {/* Cover Management Section */}
+          <div className="p-4 rounded-xl bg-paper-100/70 dark:bg-ink-800/60 border border-academic-borderLight dark:border-academic-borderDark space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-academic-borderLight/60 dark:border-academic-borderDark/60 pb-3">
+              <div>
+                <label className="font-bold text-ink-900 dark:text-ink-100 flex items-center gap-1.5 text-sm">
+                  <ImageIcon className="w-4 h-4 text-bronze-600 dark:text-bronze-400" />
+                  書籍封面管理 (Book Cover)
+                </label>
+                <p className="text-xs text-ink-500 dark:text-academic-mutedDark mt-0.5">
+                  支援從電腦選擇本機圖片 (JPG/PNG/WebP，上限 5MB)，或相容外部圖片網址。
+                </p>
+              </div>
+
+              {/* Mode switch tabs */}
+              <div className="inline-flex rounded-lg border border-academic-borderLight dark:border-academic-borderDark p-0.5 bg-paper-200 dark:bg-ink-900 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setCoverMode('local')}
+                  className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                    coverMode === 'local'
+                      ? 'bg-paper-50 dark:bg-academic-cardDark text-bronze-700 dark:text-bronze-400 shadow-xs'
+                      : 'text-ink-600 dark:text-ink-400 hover:text-ink-900'
+                  }`}
+                >
+                  本機上傳
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCoverMode('url')}
+                  className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                    coverMode === 'url'
+                      ? 'bg-paper-50 dark:bg-academic-cardDark text-bronze-700 dark:text-bronze-400 shadow-xs'
+                      : 'text-ink-600 dark:text-ink-400 hover:text-ink-900'
+                  }`}
+                >
+                  外部網址
+                </button>
+              </div>
+            </div>
+
+            {/* Error or Success banners */}
+            {coverError && (
+              <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{coverError}</span>
+              </div>
+            )}
+            {coverSuccess && (
+              <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{coverSuccess}</span>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-5 items-start">
+              {/* Cover Preview Box */}
+              <div className="relative w-32 h-44 shrink-0 rounded-lg overflow-hidden border border-academic-borderLight dark:border-academic-borderDark bg-paper-200 dark:bg-ink-900 flex items-center justify-center shadow-xs">
+                {selectedFilePreview ? (
+                  <img
+                    src={selectedFilePreview}
+                    alt="選取的封面預覽"
+                    className="w-full h-full object-cover"
+                  />
+                ) : book.coverImage ? (
+                  <img
+                    src={
+                      book.coverImage.startsWith('http://') || book.coverImage.startsWith('https://')
+                        ? book.coverImage
+                        : localApiService.getBookCoverApiUrl(book.id, coverTimestamp)
+                    }
+                    alt={book.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="p-2 text-center text-ink-400 dark:text-ink-500">
+                    <BookOpen className="w-8 h-8 mx-auto mb-1 opacity-50 text-bronze-600 dark:text-bronze-400" />
+                    <span className="text-[11px] block font-serif">預設封面</span>
+                  </div>
+                )}
+
+                {/* State Tag Badge */}
+                <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-mono bg-ink-900/80 text-paper-50 backdrop-blur-xs">
+                  {selectedFilePreview
+                    ? '待儲存'
+                    : book.coverImage
+                    ? (book.coverImage.startsWith('http') ? '外部' : '本機')
+                    : '預設'}
+                </span>
+              </div>
+
+              {/* Controls Section */}
+              <div className="flex-1 space-y-3 w-full">
+                {coverMode === 'local' ? (
+                  <div className="space-y-3">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                      accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                      className="hidden"
+                    />
+
+                    {selectedFile ? (
+                      <div className="p-3 rounded-lg bg-paper-50 dark:bg-academic-cardDark border border-bronze-300 dark:border-bronze-800 space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-ink-800 dark:text-ink-200 truncate max-w-[200px]">
+                            {selectedFile.name}
+                          </span>
+                          <span className="text-ink-400 text-[11px]">
+                            {(selectedFile.size / 1024).toFixed(1)} KB
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={handleUploadCover}
+                            disabled={uploadingCover}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-bronze-600 text-paper-50 hover:bg-bronze-700 text-xs font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
+                          >
+                            <Save className="w-3.5 h-3.5" />
+                            {uploadingCover ? '上傳中...' : '確認儲存封面'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleCancelSelectedFile}
+                            disabled={uploadingCover}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-academic-borderLight dark:border-academic-borderDark text-ink-600 dark:text-ink-300 text-xs hover:bg-paper-200 dark:hover:bg-ink-800 cursor-pointer"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                            取消
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadingCover}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark text-ink-800 dark:text-ink-200 text-xs font-semibold hover:border-bronze-600 transition-colors shadow-xs cursor-pointer"
+                        >
+                          <Upload className="w-3.5 h-3.5 text-bronze-600 dark:text-bronze-400" />
+                          {book.coverImage && !book.coverImage.startsWith('http') ? '更換本機封面' : '從電腦選擇圖片'}
+                        </button>
+
+                        {book.coverImage && (
+                          <button
+                            type="button"
+                            onClick={handleDeleteCover}
+                            disabled={uploadingCover}
+                            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400 text-xs font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            移除封面
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="text-[11px] text-ink-400 dark:text-academic-mutedDark">
+                      支援 JPG, JPEG, PNG, WebP。上傳後自動存放於本機私有資料庫，發布時安全同步。
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={book.coverImage}
+                        onChange={e => setBook({ ...book, coverImage: e.target.value })}
+                        placeholder="請輸入外部圖片網址 (https://...)"
+                        className="flex-1 p-2 rounded-lg border border-academic-borderLight dark:border-academic-borderDark bg-paper-50 dark:bg-academic-cardDark text-ink-900 dark:text-ink-100 text-xs font-mono"
+                      />
+                      {book.coverImage && (
+                        <button
+                          type="button"
+                          onClick={() => setBook({ ...book, coverImage: '' })}
+                          className="px-2.5 py-2 rounded-lg border border-academic-borderLight dark:border-academic-borderDark text-xs text-ink-600 hover:text-red-600 cursor-pointer"
+                          title="清除網址"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-ink-400 dark:text-academic-mutedDark">
+                      保留現有外部圖片相容性。如改用本機上傳，請切換至「本機上傳」分頁。
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Book as BookType } from '../types';
 import { ProgressBar } from './ProgressBar';
 import { BookOpen, Calendar, CheckCircle2, Clock, Bookmark } from 'lucide-react';
+import { resolveCoverUrl } from '../utils/url';
 
 interface BookCardProps {
   book: BookType;
@@ -33,7 +34,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, showStatusBadge = fals
         >
           {book.coverImage ? (
             <img
-              src={book.coverImage}
+              src={resolveCoverUrl(book.coverImage)}
               alt={book.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"

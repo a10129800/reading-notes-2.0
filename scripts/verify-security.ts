@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { detectImageFormat, ALLOWED_COVER_FILENAMES, MAX_COVER_SIZE } from '../server/storage';
 
 console.log('========================================================');
 console.log(' Reading Notes 2.0 - Security, Zero-Leakage & Integrity Verifier');
@@ -67,12 +68,43 @@ for (const entry of entries) {
       hasViolations = true;
     }
 
-    // Inspect files inside book directory for forbidden raw media / scan files
+    // Inspect files inside book directory (Single cover whitelist enforcement)
     const bookFiles = fs.readdirSync(bookDir);
+    let coverCount = 0;
     for (const f of bookFiles) {
+      const filePath = path.join(bookDir, f);
       const ext = path.extname(f).toLowerCase();
-      if (['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.pdf', '.zip'].includes(ext)) {
-        console.error(`[SECURITY VIOLATION] Prohibited attachment or raw image found in public book directory: ${path.join(entry.name, f)}`);
+      const lowerName = f.toLowerCase();
+
+      if (ALLOWED_COVER_FILENAMES.includes(lowerName as any)) {
+        coverCount++;
+        if (coverCount > 1) {
+          console.error(`[SECURITY VIOLATION] Directory "${entry.name}" contains multiple cover images! Only one is allowed.`);
+          hasViolations = true;
+        }
+        const stat = fs.statSync(filePath);
+        if (stat.size === 0) {
+          console.error(`[ZERO-LOSS VIOLATION] Cover file "${f}" in "${entry.name}" is empty (0 bytes)!`);
+          hasViolations = true;
+        }
+        if (stat.size > MAX_COVER_SIZE) {
+          console.error(`[SECURITY VIOLATION] Cover file "${f}" in "${entry.name}" exceeds 5MB limit!`);
+          hasViolations = true;
+        }
+        const buf = fs.readFileSync(filePath);
+        if (!detectImageFormat(buf)) {
+          console.error(`[SECURITY VIOLATION] Cover file "${f}" in "${entry.name}" has invalid image signature!`);
+          hasViolations = true;
+        }
+        const expectedCover = `content/public-books/${entry.name}/${f}`;
+        if (bookData.coverImage !== expectedCover && !bookData.coverImage.endsWith(`/${f}`)) {
+          console.error(`[INTEGRITY ERROR] Book "${entry.name}" coverImage "${bookData.coverImage}" does not match file "${expectedCover}"!`);
+          hasViolations = true;
+        }
+      } else if (f === 'book.json' || f.endsWith('.json')) {
+        // Valid JSON
+      } else {
+        console.error(`[SECURITY VIOLATION] Prohibited attachment or unauthorized file found in public book directory: ${path.join(entry.name, f)}`);
         hasViolations = true;
       }
     }
@@ -145,7 +177,7 @@ if (fs.existsSync(distDir)) {
 
       const srcFiles = fs.readdirSync(srcBookDir);
       for (const file of srcFiles) {
-        if (file.endsWith('.json')) {
+        if (file.endsWith('.json') || ALLOWED_COVER_FILENAMES.includes(file.toLowerCase() as any)) {
           const dstFile = path.join(dstBookDir, file);
           if (!fs.existsSync(dstFile)) {
             console.error(`[ZERO-LOSS VIOLATION] Essential public file "${file}" missing from dist for book "${entry.name}"!`);

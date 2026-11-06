@@ -34,7 +34,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, showStatusBadge = fals
         >
           {book.coverImage ? (
             <img
-              src={resolveCoverUrl(book.coverImage)}
+              src={resolveCoverUrl(book.coverImage, book.id)}
               alt={book.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"

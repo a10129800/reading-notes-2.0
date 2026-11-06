@@ -478,6 +478,7 @@ export function publishWhitelistedBooks(): {
 
   // 3. Copy only public books to publicDir
   const publishedBookNames: string[] = [];
+  const publishedBooksForManifest: Book[] = [];
   for (const book of publicBooks) {
     const srcDir = safeResolve(path.join(privateDir, 'books'), book.id);
     const destDir = path.join(publicDir, book.id);
@@ -518,6 +519,7 @@ export function publishWhitelistedBooks(): {
       coverImage: publicCoverImage,
     };
     fs.writeFileSync(path.join(destDir, 'book.json'), JSON.stringify(publicBookPayload, null, 2), 'utf-8');
+    publishedBooksForManifest.push(publicBookPayload);
 
     // Copy all chapter .json files for this public book
     const files = fs.readdirSync(srcDir);
@@ -531,18 +533,18 @@ export function publishWhitelistedBooks(): {
   }
 
   // 4. Generate updated manifest
-  const categories = Array.from(new Set(publicBooks.map(b => b.category)));
-  const allTags = Array.from(new Set(publicBooks.flatMap(b => b.tags || [])));
+  const categories = Array.from(new Set(publishedBooksForManifest.map(b => b.category)));
+  const allTags = Array.from(new Set(publishedBooksForManifest.flatMap(b => b.tags || [])));
 
   const manifest: PublicBooksManifest = {
     version: '2.0.0',
     generatedAt: new Date().toISOString(),
     siteTitle: 'Reading Notes 2.0 | 個人數位閱讀與知識整理平台',
     siteDescription: '深度閱讀、知識內化與公開分享系統 — 堅持原書結構、8 步結構化筆記、零付費依賴',
-    totalPublicBooks: publicBooks.length,
+    totalPublicBooks: publishedBooksForManifest.length,
     categories,
     tags: allTags,
-    books: publicBooks,
+    books: publishedBooksForManifest,
   };
 
   fs.writeFileSync(

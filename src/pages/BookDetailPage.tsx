@@ -103,7 +103,7 @@ export const BookDetailPage: React.FC = () => {
         <div className="w-full sm:w-56 shrink-0 bg-paper-200 dark:bg-ink-800 rounded-lg overflow-hidden shadow-md flex items-center justify-center">
           {book.coverImage ? (
             <img
-              src={resolveCoverUrl(book.coverImage)}
+              src={resolveCoverUrl(book.coverImage, book.id)}
               alt={book.title}
               className="w-full h-full object-cover"
             />

@@ -60,7 +60,7 @@ describe('Publish Pipeline Security & Git Flow Tests', () => {
   });
 
   it('3. verifyPublicBooksSecurity strictly catches forbidden image formats inside public-books', () => {
-    const fakeImg = path.join(PUBLIC_CONTENT_DIR, 'the-effective-executive', 'raw-scan.jpg');
+    const fakeImg = path.join(PUBLIC_CONTENT_DIR, 'test-public-book', 'raw-scan.jpg');
     fs.writeFileSync(fakeImg, 'fake binary scan data');
 
     try {

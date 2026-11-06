@@ -245,11 +245,68 @@ describe('Storage & CRUD Operations', () => {
   });
 
   it('should successfully create and restore backup without data loss', () => {
-    const backupInfo = createBackup();
-    expect(backupInfo.filename).toContain('backup-reading-notes-');
-    expect(backupInfo.sizeBytes).toBeGreaterThan(0);
+    // 1. Prepare dedicated test book with chapters for backup validation
+    const backupBookId = 'backup-crud-test-book';
+    const backupBook: Book = {
+      id: backupBookId,
+      title: '備份還原測試專用書籍',
+      author: '備份工程師',
+      publisher: '測試出版社',
+      publishDate: '2026-01-01',
+      isbn: '978-0-99-887766-5',
+      coverImage: '',
+      category: '系統架構',
+      tags: ['備份', '還原'],
+      startDate: '2026-01-01',
+      status: 'private',
+      readingStatus: 'reading',
+      progress: 60,
+      motivation: '驗證無損備份與還原',
+      introduction: '書籍詳細說明',
+      coreIdea: '資料完整性保障',
+      chapters: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    saveMasterBook(backupBook);
 
-    const restoreResult = restoreBackup(backupInfo.filename);
-    expect(restoreResult.restoredBooks).toBeGreaterThanOrEqual(1);
+    saveMasterChapter(backupBookId, {
+      id: 'backup-ch-1',
+      bookId: backupBookId,
+      order: 1,
+      title: '備份第一章',
+      sections: createDefaultChapterSections('備份章節內容'),
+      quotes: [],
+      relatedLinks: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    try {
+      // 2. Execute backup
+      const backupInfo = createBackup();
+      expect(backupInfo.filename).toContain('backup-reading-notes-');
+      expect(backupInfo.sizeBytes).toBeGreaterThan(0);
+
+      // 3. Delete book to simulate data recovery scenario
+      deleteMasterBook(backupBookId);
+      expect(getMasterBook(backupBookId)).toBeNull();
+
+      // 4. Execute restore
+      const restoreResult = restoreBackup(backupInfo.filename);
+      expect(restoreResult.restoredBooks).toBeGreaterThanOrEqual(1);
+
+      // 5. Verify restored data integrity
+      const restoredBook = getMasterBook(backupBookId);
+      expect(restoredBook).not.toBeNull();
+      expect(restoredBook?.title).toBe('備份還原測試專用書籍');
+      expect(restoredBook?.chapters.length).toBe(1);
+
+      const restoredChapter = getMasterChapter(backupBookId, 'backup-ch-1');
+      expect(restoredChapter).not.toBeNull();
+      expect(restoredChapter?.title).toBe('備份第一章');
+    } finally {
+      deleteMasterBook(backupBookId);
+    }
   });
 });

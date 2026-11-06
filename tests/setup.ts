@@ -36,41 +36,46 @@ export function initTestSandbox() {
     fs.mkdirSync(SANDBOX_PUBLIC, { recursive: true });
   }
 
-  // Seed sample book (the-effective-executive) from repo into sandbox if present
-  const repoSampleDir = path.resolve(process.cwd(), 'content/public-books/the-effective-executive');
-  const sandboxPublicSample = path.join(SANDBOX_PUBLIC, 'the-effective-executive');
-  const sandboxPrivateSample = path.join(SANDBOX_PRIVATE, 'books', 'the-effective-executive');
+  // Seed sample book (test-public-book) from dedicated test fixtures into sandbox
+  const fixtureBookDir = path.resolve(process.cwd(), 'tests/fixtures/books/test-public-book');
+  const sandboxPublicSample = path.join(SANDBOX_PUBLIC, 'test-public-book');
+  const sandboxPrivateSample = path.join(SANDBOX_PRIVATE, 'books', 'test-public-book');
 
-  if (fs.existsSync(repoSampleDir)) {
+  if (fs.existsSync(fixtureBookDir)) {
     if (!fs.existsSync(sandboxPublicSample)) {
-      fs.cpSync(repoSampleDir, sandboxPublicSample, { recursive: true });
+      fs.cpSync(fixtureBookDir, sandboxPublicSample, { recursive: true });
     }
     if (!fs.existsSync(sandboxPrivateSample)) {
-      fs.cpSync(repoSampleDir, sandboxPrivateSample, { recursive: true });
+      fs.cpSync(fixtureBookDir, sandboxPrivateSample, { recursive: true });
     }
   }
 
-  // Seed baseline manifest into public sandbox
+  // Seed baseline manifest into public sandbox from fixtures
   const manifestPath = path.join(SANDBOX_PUBLIC, 'books-manifest.json');
+  const fixtureManifestPath = path.resolve(process.cwd(), 'tests/fixtures/books/books-manifest.json');
   if (!fs.existsSync(manifestPath)) {
-    const bookJsonPath = path.join(sandboxPublicSample, 'book.json');
-    let sampleBook = null;
-    if (fs.existsSync(bookJsonPath)) {
-      try {
-        sampleBook = JSON.parse(fs.readFileSync(bookJsonPath, 'utf-8'));
-      } catch {}
+    if (fs.existsSync(fixtureManifestPath)) {
+      fs.copyFileSync(fixtureManifestPath, manifestPath);
+    } else {
+      const bookJsonPath = path.join(sandboxPublicSample, 'book.json');
+      let sampleBook = null;
+      if (fs.existsSync(bookJsonPath)) {
+        try {
+          sampleBook = JSON.parse(fs.readFileSync(bookJsonPath, 'utf-8'));
+        } catch {}
+      }
+      const manifest = {
+        version: '2.0.0',
+        generatedAt: new Date().toISOString(),
+        siteTitle: 'Reading Notes 2.0 | 測試沙盒環境',
+        siteDescription: '測試沙盒環境',
+        totalPublicBooks: sampleBook ? 1 : 0,
+        categories: sampleBook ? [sampleBook.category] : [],
+        tags: sampleBook ? (sampleBook.tags || []) : [],
+        books: sampleBook ? [sampleBook] : [],
+      };
+      fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
     }
-    const manifest = {
-      version: '2.0.0',
-      generatedAt: new Date().toISOString(),
-      siteTitle: 'Reading Notes 2.0 | 個人數位閱讀與知識整理平台',
-      siteDescription: '測試沙盒環境',
-      totalPublicBooks: sampleBook ? 1 : 0,
-      categories: sampleBook ? [sampleBook.category] : [],
-      tags: sampleBook ? (sampleBook.tags || []) : [],
-      books: sampleBook ? [sampleBook] : [],
-    };
-    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
   }
 }
 

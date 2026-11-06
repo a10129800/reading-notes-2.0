@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "siteTitle": "Reading Notes 2.0 | 測試沙盒環境",
+  "siteDescription": "自動化測試專用獨立公開書籍清單",
+  "totalPublicBooks": 1,
+  "categories": [
+    "軟體架構"
+  ],
+  "tags": [
+    "測試",
+    "架構",
+    "深度閱讀"
+  ],
+  "books": [
+    {
+      "id": "test-public-book",
+      "title": "測試公開書籍（架構思維）",
+      "author": "測試架構師",
+      "publisher": "測試出版社",
+      "publishDate": "2026-01-01",
+      "isbn": "978-0-12-345678-0",
+      "coverImage": "content/public-books/test-public-book/cover.png",
+      "category": "軟體架構",
+      "tags": [
+        "測試",
+        "架構",
+        "深度閱讀"
+      ],
+      "startDate": "2026-01-01",
+      "status": "public",
+      "readingStatus": "reading",
+      "progress": 50,
+      "motivation": "測試沙盒獨立性",
+      "introduction": "這是一本專用於自動化測試與 CI 驗證的獨立測試書籍，完全隔離於真實私人書庫。",
+      "coreIdea": "測試資料完全獨立、可重現且無外部依賴。",
+      "chapters": [
+        {
+          "id": "chapter-01",
+          "order": 1,
+          "title": "第一章：測試架構與解耦原則",
+          "readingTimeMinutes": 15,
+          "completed": true
+        }
+      ],
+      "quotes": [
+        {
+          "id": "q1",
+          "content": "解耦是軟體架構與測試工程的第一美德，也是穩定 CI 的真正基石。",
+          "page": "p.12",
+          "personalNote": "值得銘記在心的架構法則"
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

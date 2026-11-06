@@ -1,8 +1,45 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const FIXTURES_DIR = path.resolve(__dirname, 'fixtures/books');
+
+/**
+ * Intercept public books content requests to serve stable test fixtures
+ * Prevents E2E tests from depending on specific real public/private books.
+ */
+async function setupPublicBooksFixture(page: Page) {
+  await page.route('**/content/public-books/**', async (route) => {
+    const url = new URL(route.request().url());
+    const match = url.pathname.match(/\/content\/public-books\/(.+)/);
+    if (match) {
+      const relativePath = decodeURIComponent(match[1]);
+      const filePath = path.join(FIXTURES_DIR, relativePath);
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        const ext = path.extname(filePath).toLowerCase();
+        let contentType = 'text/plain';
+        if (ext === '.json') contentType = 'application/json';
+        else if (ext === '.png') contentType = 'image/png';
+        else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+        else if (ext === '.webp') contentType = 'image/webp';
+        return route.fulfill({
+          status: 200,
+          contentType,
+          body: fs.readFileSync(filePath),
+        });
+      }
+    }
+    return route.continue();
+  });
+}
 
 test.describe('Reading Notes 2.0 - End-to-End Browser Acceptance Suite', () => {
 
   test('1. Home Dashboard loads real data, branding, and statistics', async ({ page }) => {
+    await setupPublicBooksFixture(page);
     await page.goto('/');
 
     // Check brand
@@ -19,6 +56,7 @@ test.describe('Reading Notes 2.0 - End-to-End Browser Acceptance Suite', () => {
   });
 
   test('2. Dark mode toggle and responsive theme controls work properly', async ({ page }) => {
+    await setupPublicBooksFixture(page);
     await page.goto('/');
 
     const html = page.locator('html');
@@ -37,32 +75,33 @@ test.describe('Reading Notes 2.0 - End-to-End Browser Acceptance Suite', () => {
     expect(toggledAgain).toBe(!hasDark);
   });
 
-  test('3. Books catalog, category filters, and detail page navigation', async ({ page }) => {
+  test('3. Books catalog, category filters, and detail page navigation (using Test Fixture)', async ({ page }) => {
+    await setupPublicBooksFixture(page);
     await page.goto('/#/books');
 
     // Check page header
     await expect(page.locator('h1')).toContainText('書籍館藏總覽');
 
     // Verify sample book card exists
-    const bookTitle = page.locator('text=卓有成效的管理者').first();
+    const bookTitle = page.locator('text=測試公開書籍（架構思維）').first();
     await expect(bookTitle).toBeVisible();
 
     // Click to navigate to book detail
     await bookTitle.click();
-    await expect(page).toHaveURL(/.*#\/books\/the-effective-executive/);
+    await expect(page).toHaveURL(/.*#\/books\/test-public-book/);
 
     // Verify detail page elements
     await expect(page.locator('text=全書核心思想')).toBeVisible();
     await expect(page.locator('text=原書章節目錄與 8 步筆記')).toBeVisible();
-    await expect(page.locator('text=第一章：卓有成效是可以學會的').first()).toBeVisible();
-    await expect(page.locator('text=第二章：掌握自己的時間').first()).toBeVisible();
+    await expect(page.locator('text=第一章：測試架構與解耦原則').first()).toBeVisible();
   });
 
-  test('4. Chapter reader 3-column layout, font size adjustment, and 8-section notes', async ({ page }) => {
-    await page.goto('/#/books/the-effective-executive/chapter-01');
+  test('4. Chapter reader 3-column layout, font size adjustment, and 8-section notes (using Test Fixture)', async ({ page }) => {
+    await setupPublicBooksFixture(page);
+    await page.goto('/#/books/test-public-book/chapter-01');
 
     // Check chapter title
-    await expect(page.locator('h1')).toContainText('第一章：卓有成效是可以學會的');
+    await expect(page.locator('h1')).toContainText('第一章：測試架構與解耦原則');
 
     // Check 3-column elements
     await expect(page.locator('text=原書目錄結構')).toBeVisible();
@@ -76,7 +115,7 @@ test.describe('Reading Notes 2.0 - End-to-End Browser Acceptance Suite', () => {
     await expect(page.locator('text=案例分析').first()).toBeVisible();
     await expect(page.locator('text=重點整理').first()).toBeVisible();
     await expect(page.locator('text=個人心得').first()).toBeVisible();
-    await expect(page.locator('text=本章總結與收穫').first()).toBeVisible();
+    await expect(page.locator('text=本章總結').first()).toBeVisible();
 
     // Check font size adjustment
     const fontLargeBtn = page.locator('button[title="特大字級"]');
@@ -85,16 +124,17 @@ test.describe('Reading Notes 2.0 - End-to-End Browser Acceptance Suite', () => {
     await page.waitForTimeout(200);
   });
 
-  test('5. Full-text search across books, definitions, and personal reflections', async ({ page }) => {
+  test('5. Full-text search across books, definitions, and personal reflections (using Test Fixture)', async ({ page }) => {
+    await setupPublicBooksFixture(page);
     await page.goto('/#/search');
 
-    // Search for "時間"
+    // Search for "解耦原則" from test fixture
     const searchInput = page.locator('input[placeholder*="輸入關鍵詞"]');
-    await searchInput.fill('時間管理');
+    await searchInput.fill('解耦原則');
     await page.locator('button[type="submit"]').click();
 
     await page.waitForTimeout(600);
-    // Should show results matching time management
+    // Should show results matching test fixture content
     await expect(page.locator('text=相符筆記段落')).toBeVisible();
   });
 

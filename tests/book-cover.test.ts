@@ -277,9 +277,21 @@ describe('Book Cover Management & Security Suite (18 Scenarios)', () => {
 
   it('18. 整個封面測試過程絕對不觸碰、不污染正式倉庫 content/public-books', () => {
     const realPublicDir = DEFAULT_PUBLIC_DIR;
-    expect(fs.existsSync(path.join(realPublicDir, '51ml602210/book.json'))).toBe(true);
-    expect(fs.existsSync(path.join(realPublicDir, 'the-effective-executive/book.json'))).toBe(true);
     expect(fs.existsSync(path.join(realPublicDir, 'books-manifest.json'))).toBe(true);
+
+    // Verify all books listed in real manifest actually exist and are public
+    const manifest = JSON.parse(fs.readFileSync(path.join(realPublicDir, 'books-manifest.json'), 'utf-8'));
+    expect(manifest.books.length).toBeGreaterThanOrEqual(1);
+    for (const b of manifest.books) {
+      expect(b.status).toBe('public');
+      const bPath = path.join(realPublicDir, b.id, 'book.json');
+      expect(fs.existsSync(bPath)).toBe(true);
+      const bData = JSON.parse(fs.readFileSync(bPath, 'utf-8'));
+      expect(bData.status).toBe('public');
+    }
+
+    // Verify demoted/private books strictly do NOT exist in real public repository
+    expect(fs.existsSync(path.join(realPublicDir, 'the-effective-executive'))).toBe(false);
 
     // None of the test book IDs ever leak to real repository
     expect(fs.existsSync(path.join(realPublicDir, testBookId))).toBe(false);

@@ -235,7 +235,7 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-8 w-full max-w-6xl mx-auto">
       {/* Search Header */}
       <div className="text-center space-y-2">
         <h1 className="font-serif text-3xl font-extrabold text-ink-900 dark:text-ink-100 flex items-center justify-center gap-2">

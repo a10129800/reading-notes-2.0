@@ -133,7 +133,7 @@ export const PublishPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-8 w-full">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-academic-borderLight dark:border-academic-borderDark gap-4">
         <div className="flex items-center gap-3">
@@ -221,7 +221,7 @@ export const PublishPage: React.FC = () => {
           </div>
 
           {/* 6 Stages Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {Object.values(pipelineResult.stages).map((st) => (
               <div
                 key={st.id}

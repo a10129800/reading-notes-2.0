@@ -40,7 +40,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-paper-100/90 dark:bg-academic-bgDark/90 backdrop-blur-md border-b border-academic-borderLight dark:border-academic-borderDark transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-lg bg-academic-navy text-paper-50 flex items-center justify-center font-serif text-xl font-bold shadow-sm group-hover:bg-bronze-600 transition-colors">

@@ -4,7 +4,7 @@ import { BookOpen, ShieldCheck, Feather } from 'lucide-react';
 export const Footer: React.FC = () => {
   return (
     <footer className="mt-20 border-t border-academic-borderLight dark:border-academic-borderDark bg-paper-50 dark:bg-academic-bgDark/60 py-12 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-academic-borderLight dark:border-academic-borderDark">
           {/* Brand Col */}
           <div>

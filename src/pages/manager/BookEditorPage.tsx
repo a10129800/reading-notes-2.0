@@ -267,7 +267,7 @@ export const BookEditorPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-8 w-full">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-academic-borderLight dark:border-academic-borderDark">
         <div className="flex items-center gap-3">

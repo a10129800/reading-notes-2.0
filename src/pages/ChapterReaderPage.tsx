@@ -256,7 +256,7 @@ export const ChapterReaderPage: React.FC = () => {
               <h3 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100 mb-2">
                 【本章背景介紹】
               </h3>
-              <p className="text-ink-700 dark:text-ink-300 leading-relaxed mb-4">
+              <p className="text-ink-700 dark:text-ink-300 leading-relaxed mb-4 whitespace-pre-line">
                 {sections.introduction.overview}
               </p>
 
@@ -296,7 +296,7 @@ export const ChapterReaderPage: React.FC = () => {
                 <h4 className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase mb-1">
                   作者主要論述 (Main Thesis)
                 </h4>
-                <p className="font-serif italic font-medium text-ink-900 dark:text-ink-100">
+                <p className="font-serif italic font-medium text-ink-900 dark:text-ink-100 whitespace-pre-line">
                   {sections.summary.mainArgument}
                 </p>
               </div>
@@ -305,7 +305,7 @@ export const ChapterReaderPage: React.FC = () => {
                 <h4 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100">
                   章節內容整理
                 </h4>
-                <p className="text-ink-700 dark:text-ink-300 leading-relaxed">
+                <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
                   {sections.summary.contentDigest}
                 </p>
               </div>
@@ -361,7 +361,7 @@ export const ChapterReaderPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-academic-borderLight dark:border-academic-borderDark text-xs">
                 <div>
                   <h4 className="font-bold text-ink-800 dark:text-ink-200 mb-1">理論學說背景</h4>
-                  <p className="text-ink-600 dark:text-academic-mutedDark leading-relaxed">
+                  <p className="text-ink-600 dark:text-academic-mutedDark leading-relaxed whitespace-pre-line">
                     {sections.professionalKnowledge.theories}
                   </p>
                 </div>
@@ -386,7 +386,7 @@ export const ChapterReaderPage: React.FC = () => {
                 <h4 className="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">
                   白話概念重構
                 </h4>
-                <p className="text-ink-800 dark:text-ink-200 leading-relaxed">
+                <p className="text-ink-800 dark:text-ink-200 leading-relaxed whitespace-pre-line">
                   {sections.vernacularExplanation.plainText}
                 </p>
               </div>
@@ -394,7 +394,7 @@ export const ChapterReaderPage: React.FC = () => {
                 <h4 className="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">
                   生活化或職場譬喻
                 </h4>
-                <p className="text-ink-700 dark:text-ink-300 leading-relaxed italic bg-paper-100 dark:bg-ink-800/40 p-3 rounded-lg">
+                <p className="text-ink-700 dark:text-ink-300 leading-relaxed italic bg-paper-100 dark:bg-ink-800/40 p-3 rounded-lg whitespace-pre-line">
                   「{sections.vernacularExplanation.everydayExamples}」
                 </p>
               </div>
@@ -413,7 +413,7 @@ export const ChapterReaderPage: React.FC = () => {
                 <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-academic-navy text-paper-50">
                   原書案例 (原作者論述)
                 </span>
-                <p className="text-xs text-ink-700 dark:text-ink-300 leading-relaxed">
+                <p className="text-xs text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
                   {sections.caseAnalysis.bookCases}
                 </p>
               </div>
@@ -423,12 +423,12 @@ export const ChapterReaderPage: React.FC = () => {
                 <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-bronze-600 text-paper-50">
                   自行舉例 (讀者延伸實踐)
                 </span>
-                <p className="text-xs text-ink-700 dark:text-ink-300 leading-relaxed">
+                <p className="text-xs text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
                   {sections.caseAnalysis.customCases}
                 </p>
               </div>
             </div>
-            <div className="p-3 bg-paper-50 dark:bg-ink-800/30 rounded-lg text-xs text-ink-600 dark:text-academic-mutedDark">
+            <div className="p-3 bg-paper-50 dark:bg-ink-800/30 rounded-lg text-xs text-ink-600 dark:text-academic-mutedDark whitespace-pre-line">
               <span className="font-bold">案例與理論之關聯應用：</span> {sections.caseAnalysis.application}
             </div>
           </section>
@@ -478,7 +478,7 @@ export const ChapterReaderPage: React.FC = () => {
                 <h4 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100 mb-1">
                   讀後主觀感想與自我反思
                 </h4>
-                <p className="text-sm text-ink-700 dark:text-ink-300 leading-relaxed">
+                <p className="text-sm text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
                   {sections.personalInsights.reflections}
                 </p>
               </div>
@@ -488,7 +488,7 @@ export const ChapterReaderPage: React.FC = () => {
                   <span className="font-bold text-emerald-800 dark:text-emerald-300 block mb-1">
                     ✓ 認同作者之觀點
                   </span>
-                  <p className="text-ink-700 dark:text-ink-300 leading-relaxed">
+                  <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
                     {sections.personalInsights.agreedPoints}
                   </p>
                 </div>
@@ -497,7 +497,7 @@ export const ChapterReaderPage: React.FC = () => {
                   <span className="font-bold text-rose-800 dark:text-rose-300 block mb-1">
                     ✗ 不認同或存疑之處
                   </span>
-                  <p className="text-ink-700 dark:text-ink-300 leading-relaxed">
+                  <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
                     {sections.personalInsights.disagreedPoints}
                   </p>
                 </div>
@@ -523,11 +523,11 @@ export const ChapterReaderPage: React.FC = () => {
                 <h4 className="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">
                   核心知識結語
                 </h4>
-                <p className="font-serif text-base font-bold text-ink-900 dark:text-ink-100">
+                <p className="font-serif text-base font-bold text-ink-900 dark:text-ink-100 whitespace-pre-line">
                   {sections.chapterSummary.coreKnowledge}
                 </p>
               </div>
-              <p className="text-sm text-ink-700 dark:text-ink-300 leading-relaxed">
+              <p className="text-sm text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
                 {sections.chapterSummary.conclusions}
               </p>
               {sections.chapterSummary.futureThoughts && (

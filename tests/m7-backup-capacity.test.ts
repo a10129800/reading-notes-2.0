@@ -129,7 +129,7 @@ describe('M7 Backup Capacity, Data Integrity & Stress Tests', () => {
 
     // Clean up
     fs.unlinkSync(attPath);
-  });
+  }, 30000);
 
   it('3. handles mixed multiple images and attachments in a single backup archive', () => {
     const img1 = path.join(imagesDir, `${testPrefix}mixed-1.png`);

@@ -95,6 +95,8 @@ export interface ChapterMeta {
   order: number;
   title: string;
   subtitle?: string;
+  level?: number;                     // 1: 篇/導論 (頂層), 2: 章 (子篇章), 3: 節
+  parentChapterId?: string;           // 父章節 ID，用於樹狀階層目錄
   completed?: boolean;
   readingTimeMinutes?: number;
   quotesCount?: number;

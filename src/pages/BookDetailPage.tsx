@@ -249,27 +249,42 @@ export const BookDetailPage: React.FC = () => {
               本書尚未建立任何章節。
             </div>
           ) : (
-            book.chapters.map((ch, idx) => (
-              <Link
-                key={ch.id}
-                to={`/books/${book.id}/${ch.id}`}
-                className="group flex items-center justify-between p-4 sm:p-5 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark hover:border-bronze-500 dark:hover:border-bronze-500 hover:shadow-sm transition-all"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 rounded-full bg-paper-200 dark:bg-ink-800 text-bronze-700 dark:text-bronze-400 flex items-center justify-center font-mono text-xs font-bold shrink-0">
-                    {String(idx + 1).padStart(2, '0')}
-                  </div>
-                  <div>
-                    <h3 className="font-serif text-base font-bold text-ink-900 dark:text-ink-100 group-hover:text-bronze-700 dark:group-hover:text-bronze-400 transition-colors">
-                      {ch.title}
-                    </h3>
-                    {ch.subtitle && (
-                      <p className="text-xs text-ink-500 dark:text-academic-mutedDark mt-0.5">
-                        {ch.subtitle}
-                      </p>
+            book.chapters.map((ch, idx) => {
+              const isChild = (ch.level && ch.level > 1) || Boolean(ch.parentChapterId);
+              return (
+                <Link
+                  key={ch.id}
+                  to={`/books/${book.id}/${ch.id}`}
+                  className={`group flex items-center justify-between p-4 sm:p-5 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark hover:border-bronze-500 dark:hover:border-bronze-500 hover:shadow-sm transition-all ${
+                    isChild ? 'ml-6 sm:ml-8 border-l-4 border-l-bronze-500/70' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    {isChild ? (
+                      <div className="w-8 h-8 rounded-full bg-paper-200 dark:bg-ink-800 text-bronze-600 dark:text-bronze-400 flex items-center justify-center font-mono text-sm font-bold shrink-0">
+                        └─
+                      </div>
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-paper-200 dark:bg-ink-800 text-bronze-700 dark:text-bronze-400 flex items-center justify-center font-mono text-xs font-bold shrink-0">
+                        {String(idx + 1).padStart(2, '0')}
+                      </div>
                     )}
+                    <div>
+                      <h3 className="font-serif text-base font-bold text-ink-900 dark:text-ink-100 group-hover:text-bronze-700 dark:group-hover:text-bronze-400 transition-colors flex items-center gap-2">
+                        {ch.title}
+                        {isChild && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-bronze-50 dark:bg-bronze-950/60 text-bronze-700 dark:text-bronze-300 font-sans font-normal">
+                            子篇章
+                          </span>
+                        )}
+                      </h3>
+                      {ch.subtitle && (
+                        <p className="text-xs text-ink-500 dark:text-academic-mutedDark mt-0.5">
+                          {ch.subtitle}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
                 <div className="flex items-center gap-4 shrink-0 text-xs text-ink-500 dark:text-academic-mutedDark">
                   {ch.readingTimeMinutes && (
@@ -286,7 +301,8 @@ export const BookDetailPage: React.FC = () => {
                   <ChevronRight className="w-5 h-5 text-ink-400 group-hover:text-bronze-600 group-hover:translate-x-1 transition-all" />
                 </div>
               </Link>
-            ))
+            );
+          })
           )}
         </div>
       </section>

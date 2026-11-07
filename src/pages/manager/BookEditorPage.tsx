@@ -744,10 +744,14 @@ export const BookEditorPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {book.chapters.map((ch, idx) => (
+            {book.chapters.map((ch, idx) => {
+              const isChild = (ch.level && ch.level > 1) || Boolean(ch.parentChapterId);
+              return (
               <div
                 key={ch.id}
-                className="p-4 rounded-xl bg-paper-100 dark:bg-ink-800/40 border border-academic-borderLight dark:border-academic-borderDark flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                className={`p-4 rounded-xl bg-paper-100 dark:bg-ink-800/40 border border-academic-borderLight dark:border-academic-borderDark flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                  isChild ? 'ml-6 sm:ml-8 border-l-4 border-l-bronze-500/70 bg-paper-50 dark:bg-ink-800/20' : ''
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col gap-0.5">
@@ -771,13 +775,24 @@ export const BookEditorPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="w-7 h-7 rounded-full bg-paper-200 dark:bg-ink-700 text-bronze-700 dark:text-bronze-300 font-mono text-xs font-bold flex items-center justify-center shrink-0">
-                    {idx + 1}
-                  </div>
+                  {isChild ? (
+                    <div className="w-7 h-7 rounded-full bg-paper-200 dark:bg-ink-700 text-bronze-600 dark:text-bronze-400 font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                      └─
+                    </div>
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-paper-200 dark:bg-ink-700 text-bronze-700 dark:text-bronze-300 font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                      {idx + 1}
+                    </div>
+                  )}
 
                   <div>
-                    <h3 className="font-serif text-sm font-bold text-ink-900 dark:text-ink-100">
+                    <h3 className="font-serif text-sm font-bold text-ink-900 dark:text-ink-100 flex items-center gap-2">
                       {ch.title}
+                      {isChild && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/60 text-bronze-700 dark:text-bronze-300 font-sans font-normal">
+                          子篇章
+                        </span>
+                      )}
                     </h3>
                     <p className="text-[11px] text-ink-500 font-mono">
                       ID: {ch.id} {ch.subtitle && `· ${ch.subtitle}`}
@@ -803,7 +818,8 @@ export const BookEditorPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-            ))}
+            );
+          })}
           </div>
         )}
       </div>

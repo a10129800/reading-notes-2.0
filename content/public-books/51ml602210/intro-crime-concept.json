@@ -2,7 +2,7 @@
   "id": "intro-crime-concept",
   "bookId": "51ml602210",
   "order": 2,
-  "title": "導論 第一章：犯罪的概念",
+  "title": "第一章 犯罪的概念",
   "subtitle": "不法推定罪責與雙重阻卻體系（原書 p.1-1 ~ 1-7）",
   "completed": false,
   "readingTimeMinutes": 30,
@@ -145,5 +145,7 @@
   ],
   "relatedLinks": [],
   "createdAt": "2026-11-05T10:35:21.001Z",
-  "updatedAt": "2026-11-07T10:30:01.272Z"
+  "updatedAt": "2026-11-07T10:30:01.272Z",
+  "level": 2,
+  "parentChapterId": "intro-overview"
 }

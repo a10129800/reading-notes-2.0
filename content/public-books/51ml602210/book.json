@@ -23,6 +23,7 @@
       "order": 1,
       "title": "導論：刑法導讀與體系鳥瞰",
       "subtitle": "刑法的初步鳥瞰與三階層思維建立",
+      "level": 1,
       "completed": false,
       "readingTimeMinutes": 10,
       "quotesCount": 1,
@@ -32,17 +33,19 @@
       "id": "intro-crime-concept",
       "bookId": "51ml602210",
       "order": 2,
-      "title": "導論 第一章：犯罪的概念",
-      "subtitle": "不法推定罪責與雙重阻卻體系",
+      "title": "第一章 犯罪的概念",
+      "subtitle": "不法推定罪責與雙重阻卻體系（原書 p.1-1 ~ 1-7）",
+      "level": 2,
+      "parentChapterId": "intro-overview",
       "completed": false,
       "readingTimeMinutes": 25,
       "quotesCount": 4,
-      "updatedAt": "2026-11-07T12:07:23.550Z"
+      "updatedAt": "2026-11-07T12:39:41.589Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-07T12:07:23.610Z",
+  "updatedAt": "2026-11-07T12:39:41.789Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {

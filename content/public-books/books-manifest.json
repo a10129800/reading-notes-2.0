@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "generatedAt": "2026-11-07T07:09:42.970Z",
+  "generatedAt": "2026-11-07T12:17:36.839Z",
   "siteTitle": "Reading Notes 2.0 | 個人數位閱讀與知識整理平台",
   "siteDescription": "深度閱讀、知識內化與公開分享系統 — 堅持原書結構、8 步結構化筆記、零付費依賴",
   "totalPublicBooks": 1,
@@ -35,20 +35,31 @@
       ],
       "chapters": [
         {
-          "id": "intro-crime-concept",
+          "id": "intro-overview",
           "bookId": "51ml602210",
           "order": 1,
-          "title": "導論：犯罪概念與論罪結構",
+          "title": "導論：刑法導讀與體系鳥瞰",
           "subtitle": "刑法的初步鳥瞰與三階層思維建立",
           "completed": false,
           "readingTimeMinutes": 10,
           "quotesCount": 1,
           "updatedAt": "2026-11-05T11:58:23.156Z"
+        },
+        {
+          "id": "intro-crime-concept",
+          "bookId": "51ml602210",
+          "order": 2,
+          "title": "導論 第一章：犯罪的概念",
+          "subtitle": "不法推定罪責與雙重阻卻體系",
+          "completed": false,
+          "readingTimeMinutes": 25,
+          "quotesCount": 4,
+          "updatedAt": "2026-11-07T12:07:23.550Z"
         }
       ],
       "startDate": "2026-11-05",
       "coverImage": "content/public-books/51ml602210/cover.jpg",
-      "updatedAt": "2026-11-07T07:09:32.951Z",
+      "updatedAt": "2026-11-07T12:07:23.610Z",
       "createdAt": "2026-11-05T10:27:22.287Z",
       "quotes": [
         {

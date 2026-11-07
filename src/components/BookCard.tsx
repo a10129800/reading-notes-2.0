@@ -11,6 +11,15 @@ interface BookCardProps {
 }
 
 export const BookCard: React.FC<BookCardProps> = ({ book, showStatusBadge = false }) => {
+  const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageError(false);
+  }, [book.coverImage, book.id]);
+
+  const coverUrl = resolveCoverUrl(book.coverImage, book.id);
+  const shouldShowImage = Boolean(coverUrl && !imageError);
+
   const readingStateLabels = {
     unread: { label: '未讀', class: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400' },
     reading: { label: '閱讀中', class: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' },
@@ -32,18 +41,16 @@ export const BookCard: React.FC<BookCardProps> = ({ book, showStatusBadge = fals
           to={`/books/${book.id}`}
           className="relative w-full sm:w-44 h-56 sm:h-auto shrink-0 bg-paper-200 dark:bg-ink-800 overflow-hidden flex items-center justify-center"
         >
-          {book.coverImage ? (
+          {shouldShowImage ? (
             <img
-              src={resolveCoverUrl(book.coverImage, book.id)}
+              src={coverUrl}
               alt={book.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
+              onError={() => setImageError(true)}
             />
           ) : (
-            <div className="p-4 text-center">
+            <div className="p-4 text-center flex flex-col items-center justify-center w-full h-full">
               <BookOpen className="w-10 h-10 text-bronze-600 dark:text-bronze-400 mx-auto mb-2 opacity-60" />
               <span className="font-serif text-xs font-bold text-ink-600 dark:text-ink-300 line-clamp-2">
                 {book.title}

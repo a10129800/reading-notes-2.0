@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Book, DashboardStats, BookStatus } from '../../types';
 import { localApiService } from '../../services/localApiService';
@@ -21,6 +21,53 @@ import {
   CheckCircle2,
   FileText
 } from 'lucide-react';
+
+/**
+ * Library-style Book Cover Thumbnail for Manager Dashboard
+ * Fixed 3:4 aspect ratio, rounded corners, subtle shadow, and graceful fallback
+ */
+const ManagerBookCover: React.FC<{ book: Book }> = ({ book }) => {
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [book.coverImage, book.id]);
+
+  const coverUrl = useMemo(() => {
+    if (!book.coverImage) return '';
+    if (book.coverImage.startsWith('http://') || book.coverImage.startsWith('https://')) {
+      return book.coverImage;
+    }
+    return localApiService.getBookCoverApiUrl(book.id);
+  }, [book.coverImage, book.id]);
+
+  const hasImage = Boolean(coverUrl && !imageError);
+
+  return (
+    <Link
+      to={`/manager/books/${book.id}`}
+      className="group/cover relative w-16 sm:w-[72px] aspect-[3/4] shrink-0 rounded-lg overflow-hidden border border-academic-borderLight dark:border-academic-borderDark bg-paper-200 dark:bg-ink-900 shadow-xs flex items-center justify-center transition-transform hover:scale-105"
+      title={`點擊編輯《${book.title}》`}
+    >
+      {hasImage ? (
+        <img
+          src={coverUrl}
+          alt={book.title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <div className="p-1.5 text-center flex flex-col items-center justify-center w-full h-full bg-paper-100 dark:bg-ink-800/80">
+          <BookOpen className="w-5 h-5 text-bronze-600 dark:text-bronze-400 opacity-60 mb-0.5 group-hover/cover:scale-110 transition-transform" />
+          <span className="text-[9px] font-serif font-bold text-ink-500 dark:text-ink-400 line-clamp-2 leading-tight px-0.5">
+            {book.title}
+          </span>
+        </div>
+      )}
+    </Link>
+  );
+};
 
 export const ManagerDashboardPage: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -252,32 +299,45 @@ export const ManagerDashboardPage: React.FC = () => {
             return (
               <div
                 key={book.id}
-                className="p-5 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                className="p-4 sm:p-5 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all"
               >
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-mono border font-semibold ${statusConfig.class}`}>
-                      {statusConfig.label}
-                    </span>
-                    <span className="text-xs text-ink-400 font-mono">
-                      ID: {book.id}
-                    </span>
-                    <span className="text-xs px-2 py-0.5 rounded bg-paper-200 dark:bg-ink-800 text-ink-600 dark:text-ink-300">
-                      {book.category}
-                    </span>
+                <div className="flex items-start gap-4 flex-1 min-w-0 w-full md:w-auto">
+                  {/* Library-style Book Cover Thumbnail */}
+                  <ManagerBookCover book={book} />
+
+                  {/* Book Details */}
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded text-[11px] font-mono border font-semibold ${statusConfig.class}`}>
+                        {statusConfig.label}
+                      </span>
+                      <span className="text-xs text-ink-400 font-mono">
+                        ID: {book.id}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-paper-200 dark:bg-ink-800 text-ink-600 dark:text-ink-300">
+                        {book.category}
+                      </span>
+                    </div>
+
+                    <Link to={`/manager/books/${book.id}`}>
+                      <h3 className="font-serif text-base sm:text-lg font-bold text-ink-900 dark:text-ink-100 hover:text-bronze-600 dark:group-hover:text-bronze-400 transition-colors line-clamp-1" title={book.title}>
+                        {book.title}
+                      </h3>
+                    </Link>
+
+                    <p className="text-xs text-ink-600 dark:text-academic-mutedDark">
+                      作者：{book.author} · 章節數：{book.chapters?.length || 0} · 閱讀進度：{book.progress}%
+                    </p>
+
+                    {/* Mini Progress Bar */}
+                    <div className="max-w-xs pt-0.5">
+                      <ProgressBar progress={book.progress} size="sm" />
+                    </div>
                   </div>
-
-                  <h3 className="font-serif text-lg font-bold text-ink-900 dark:text-ink-100">
-                    {book.title}
-                  </h3>
-
-                  <p className="text-xs text-ink-600 dark:text-academic-mutedDark">
-                    作者：{book.author} · 章節數：{book.chapters?.length || 0} · 閱讀進度：{book.progress}%
-                  </p>
                 </div>
 
                 {/* Action button row */}
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <div className="flex flex-wrap items-center gap-2 shrink-0 self-end md:self-center">
                   <a
                     href={localApiService.getExportMarkdownUrl(book.id)}
                     download

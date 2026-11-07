@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs';
 
 // Helper plugin to copy content/public-books to dist on build and serve in dev
-function copyPublicContentPlugin() {
+export function copyPublicContentPlugin() {
   return {
     name: 'copy-public-content',
     configureServer(server: any) {
@@ -17,16 +17,36 @@ function copyPublicContentPlugin() {
       server.middlewares.use((req: any, res: any, next: any) => {
         if (req.url && (req.url.startsWith('/content/') || req.url.includes('/content/'))) {
           const cleanUrl = req.url.split('?')[0];
-          const relativeContentPath = cleanUrl.substring(cleanUrl.indexOf('/content/') + 1);
-          const fullPath = path.resolve(__dirname, relativeContentPath);
-          if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
-            let contentType = 'text/plain';
-            if (fullPath.endsWith('.json')) contentType = 'application/json';
-            else if (fullPath.endsWith('.jpg') || fullPath.endsWith('.jpeg')) contentType = 'image/jpeg';
-            else if (fullPath.endsWith('.png')) contentType = 'image/png';
-            else if (fullPath.endsWith('.webp')) contentType = 'image/webp';
-            res.setHeader('Content-Type', contentType);
-            return fs.createReadStream(fullPath).pipe(res);
+          const contentIndex = cleanUrl.indexOf('/content/');
+          if (contentIndex !== -1) {
+            const relativeContentPath = cleanUrl.substring(contentIndex + 1);
+            const publicContentRoot = path.resolve(__dirname, 'content');
+            const fullPath = path.resolve(__dirname, relativeContentPath);
+
+            // Path traversal prevention: enforce resolution within content root
+            if (!fullPath.startsWith(publicContentRoot + path.sep) && fullPath !== publicContentRoot) {
+              res.statusCode = 403;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(JSON.stringify({ error: 'Access denied' }));
+              return;
+            }
+
+            if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+              let contentType = 'text/plain; charset=utf-8';
+              if (fullPath.endsWith('.json')) contentType = 'application/json; charset=utf-8';
+              else if (fullPath.endsWith('.jpg') || fullPath.endsWith('.jpeg')) contentType = 'image/jpeg';
+              else if (fullPath.endsWith('.png')) contentType = 'image/png';
+              else if (fullPath.endsWith('.webp')) contentType = 'image/webp';
+              else if (fullPath.endsWith('.svg')) contentType = 'image/svg+xml';
+              res.setHeader('Content-Type', contentType);
+              return fs.createReadStream(fullPath).pipe(res);
+            }
+
+            // Definite 404 for missing static content assets, prevent falling through to SPA HTML
+            res.statusCode = 404;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.end(JSON.stringify({ error: 'Asset not found', path: cleanUrl }));
+            return;
           }
         }
         next();

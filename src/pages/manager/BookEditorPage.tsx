@@ -49,6 +49,12 @@ export const BookEditorPage: React.FC = () => {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [coverError, setCoverError] = useState<string | null>(null);
   const [coverSuccess, setCoverSuccess] = useState<string | null>(null);
+  const [coverLoadError, setCoverLoadError] = useState(false);
+
+  // Reset image load error on source updates
+  useEffect(() => {
+    setCoverLoadError(false);
+  }, [book?.coverImage, book?.id, coverTimestamp, selectedFilePreview]);
 
   // Sync initial cover mode based on existing cover
   useEffect(() => {
@@ -457,7 +463,7 @@ export const BookEditorPage: React.FC = () => {
                     alt="選取的封面預覽"
                     className="w-full h-full object-cover"
                   />
-                ) : book.coverImage ? (
+                ) : book.coverImage && !coverLoadError ? (
                   <img
                     src={
                       book.coverImage.startsWith('http://') || book.coverImage.startsWith('https://')
@@ -466,12 +472,10 @@ export const BookEditorPage: React.FC = () => {
                     }
                     alt={book.title}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
-                    }}
+                    onError={() => setCoverLoadError(true)}
                   />
                 ) : (
-                  <div className="p-2 text-center text-ink-400 dark:text-ink-500">
+                  <div className="p-2 text-center text-ink-400 dark:text-ink-500 flex flex-col items-center justify-center w-full h-full">
                     <BookOpen className="w-8 h-8 mx-auto mb-1 opacity-50 text-bronze-600 dark:text-bronze-400" />
                     <span className="text-[11px] block font-serif">預設封面</span>
                   </div>

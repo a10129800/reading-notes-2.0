@@ -178,7 +178,7 @@ test.describe('Reading Notes 2.0 - End-to-End Browser Acceptance Suite', () => {
     await page.waitForTimeout(800);
 
     // Verify book appears on dashboard
-    await expect(page.locator('text=E2E 自動化測試專用書籍')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'E2E 自動化測試專用書籍' })).toBeVisible();
 
     // Navigate to edit book
     const editBookLink = page.locator('a[href="#/manager/books/e2e-book-test"]').first();

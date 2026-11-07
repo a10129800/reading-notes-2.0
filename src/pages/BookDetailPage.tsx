@@ -24,6 +24,11 @@ export const BookDetailPage: React.FC = () => {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [bookId, book?.coverImage]);
 
   useEffect(() => {
     if (!bookId) return;
@@ -101,16 +106,17 @@ export const BookDetailPage: React.FC = () => {
       <section className="bg-paper-50 dark:bg-academic-cardDark p-6 sm:p-8 rounded-2xl border border-academic-borderLight dark:border-academic-borderDark shadow-sm flex flex-col md:flex-row gap-8">
         {/* Cover */}
         <div className="w-full sm:w-56 shrink-0 bg-paper-200 dark:bg-ink-800 rounded-lg overflow-hidden shadow-md flex items-center justify-center">
-          {book.coverImage ? (
+          {book.coverImage && !imageError ? (
             <img
               src={resolveCoverUrl(book.coverImage, book.id)}
               alt={book.title}
               className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
             />
           ) : (
-            <div className="p-8 text-center">
+            <div className="p-8 text-center flex flex-col items-center justify-center w-full h-full">
               <BookOpen className="w-12 h-12 text-bronze-600 mx-auto mb-2 opacity-60" />
-              <span className="font-serif text-sm font-bold text-ink-600 line-clamp-3">
+              <span className="font-serif text-sm font-bold text-ink-600 dark:text-ink-300 line-clamp-3">
                 {book.title}
               </span>
             </div>

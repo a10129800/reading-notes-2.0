@@ -265,12 +265,16 @@ export const BookDetailPage: React.FC = () => {
                         └─
                       </div>
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-paper-200 dark:bg-ink-800 text-bronze-700 dark:text-bronze-400 flex items-center justify-center font-mono text-xs font-bold shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-bronze-100 dark:bg-bronze-950/80 text-bronze-800 dark:text-bronze-300 flex items-center justify-center font-mono text-xs font-bold shrink-0">
                         {String(idx + 1).padStart(2, '0')}
                       </div>
                     )}
                     <div>
-                      <h3 className="font-serif text-base font-bold text-ink-900 dark:text-ink-100 group-hover:text-bronze-700 dark:group-hover:text-bronze-400 transition-colors flex items-center gap-2">
+                      <h3 className={`font-serif font-bold transition-colors flex items-center gap-2 ${
+                        isChild
+                          ? 'text-sm text-ink-800 dark:text-ink-200 group-hover:text-bronze-700'
+                          : 'text-lg text-ink-950 dark:text-ink-50 group-hover:text-bronze-700'
+                      }`}>
                         {ch.title}
                         {isChild && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-bronze-50 dark:bg-bronze-950/60 text-bronze-700 dark:text-bronze-300 font-sans font-normal">

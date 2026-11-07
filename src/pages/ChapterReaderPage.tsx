@@ -179,7 +179,7 @@ export const ChapterReaderPage: React.FC = () => {
               </span>
             </div>
 
-            <nav className="space-y-1">
+            <nav className="space-y-1.5">
               {book.chapters?.map((ch, idx) => {
                 const isActive = ch.id === chapter.id;
                 const isChild = (ch.level && ch.level > 1) || Boolean(ch.parentChapterId);
@@ -187,14 +187,16 @@ export const ChapterReaderPage: React.FC = () => {
                   <Link
                     key={ch.id}
                     to={`/books/${book.id}/${ch.id}`}
-                    className={`block px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    className={`block px-3 py-2 rounded-lg transition-all ${
                       isChild
-                        ? 'ml-4 pl-3.5 border-l-2 border-academic-borderLight dark:border-academic-borderDark'
-                        : ''
+                        ? 'ml-4 pl-3.5 border-l-2 border-academic-borderLight dark:border-academic-borderDark text-xs font-medium'
+                        : 'mt-2.5 first:mt-0 text-sm font-bold font-serif'
                     } ${
                       isActive
                         ? 'bg-bronze-50 dark:bg-bronze-950/60 text-bronze-800 dark:text-bronze-300 border-l-2 border-bronze-600 font-semibold shadow-xs'
-                        : 'text-ink-600 dark:text-ink-400 hover:bg-paper-200 dark:hover:bg-ink-800'
+                        : isChild
+                          ? 'text-ink-600 dark:text-ink-400 hover:bg-paper-200 dark:hover:bg-ink-800'
+                          : 'text-ink-950 dark:text-ink-100 hover:bg-paper-200 dark:hover:bg-ink-800'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -203,11 +205,13 @@ export const ChapterReaderPage: React.FC = () => {
                           └─
                         </span>
                       ) : (
-                        <span className="font-mono text-[10px] text-ink-400 shrink-0">
+                        <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-bronze-100/80 dark:bg-bronze-950/80 text-bronze-800 dark:text-bronze-300 shrink-0">
                           {String(idx + 1).padStart(2, '0')}
                         </span>
                       )}
-                      <span className="truncate">{ch.title}</span>
+                      <span className={`truncate ${isChild ? 'text-xs font-medium' : 'text-sm font-bold'}`}>
+                        {ch.title}
+                      </span>
                     </div>
                   </Link>
                 );

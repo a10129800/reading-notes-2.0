@@ -260,24 +260,37 @@ export const ChapterReaderPage: React.FC = () => {
                 {sections.introduction.overview}
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-academic-borderLight dark:border-academic-borderDark text-xs">
-                <div>
-                  <h4 className="font-bold text-ink-900 dark:text-ink-100 mb-1.5 flex items-center gap-1">
-                    🎯 學習目標
-                  </h4>
-                  <ul className="space-y-1 text-ink-600 dark:text-academic-mutedDark">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark text-xs">
+                {/* 🎯 學習目標 Card */}
+                <div className="p-4 rounded-xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 shadow-xs space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md font-bold text-xs bg-amber-500 text-white shadow-xs">
+                      🎯 學習目標
+                    </span>
+                  </div>
+                  <ul className="space-y-1.5 text-amber-950 dark:text-amber-100 font-medium">
                     {sections.introduction.learningGoals.map((g, i) => (
-                      <li key={i}>• {g}</li>
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0 mt-0.5">•</span>
+                        <span className="leading-relaxed">{g}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>
-                <div>
-                  <h4 className="font-bold text-ink-900 dark:text-ink-100 mb-1.5 flex items-center gap-1">
-                    ❓ 核心探討問題
-                  </h4>
-                  <ul className="space-y-1 text-ink-600 dark:text-academic-mutedDark">
+
+                {/* ❓ 核心探討問題 Card */}
+                <div className="p-4 rounded-xl bg-blue-50/90 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-700/60 shadow-xs space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md font-bold text-xs bg-blue-600 text-white shadow-xs">
+                      ❓ 核心探討問題
+                    </span>
+                  </div>
+                  <ul className="space-y-1.5 text-blue-950 dark:text-blue-100 font-medium">
                     {sections.introduction.coreQuestions.map((q, i) => (
-                      <li key={i}>• {q}</li>
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0 mt-0.5">•</span>
+                        <span className="leading-relaxed">{q}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>

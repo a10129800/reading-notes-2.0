@@ -350,7 +350,7 @@ export const ChapterReaderPage: React.FC = () => {
                 <h4 className="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">
                   正式學術 / 產業定義
                 </h4>
-                <p className="text-ink-900 dark:text-ink-100 font-serif font-semibold">
+                <p className="text-ink-900 dark:text-ink-100 font-serif font-semibold leading-relaxed whitespace-pre-line">
                   {sections.professionalKnowledge.definitions}
                 </p>
               </div>

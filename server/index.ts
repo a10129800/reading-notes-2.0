@@ -18,10 +18,12 @@ import {
   saveBookCover,
   getBookCoverPath,
   deleteBookCover,
+  getPublishHistory,
+  getPublishRecordById,
   PRIVATE_DATA_DIR,
   PUBLIC_CONTENT_DIR,
 } from './storage';
-import { executePublishPipeline, fetchDeploymentStatus } from './gitPublisher';
+import { executePublishPipeline, fetchDeploymentStatus, getActivePublishTask } from './gitPublisher';
 import { formatChapterToMarkdown } from '../src/utils/template';
 
 const app = express();
@@ -290,11 +292,57 @@ app.post('/api/publish', (_req: Request, res: Response) => {
   }
 });
 
+// Get current active publishing task (for real-time progress & resilient reconnection)
+app.get('/api/publish/current', (_req: Request, res: Response) => {
+  const current = getActivePublishTask();
+  res.json({
+    inProgress: !!current,
+    task: current,
+  });
+});
+
+// Get publication history (Strictly local private records)
+app.get('/api/publish/history', (_req: Request, res: Response) => {
+  try {
+    const history = getPublishHistory();
+    res.json(history);
+  } catch (err: any) {
+    res.status(500).json({ error: sanitizeErrorMessage(err.message) });
+  }
+});
+
+// Get specific publish task status (live in-flight or historical record by taskId)
+app.get('/api/publish/tasks/:taskId', (req: Request, res: Response) => {
+  const taskId = req.params.taskId as string;
+  const current = getActivePublishTask();
+  if (current && current.taskId === taskId) {
+    res.json({ found: true, isLive: true, task: current });
+    return;
+  }
+  const record = getPublishRecordById(taskId);
+  if (record) {
+    res.json({ found: true, isLive: false, record });
+    return;
+  }
+  res.status(404).json({ found: false, error: 'Task not found' });
+});
+
 // Trigger complete end-to-end publish pipeline (Local Sync + Security + Build + Git Stage + Commit + Push + Deployment)
 app.post('/api/publish/pipeline', async (req: Request, res: Response) => {
+  const activeTask = getActivePublishTask();
+  if (activeTask) {
+    res.status(409).json({
+      success: false,
+      error: '發布任務正在執行中，請等待當前任務完成。',
+      task: activeTask,
+    });
+    return;
+  }
+
   try {
     const commitAndPush = req.body?.commitAndPush !== false;
-    const result = await executePublishPipeline({ commitAndPush });
+    const taskId = typeof req.body?.taskId === 'string' ? req.body.taskId : undefined;
+    const result = await executePublishPipeline({ commitAndPush, taskId });
     res.json(result);
   } catch (err: any) {
     res.status(500).json({
@@ -304,10 +352,11 @@ app.post('/api/publish/pipeline', async (req: Request, res: Response) => {
   }
 });
 
-// Query live GitHub Actions deployment status
-app.get('/api/publish/deployment-status', async (_req: Request, res: Response) => {
+// Query live GitHub Actions deployment status (with optional target commit hash filter)
+app.get('/api/publish/deployment-status', async (req: Request, res: Response) => {
   try {
-    const status = await fetchDeploymentStatus();
+    const targetCommit = typeof req.query.commit === 'string' ? req.query.commit : undefined;
+    const status = await fetchDeploymentStatus(targetCommit);
     res.json(status);
   } catch (err: any) {
     res.status(500).json({ error: sanitizeErrorMessage(err.message) });

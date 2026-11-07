@@ -175,12 +175,13 @@ export interface DashboardStats {
 export interface PublishPipelineStage {
   id: string;
   name: string;
-  status: 'pending' | 'in_progress' | 'success' | 'failed' | 'skipped';
+  status: 'pending' | 'in_progress' | 'success' | 'failed' | 'skipped' | 'waiting';
   message?: string;
   details?: any;
 }
 
 export interface PublishPipelineResult {
+  taskId?: string;
   success: boolean;
   timestamp: string;
   stages: Record<string, PublishPipelineStage>;
@@ -190,8 +191,10 @@ export interface PublishPipelineResult {
     removedCount: number;
     commitHash?: string;
     pushed: boolean;
+    hasContentChanges?: boolean;
     actionsUrl?: string;
     pagesUrl: string;
+    failedStep?: string;
   };
   error?: string;
 }
@@ -203,5 +206,29 @@ export interface DeploymentStatus {
   commitHash?: string;
   htmlUrl?: string;
   updatedAt?: string;
+  failedStep?: string;
+  pagesStatus?: 'pending' | 'in_progress' | 'success' | 'failed' | 'unknown';
+  pagesDeploymentId?: number;
+  pagesDeploymentSha?: string;
+  isMatchSha?: boolean;
+}
+
+export interface PublishRecord {
+  taskId: string;
+  startedAt: string;
+  completedAt?: string;
+  status: 'running' | 'success' | 'failed' | 'skipped';
+  commitHash?: string;
+  pushed: boolean;
+  hasContentChanges: boolean;
+  actionsRunId?: number;
+  actionsConclusion?: 'success' | 'failure' | 'cancelled';
+  failedStep?: string;
+  pagesDeploymentId?: number;
+  pagesDeploymentSha?: string;
+  pagesStatus?: 'success' | 'in_progress' | 'failed' | 'unknown';
+  error?: string;
+  publishedBooks: string[];
+  stages: Record<string, PublishPipelineStage>;
 }
 

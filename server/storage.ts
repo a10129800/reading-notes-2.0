@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Book, ChapterDetail, PublicBooksManifest, BookStatus } from '../src/types';
+import { Book, ChapterDetail, PublicBooksManifest, BookStatus, PublishRecord } from '../src/types';
 import { createDefaultChapterSections, formatChapterToMarkdown } from '../src/utils/template';
 
 // Sibling directory outside public Git repository
@@ -536,9 +536,26 @@ export function publishWhitelistedBooks(): {
   const categories = Array.from(new Set(publishedBooksForManifest.map(b => b.category)));
   const allTags = Array.from(new Set(publishedBooksForManifest.flatMap(b => b.tags || [])));
 
+  const manifestPath = path.join(publicDir, 'books-manifest.json');
+  let manifestGeneratedAt = new Date().toISOString();
+
+  // Smart check: preserve existing generatedAt if manifest content (excluding timestamp) has zero changes
+  if (fs.existsSync(manifestPath) && removedCount === 0) {
+    try {
+      const existingManifest: PublicBooksManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+      const isSameCount = existingManifest.totalPublicBooks === publishedBooksForManifest.length;
+      const isSameBooks = JSON.stringify(existingManifest.books) === JSON.stringify(publishedBooksForManifest);
+      const isSameCategories = JSON.stringify(existingManifest.categories) === JSON.stringify(categories);
+      const isSameTags = JSON.stringify(existingManifest.tags) === JSON.stringify(allTags);
+      if (isSameCount && isSameBooks && isSameCategories && isSameTags && existingManifest.generatedAt) {
+        manifestGeneratedAt = existingManifest.generatedAt;
+      }
+    } catch {}
+  }
+
   const manifest: PublicBooksManifest = {
     version: '2.0.0',
-    generatedAt: new Date().toISOString(),
+    generatedAt: manifestGeneratedAt,
     siteTitle: 'Reading Notes 2.0 | 個人數位閱讀與知識整理平台',
     siteDescription: '深度閱讀、知識內化與公開分享系統 — 堅持原書結構、8 步結構化筆記、零付費依賴',
     totalPublicBooks: publishedBooksForManifest.length,
@@ -784,4 +801,58 @@ export function restoreBackup(filename: string): {
   }
 
   return { restoredBooks, restoredChapters, restoredImages, restoredAttachments, restoredCovers };
+}
+
+/**
+ * Publish History Persistence (Strictly stored in private data directory)
+ */
+const MAX_PUBLISH_HISTORY = 20;
+
+export function getPublishHistory(): PublishRecord[] {
+  initPrivateStorage();
+  const historyPath = path.join(getPrivateDataDir(), 'publish-history.json');
+  if (!fs.existsSync(historyPath)) return [];
+  try {
+    const raw = fs.readFileSync(historyPath, 'utf-8');
+    const list: PublishRecord[] = JSON.parse(raw);
+    if (!Array.isArray(list)) return [];
+    return list.sort((a, b) => (b.startedAt || '').localeCompare(a.startedAt || '')).slice(0, MAX_PUBLISH_HISTORY);
+  } catch (err) {
+    console.warn('[Storage] Failed to read publish-history.json:', err);
+    return [];
+  }
+}
+
+export function savePublishRecord(record: PublishRecord): void {
+  initPrivateStorage();
+  const historyPath = path.join(getPrivateDataDir(), 'publish-history.json');
+  const tempPath = path.join(getPrivateDataDir(), `.publish-history.tmp.${Date.now()}`);
+  try {
+    const current = getPublishHistory();
+    const existingIndex = current.findIndex(r => r.taskId === record.taskId);
+    if (existingIndex >= 0) {
+      current[existingIndex] = { ...current[existingIndex], ...record };
+    } else {
+      current.unshift(record);
+    }
+    const trimmed = current.slice(0, MAX_PUBLISH_HISTORY);
+    fs.writeFileSync(tempPath, JSON.stringify(trimmed, null, 2), 'utf-8');
+    fs.renameSync(tempPath, historyPath);
+  } catch (err) {
+    if (fs.existsSync(tempPath)) {
+      try { fs.unlinkSync(tempPath); } catch {}
+    }
+    console.warn('[Storage] Failed to save publish record:', err);
+  }
+}
+
+export function getLatestPublishRecord(): PublishRecord | null {
+  const history = getPublishHistory();
+  return history.length > 0 ? history[0] : null;
+}
+
+export function getPublishRecordById(taskId: string): PublishRecord | null {
+  if (!taskId) return null;
+  const history = getPublishHistory();
+  return history.find(r => r.taskId === taskId) || null;
 }

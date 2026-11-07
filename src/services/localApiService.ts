@@ -1,4 +1,4 @@
-import { Book, ChapterDetail, DashboardStats, PublishPipelineResult, DeploymentStatus } from '../types';
+import { Book, ChapterDetail, DashboardStats, PublishPipelineResult, DeploymentStatus, PublishRecord } from '../types';
 
 class LocalApiService {
   private baseUrl = '/api';
@@ -114,11 +114,11 @@ class LocalApiService {
     return res.json();
   }
 
-  async publishPipeline(commitAndPush = true): Promise<PublishPipelineResult> {
+  async publishPipeline(commitAndPush = true, taskId?: string): Promise<PublishPipelineResult> {
     const res = await fetch(`${this.baseUrl}/publish/pipeline`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ commitAndPush }),
+      body: JSON.stringify({ commitAndPush, taskId }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -127,8 +127,32 @@ class LocalApiService {
     return res.json();
   }
 
-  async getDeploymentStatus(): Promise<DeploymentStatus> {
-    const res = await fetch(`${this.baseUrl}/publish/deployment-status`);
+  async getCurrentPublishTask(): Promise<{ inProgress: boolean; task: PublishPipelineResult | null }> {
+    const res = await fetch(`${this.baseUrl}/publish/current`);
+    if (!res.ok) throw new Error('Failed to get current publish task');
+    return res.json();
+  }
+
+  async getPublishTask(taskId: string): Promise<{ found: boolean; isLive: boolean; task?: PublishPipelineResult; record?: PublishRecord }> {
+    const res = await fetch(`${this.baseUrl}/publish/tasks/${encodeURIComponent(taskId)}`);
+    if (!res.ok) {
+      if (res.status === 404) return { found: false, isLive: false };
+      throw new Error('Failed to fetch publish task');
+    }
+    return res.json();
+  }
+
+  async getPublishHistory(): Promise<PublishRecord[]> {
+    const res = await fetch(`${this.baseUrl}/publish/history`);
+    if (!res.ok) throw new Error('Failed to get publish history');
+    return res.json();
+  }
+
+  async getDeploymentStatus(targetCommit?: string): Promise<DeploymentStatus> {
+    const url = targetCommit
+      ? `${this.baseUrl}/publish/deployment-status?commit=${encodeURIComponent(targetCommit)}`
+      : `${this.baseUrl}/publish/deployment-status`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to fetch deployment status');
     return res.json();
   }

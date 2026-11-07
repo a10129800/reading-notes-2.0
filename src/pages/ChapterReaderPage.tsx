@@ -347,12 +347,23 @@ export const ChapterReaderPage: React.FC = () => {
             </div>
             <div className="p-5 rounded-xl bg-paper-100 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark space-y-4">
               <div>
-                <h4 className="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">
+                <h4 className="text-xs font-bold text-ink-500 uppercase tracking-wider mb-3">
                   正式學術 / 產業定義
                 </h4>
-                <p className="text-ink-900 dark:text-ink-100 font-serif font-semibold leading-relaxed whitespace-pre-line">
-                  {sections.professionalKnowledge.definitions}
-                </p>
+                <div className="space-y-4">
+                  {sections.professionalKnowledge.definitions
+                    .split(/\n+/)
+                    .map(item => item.trim())
+                    .filter(Boolean)
+                    .map((def, idx) => (
+                      <p
+                        key={idx}
+                        className="text-ink-900 dark:text-ink-100 font-serif font-medium leading-relaxed"
+                      >
+                        {def}
+                      </p>
+                    ))}
+                </div>
               </div>
 
               <div>

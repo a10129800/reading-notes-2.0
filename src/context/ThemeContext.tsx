@@ -33,6 +33,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('rn_theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-font-size', fontSize);
+  }, [fontSize]);
+
   const setFontSize = (size: 'normal' | 'large' | 'xlarge') => {
     setFontSizeState(size);
     localStorage.setItem('rn_fontsize', size);

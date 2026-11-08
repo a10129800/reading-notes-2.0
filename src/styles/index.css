@@ -67,3 +67,89 @@
   }
 }
 
+/* ==========================================================================
+   Reader Font Scaling System (標 normal / 大 large / 特大 xlarge)
+   ========================================================================== */
+.font-scale-large {
+  font-size: 1.125rem;
+}
+.font-scale-large .text-\[10px\] {
+  font-size: 12px !important;
+  line-height: 1.25rem !important;
+}
+.font-scale-large .text-\[11px\] {
+  font-size: 13.5px !important;
+  line-height: 1.35rem !important;
+}
+.font-scale-large .text-xs {
+  font-size: 0.95rem !important;
+  line-height: 1.625rem !important;
+}
+.font-scale-large .text-sm {
+  font-size: 1.1rem !important;
+  line-height: 1.75rem !important;
+}
+.font-scale-large .text-base {
+  font-size: 1.25rem !important;
+  line-height: 1.875rem !important;
+}
+.font-scale-large .text-lg {
+  font-size: 1.375rem !important;
+  line-height: 2rem !important;
+}
+.font-scale-large .text-xl {
+  font-size: 1.55rem !important;
+  line-height: 2.125rem !important;
+}
+.font-scale-large .text-2xl {
+  font-size: 1.85rem !important;
+  line-height: 2.375rem !important;
+}
+.font-scale-large .case-index-badge {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  font-size: 11px !important;
+}
+
+.font-scale-xlarge {
+  font-size: 1.25rem;
+}
+.font-scale-xlarge .text-\[10px\] {
+  font-size: 13.5px !important;
+  line-height: 1.35rem !important;
+}
+.font-scale-xlarge .text-\[11px\] {
+  font-size: 15px !important;
+  line-height: 1.5rem !important;
+}
+.font-scale-xlarge .text-xs {
+  font-size: 1.125rem !important;
+  line-height: 1.8rem !important;
+}
+.font-scale-xlarge .text-sm {
+  font-size: 1.25rem !important;
+  line-height: 1.95rem !important;
+}
+.font-scale-xlarge .text-base {
+  font-size: 1.4rem !important;
+  line-height: 2.15rem !important;
+}
+.font-scale-xlarge .text-lg {
+  font-size: 1.55rem !important;
+  line-height: 2.25rem !important;
+}
+.font-scale-xlarge .text-xl {
+  font-size: 1.8rem !important;
+  line-height: 2.45rem !important;
+}
+.font-scale-xlarge .text-2xl {
+  font-size: 2.15rem !important;
+  line-height: 2.75rem !important;
+}
+.font-scale-xlarge .case-index-badge {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  font-size: 13px !important;
+}
+
+

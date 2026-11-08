@@ -222,7 +222,7 @@ export const ChapterReaderPage: React.FC = () => {
         </aside>
 
         {/* Center Column: 8-Section Article (6 cols) */}
-        <main className={`lg:col-span-6 space-y-10 ${fontClass}`}>
+        <main className={`lg:col-span-6 space-y-10 font-scale-${fontSize} ${fontClass}`}>
           {/* Chapter Main Header */}
           <div className="border-b border-academic-borderLight dark:border-academic-borderDark pb-6">
             <div className="flex items-center gap-2 text-xs font-mono text-bronze-700 dark:text-bronze-400 font-semibold uppercase mb-2">
@@ -476,7 +476,7 @@ export const ChapterReaderPage: React.FC = () => {
                       >
                         <summary className="flex items-center justify-between p-3.5 cursor-pointer list-none select-none hover:bg-sky-50/80 dark:hover:bg-sky-900/40 transition-colors">
                           <div className="flex items-start gap-2.5 flex-1 pr-2">
-                            <span className="w-5 h-5 rounded-full bg-academic-navy text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="case-index-badge w-5 h-5 rounded-full bg-academic-navy text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                               {idx + 1}
                             </span>
                             <div>
@@ -740,7 +740,7 @@ export const ChapterReaderPage: React.FC = () => {
 
           {/* Chapter Quotes */}
           {chapter.quotes && chapter.quotes.length > 0 && (
-            <div className="bg-paper-50 dark:bg-academic-cardDark p-4 rounded-xl border border-academic-borderLight dark:border-academic-borderDark space-y-3">
+            <div className={`bg-paper-50 dark:bg-academic-cardDark p-4 rounded-xl border border-academic-borderLight dark:border-academic-borderDark space-y-3 font-scale-${fontSize}`}>
               <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
                 <Quote className="w-3.5 h-3.5" />
                 本章金句 ({chapter.quotes.length})

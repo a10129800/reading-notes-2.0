@@ -58,6 +58,19 @@
           "readingTimeMinutes": 25,
           "quotesCount": 4,
           "updatedAt": "2026-11-07T12:39:41.589Z"
+        },
+        {
+          "id": "intro-crime-structure",
+          "bookId": "51ml602210",
+          "order": 3,
+          "title": "第二章 刑法的論罪結構",
+          "subtitle": "基本論罪流程、故意既遂原則與處罰例外（原書 p.1-13 ~ 1-16）",
+          "level": 2,
+          "parentChapterId": "intro-overview",
+          "completed": false,
+          "readingTimeMinutes": 20,
+          "quotesCount": 4,
+          "updatedAt": "2026-11-08T06:10:00.000Z"
         }
       ],
       "startDate": "2026-11-05",

@@ -462,7 +462,7 @@ export const ChapterReaderPage: React.FC = () => {
                       原書案例 (原作者論述)
                     </span>
                     <span className="text-[11px] text-sky-800 dark:text-sky-300 font-medium">
-                      共 17 個案例・點開各折頁可查閱完整案例詳情
+                      共 {sections.caseAnalysis.caseItems?.length || 0} 個案例・點開各折頁可查閱完整案例詳情
                     </span>
                   </div>
                 </div>

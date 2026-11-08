@@ -6,6 +6,7 @@ import { Book, ChapterDetail, ChapterMeta } from '../types';
 import { publicDataService } from '../services/publicDataService';
 import { useTheme } from '../context/ThemeContext';
 import { FontSizeControl } from '../components/FontSizeControl';
+import { LegalMascotWidget } from '../components/LegalMascotWidget';
 import {
   ArrowLeft,
   ArrowRight,
@@ -40,6 +41,8 @@ export const ChapterReaderPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
+  const [isDictOpen, setIsDictOpen] = useState(false);
+  const [activeLawId, setActiveLawId] = useState<string | null>(null);
 
   // Load book & chapter data
   useEffect(() => {
@@ -114,6 +117,86 @@ export const ChapterReaderPage: React.FC = () => {
   }
 
   const sections = chapter.sections;
+
+  // 開啟浮動法律小辭典並跳轉指定條號
+  const handleOpenLawDict = (lawNumberOrQuery?: string) => {
+    if (lawNumberOrQuery && sections?.professionalKnowledge?.citationItems) {
+      const numMatch = lawNumberOrQuery.match(/\d+/);
+      const targetNum = numMatch ? numMatch[0] : '';
+      const items = sections.professionalKnowledge.citationItems;
+
+      const found = items.find((it) => {
+        if (targetNum) {
+          const reg = new RegExp(`第\\s*${targetNum}\\s*條`);
+          if (reg.test(it.lawName)) return true;
+          if (it.id.endsWith(`-${targetNum}`) || it.id.includes(`-${targetNum}-`)) return true;
+        }
+        return (
+          it.id === lawNumberOrQuery ||
+          it.lawName.includes(lawNumberOrQuery) ||
+          (it.articleTitle && it.articleTitle.includes(lawNumberOrQuery))
+        );
+      });
+
+      if (found) {
+        setActiveLawId(found.id);
+      }
+    }
+    setIsDictOpen(true);
+  };
+
+  // 解析表格文字中法條編號（例如 §15、§13、§25 等），轉換為可點擊彈出小辭典的互動按鈕
+  const renderTextWithLawBadges = (content: React.ReactNode): React.ReactNode => {
+    if (typeof content === 'string') {
+      const regex = /(§\s*\d+(?:\s*(?:I{1,3}|IV|V|但))?)/g;
+      const parts = content.split(regex);
+      if (parts.length <= 1) return content;
+
+      return parts.map((part, index) => {
+        const match = part.match(/^§\s*(\d+)(\s*(?:I{1,3}|IV|V|但))?/);
+        if (match) {
+          const num = match[1];
+          const sub = match[2] ? match[2].trim() : '';
+          const fullDisplay = `§ ${num}${sub ? ` ${sub}` : ''}`;
+          return (
+            <button
+              key={index}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleOpenLawDict(part);
+              }}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 mx-0.5 rounded text-[11px] font-bold font-mono bg-emerald-100 hover:bg-emerald-200 text-emerald-900 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-700/80 shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer align-baseline group"
+              title={`點擊查看全國法規第 ${num} 條條文`}
+            >
+              <span>{fullDisplay}</span>
+              <BookOpen className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            </button>
+          );
+        }
+        return part;
+      });
+    }
+
+    if (Array.isArray(content)) {
+      return content.map((child, idx) => (
+        <React.Fragment key={idx}>
+          {renderTextWithLawBadges(child)}
+        </React.Fragment>
+      ));
+    }
+
+    if (React.isValidElement(content) && content.props && (content.props as any).children) {
+      return React.cloneElement(
+        content,
+        {},
+        renderTextWithLawBadges((content.props as any).children)
+      );
+    }
+
+    return content;
+  };
 
   return (
     <div className="relative">
@@ -715,8 +798,10 @@ export const ChapterReaderPage: React.FC = () => {
                         th: ({ node, ...props }) => (
                           <th className="px-2.5 py-2.5 font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-ink-800 text-slate-900 dark:text-slate-100 text-xs tracking-tight text-center break-words" {...props} />
                         ),
-                        td: ({ node, ...props }) => (
-                          <td className="px-2.5 py-2.5 border border-slate-300 dark:border-slate-700 leading-relaxed align-top text-xs text-slate-800 dark:text-slate-200 break-words" {...props} />
+                        td: ({ node, children, ...props }) => (
+                          <td className="px-2.5 py-2.5 border border-slate-300 dark:border-slate-700 leading-relaxed align-top text-xs text-slate-800 dark:text-slate-200 break-words" {...props}>
+                            {renderTextWithLawBadges(children)}
+                          </td>
                         ),
                         strong: ({ node, ...props }) => (
                           <strong className="font-bold text-slate-950 dark:text-amber-300" {...props} />
@@ -938,6 +1023,18 @@ export const ChapterReaderPage: React.FC = () => {
           </button>
         </aside>
       </div>
+
+      {/* 浮動法律動物（獬豸）與法律小辭典 */}
+      <LegalMascotWidget
+        citationItems={sections.professionalKnowledge?.citationItems || []}
+        isOpen={isDictOpen}
+        onToggle={() => setIsDictOpen(!isDictOpen)}
+        onClose={() => setIsDictOpen(false)}
+        activeLawId={activeLawId}
+        onSelectLaw={(lawIdOrQuery) => {
+          handleOpenLawDict(lawIdOrQuery);
+        }}
+      />
     </div>
   );
 };

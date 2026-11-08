@@ -397,11 +397,18 @@ export const ChapterReaderPage: React.FC = () => {
                 </div>
 
                 {/* 出處 Card */}
-                <div className="p-4 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 shadow-xs space-y-2">
+                <div className="p-4 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 shadow-xs space-y-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="px-2 py-0.5 rounded-md font-bold text-xs bg-emerald-600 text-white shadow-xs">
-                      出處
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-md font-bold text-xs bg-emerald-700 text-white shadow-xs">
+                        出處 (法規文獻依據)
+                      </span>
+                      {sections.professionalKnowledge.citationItems && sections.professionalKnowledge.citationItems.length > 0 && (
+                        <span className="text-[11px] text-emerald-800 dark:text-emerald-300 font-medium">
+                          共 {sections.professionalKnowledge.citationItems.length} 部法條・點開各折頁可查閱全國法規全文
+                        </span>
+                      )}
+                    </div>
                     <a
                       href="https://law.moj.gov.tw/Index.aspx"
                       target="_blank"
@@ -413,9 +420,96 @@ export const ChapterReaderPage: React.FC = () => {
                       <span>法務部全國法規資料庫</span>
                     </a>
                   </div>
-                  <p className="text-emerald-950 dark:text-emerald-100 font-mono font-semibold leading-relaxed whitespace-pre-line">
-                    {sections.professionalKnowledge.citations}
-                  </p>
+
+                  {sections.professionalKnowledge.citationItems && sections.professionalKnowledge.citationItems.length > 0 ? (
+                    <div className="space-y-2 pt-1">
+                      {sections.professionalKnowledge.citationItems.map((item, idx) => (
+                        <details
+                          key={item.id || idx}
+                          className="group rounded-xl border border-emerald-200 dark:border-emerald-800/60 bg-white/95 dark:bg-emerald-950/40 overflow-hidden shadow-xs transition-all duration-200 hover:border-emerald-400"
+                        >
+                          <summary className="flex items-center justify-between p-3.5 cursor-pointer list-none select-none hover:bg-emerald-50/80 dark:hover:bg-emerald-900/40 transition-colors">
+                            <div className="flex items-start gap-2.5 flex-1 pr-2">
+                              <span className="citation-index-badge w-5 h-5 rounded-full bg-emerald-700 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                {idx + 1}
+                              </span>
+                              <div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h5 className="font-bold text-emerald-950 dark:text-emerald-100 text-xs">
+                                    {item.lawName}
+                                    {item.articleTitle && (
+                                      <span className="ml-1.5 font-semibold text-emerald-800 dark:text-emerald-300">
+                                        【{item.articleTitle}】
+                                      </span>
+                                    )}
+                                  </h5>
+                                  {item.page && (
+                                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-mono">
+                                      {item.page}
+                                    </span>
+                                  )}
+                                </div>
+                                {item.summary && (
+                                  <p className="text-[11px] text-emerald-900/80 dark:text-emerald-200/80 mt-0.5 font-normal">
+                                    {item.summary}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-200 group-open:hidden px-2 py-0.5 rounded bg-emerald-100/90 dark:bg-emerald-900/70">
+                                點開看條文全文 ▾
+                              </span>
+                              <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-200 hidden group-open:inline px-2 py-0.5 rounded bg-emerald-100/90 dark:bg-emerald-900/70">
+                                收合法條 ▴
+                              </span>
+                              <ChevronRight className="w-4 h-4 text-emerald-700 dark:text-emerald-400 transition-transform duration-200 group-open:rotate-90" />
+                            </div>
+                          </summary>
+
+                          {/* 完整法條折頁內容 */}
+                          <div className="px-4 pb-4 pt-2.5 border-t border-emerald-100 dark:border-emerald-900/40 bg-emerald-50/40 dark:bg-emerald-950/40 space-y-2.5 text-xs">
+                            <div className="p-3 rounded-lg bg-white dark:bg-ink-900/90 border border-emerald-200/80 dark:border-emerald-700/60 space-y-1">
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1">
+                                  📜 全國法規資料庫現行條文：
+                                </span>
+                                {item.lawUrl && (
+                                  <a
+                                    href={item.lawUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-0.5 font-normal"
+                                    title="至全國法規資料庫檢索本條"
+                                  >
+                                    線上檢索 <ExternalLink className="w-2.5 h-2.5" />
+                                  </a>
+                                )}
+                              </div>
+                              <p className="text-emerald-950 dark:text-emerald-100 font-mono leading-relaxed whitespace-pre-line pl-1 text-[11.5px]">
+                                {item.content}
+                              </p>
+                            </div>
+
+                            {item.bookNote && (
+                              <div className="p-2.5 rounded-lg bg-emerald-100/60 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50 space-y-0.5">
+                                <span className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1 text-[11px]">
+                                  💡 研讀導引與出處對應：
+                                </span>
+                                <p className="text-emerald-950 dark:text-emerald-100 font-medium leading-relaxed whitespace-pre-line pl-1">
+                                  {item.bookNote}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </details>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-emerald-950 dark:text-emerald-100 font-mono font-semibold leading-relaxed whitespace-pre-line">
+                      {sections.professionalKnowledge.citations}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

@@ -36,11 +36,23 @@ export interface SectionSummary {
 }
 
 // 03. 專業知識
+export interface CitationItem {
+  id: string;
+  lawName: string;            // 法條名稱 (例如：刑法第 12 條)
+  articleTitle?: string;      // 條文要旨 / 名稱 (例如：責任條件－故意與過失之原則與例外)
+  page?: string;              // 原書頁碼對應 (例如：p. 1-13)
+  summary?: string;           // 條文要點摘要
+  content: string;            // 全國法規資料庫現行條文全文
+  bookNote?: string;          // 本書對應法理與出處說明
+  lawUrl?: string;            // 法務部全國法規資料庫連結
+}
+
 export interface SectionProfessionalKnowledge {
   definitions: string;        // 正式定義
   terminology: string[];      // 專業術語
   theories: string;           // 理論與學說
   citations: string;          // 相關研究與重要依據（含來源出處）
+  citationItems?: CitationItem[]; // 完整法條折頁清單 (出處互動折頁)
 }
 
 // 04. 白話解釋

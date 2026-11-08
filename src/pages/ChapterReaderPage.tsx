@@ -8,6 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 import { FontSizeControl } from '../components/FontSizeControl';
 import { LegalMascotWidget } from '../components/LegalMascotWidget';
 import { LawFloatingPopover } from '../components/LawFloatingPopover';
+import { lawDatabaseService } from '../services/lawDatabaseService';
 import { CitationItem } from '../types';
 import {
   ArrowLeft,
@@ -129,65 +130,40 @@ export const ChapterReaderPage: React.FC = () => {
 
   const sections = chapter.sections;
 
-  // 開啟浮動法律小辭典並跳轉指定條號
+  // 開啟浮動法律小辭典並跳轉指定條號（支援全庫 430+ 條文與外部法規）
   const handleOpenLawDict = (lawNumberOrQuery?: string) => {
-    if (lawNumberOrQuery && sections?.professionalKnowledge?.citationItems) {
-      const numMatch = lawNumberOrQuery.match(/\d+/);
-      const targetNum = numMatch ? numMatch[0] : '';
-      const items = sections.professionalKnowledge.citationItems;
-
-      const found = items.find((it) => {
-        if (targetNum) {
-          const reg = new RegExp(`第\\s*${targetNum}\\s*條`);
-          if (reg.test(it.lawName)) return true;
-          if (it.id.endsWith(`-${targetNum}`) || it.id.includes(`-${targetNum}-`)) return true;
-        }
-        return (
-          it.id === lawNumberOrQuery ||
-          it.lawName.includes(lawNumberOrQuery) ||
-          (it.articleTitle && it.articleTitle.includes(lawNumberOrQuery))
-        );
-      });
-
+    if (lawNumberOrQuery) {
+      const found = lawDatabaseService.findLaw(
+        lawNumberOrQuery,
+        sections?.professionalKnowledge?.citationItems
+      );
       if (found) {
         setActiveLawId(found.id);
+      } else {
+        setActiveLawId(lawNumberOrQuery);
       }
     }
     setIsDictOpen(true);
   };
 
-  // 點擊表格內法條標籤時，直接在原位置彈出浮動窗格 (Popover)
+  // 點擊表格內法條標籤時，直接在原位置彈出浮動窗格 (Popover，支援全庫檢索)
   const handleOpenLawPopover = (lawNumberOrQuery: string, targetRect: DOMRect) => {
-    if (sections?.professionalKnowledge?.citationItems) {
-      const numMatch = lawNumberOrQuery.match(/\d+/);
-      const targetNum = numMatch ? numMatch[0] : '';
-      const items = sections.professionalKnowledge.citationItems;
+    const found = lawDatabaseService.findLaw(
+      lawNumberOrQuery,
+      sections?.professionalKnowledge?.citationItems
+    );
 
-      const found = items.find((it) => {
-        if (targetNum) {
-          const reg = new RegExp(`第\\s*${targetNum}\\s*條`);
-          if (reg.test(it.lawName)) return true;
-          if (it.id.endsWith(`-${targetNum}`) || it.id.includes(`-${targetNum}-`)) return true;
-        }
-        return (
-          it.id === lawNumberOrQuery ||
-          it.lawName.includes(lawNumberOrQuery) ||
-          (it.articleTitle && it.articleTitle.includes(lawNumberOrQuery))
-        );
+    if (found) {
+      setPopoverState({
+        isOpen: true,
+        targetRect,
+        item: found,
       });
-
-      if (found) {
-        setPopoverState({
-          isOpen: true,
-          targetRect,
-          item: found,
-        });
-        setActiveLawId(found.id);
-        return;
-      }
+      setActiveLawId(found.id);
+      return;
     }
 
-    // 若未在當前章節法條清單匹配，仍開啟全域小辭典
+    // 若未在本地匹配，仍開啟全域小辭典並帶入關鍵字
     handleOpenLawDict(lawNumberOrQuery);
   };
 

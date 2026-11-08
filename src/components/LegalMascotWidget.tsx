@@ -1,6 +1,26 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { ExternalLink, X, Search, ChevronLeft, ChevronRight, Copy, Check, BookOpen } from 'lucide-react';
+import {
+  ExternalLink,
+  X,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Check,
+  BookOpen,
+  Sparkles,
+  Globe,
+  Scale,
+  Shield,
+  Layers,
+  FileSearch,
+} from 'lucide-react';
 import { CitationItem } from '../types';
+import {
+  lawDatabaseService,
+  LawDatabaseItem,
+  LawTabFilter,
+} from '../services/lawDatabaseService';
 
 interface LegalMascotWidgetProps {
   citationItems?: CitationItem[];
@@ -15,23 +35,51 @@ interface LegalMascotWidgetProps {
  * 法律神獸「獬豸」(Xiezhi) 可愛向量插畫
  * 傳說中能辨曲直之正義神獸，頭頂獨角，身穿法袍，代表公平與法治
  */
-export const XiezhiMascotSvg: React.FC<{ className?: string }> = ({ className = "w-16 h-16" }) => {
+export const XiezhiMascotSvg: React.FC<{ className?: string }> = ({
+  className = 'w-16 h-16',
+}) => {
   return (
-    <svg viewBox="0 0 120 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 120 120"
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <defs>
         {/* 獨角漸層 */}
-        <linearGradient id="hornGrad" x1="60" y1="5" x2="60" y2="40" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="hornGrad"
+          x1="60"
+          y1="5"
+          x2="60"
+          y2="40"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#FDE047" />
           <stop offset="60%" stopColor="#F59E0B" />
           <stop offset="100%" stopColor="#D97706" />
         </linearGradient>
         {/* 頭部漸層 */}
-        <linearGradient id="headGrad" x1="60" y1="20" x2="60" y2="85" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="headGrad"
+          x1="60"
+          y1="20"
+          x2="60"
+          y2="85"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#FEF3C7" />
           <stop offset="100%" stopColor="#FDE68A" />
         </linearGradient>
         {/* 法袍漸層 */}
-        <linearGradient id="robeGrad" x1="60" y1="75" x2="60" y2="118" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="robeGrad"
+          x1="60"
+          y1="75"
+          x2="60"
+          y2="118"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#1E293B" />
           <stop offset="100%" stopColor="#0F172A" />
         </linearGradient>
@@ -53,21 +101,49 @@ export const XiezhiMascotSvg: React.FC<{ className?: string }> = ({ className = 
       />
 
       {/* 法袍白色領巾 (領片) */}
-      <path d="M50 82 L60 96 L70 82 L64 80 L60 84 L56 80 Z" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1" />
+      <path
+        d="M50 82 L60 96 L70 82 L64 80 L60 84 L56 80 Z"
+        fill="#FFFFFF"
+        stroke="#CBD5E1"
+        strokeWidth="1"
+      />
       {/* 法袍胸前正義金徽 */}
       <circle cx="60" cy="104" r="4.5" fill="#F59E0B" stroke="#FDE68A" strokeWidth="1.2" />
-      <path d="M58 104 L62 104 M60 102 L60 106" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" />
+      <path
+        d="M58 104 L62 104 M60 102 L60 106"
+        stroke="#FFFFFF"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
 
       {/* 獬豸神獸耳朵 */}
       {/* 左耳 */}
-      <path d="M34 46 C24 40 20 54 30 62 Z" fill="#FDE68A" stroke="#D97706" strokeWidth="1.5" />
+      <path
+        d="M34 46 C24 40 20 54 30 62 Z"
+        fill="#FDE68A"
+        stroke="#D97706"
+        strokeWidth="1.5"
+      />
       <path d="M32 48 C26 44 24 53 30 58 Z" fill="#FDA4AF" />
       {/* 右耳 */}
-      <path d="M86 46 C96 40 100 54 90 62 Z" fill="#FDE68A" stroke="#D97706" strokeWidth="1.5" />
+      <path
+        d="M86 46 C96 40 100 54 90 62 Z"
+        fill="#FDE68A"
+        stroke="#D97706"
+        strokeWidth="1.5"
+      />
       <path d="M88 48 C94 44 96 53 90 58 Z" fill="#FDA4AF" />
 
       {/* 圓潤頭部 */}
-      <circle cx="60" cy="60" r="32" fill="url(#headGrad)" stroke="#D97706" strokeWidth="2" filter="url(#softShadow)" />
+      <circle
+        cx="60"
+        cy="60"
+        r="32"
+        fill="url(#headGrad)"
+        stroke="#D97706"
+        strokeWidth="2"
+        filter="url(#softShadow)"
+      />
 
       {/* 額頭神獸獨角 (象徵是非分明、剛正不阿) */}
       <path
@@ -78,14 +154,34 @@ export const XiezhiMascotSvg: React.FC<{ className?: string }> = ({ className = 
         strokeLinejoin="round"
       />
       {/* 獨角紋路與光澤 */}
-      <path d="M56 26 C58 27 62 27 64 26" stroke="#FEF3C7" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M57 18 C59 19 61 19 63 18" stroke="#FEF3C7" strokeWidth="1.2" strokeLinecap="round" />
+      <path
+        d="M56 26 C58 27 62 27 64 26"
+        stroke="#FEF3C7"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M57 18 C59 19 61 19 63 18"
+        stroke="#FEF3C7"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
       {/* 獨角頂端正義星芒 */}
       <circle cx="60" cy="8" r="2.5" fill="#FFFFFF" />
 
       {/* 眉毛 */}
-      <path d="M44 48 C47 46 51 47 52 49" stroke="#92400E" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M68 49 C69 47 73 46 76 48" stroke="#92400E" strokeWidth="1.8" strokeLinecap="round" />
+      <path
+        d="M44 48 C47 46 51 47 52 49"
+        stroke="#92400E"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M68 49 C69 47 73 46 76 48"
+        stroke="#92400E"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
 
       {/* 大眼睛 (水汪汪正義萌眼) */}
       {/* 左眼 */}
@@ -105,12 +201,36 @@ export const XiezhiMascotSvg: React.FC<{ className?: string }> = ({ className = 
       <ellipse cx="60" cy="63" rx="2.5" ry="1.8" fill="#B45309" />
 
       {/* 萌萌微笑嘴巴 */}
-      <path d="M54 68 C57 72 63 72 66 68" stroke="#78350F" strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path
+        d="M54 68 C57 72 63 72 66 68"
+        stroke="#78350F"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
 
       {/* 迷你小法槌（右爪拿著） */}
       <g transform="translate(82, 85) rotate(-25)">
-        <rect x="0" y="8" width="5" height="22" rx="2" fill="#92400E" stroke="#78350F" strokeWidth="1" />
-        <rect x="-6" y="0" width="17" height="9" rx="2.5" fill="#B45309" stroke="#78350F" strokeWidth="1" />
+        <rect
+          x="0"
+          y="8"
+          width="5"
+          height="22"
+          rx="2"
+          fill="#92400E"
+          stroke="#78350F"
+          strokeWidth="1"
+        />
+        <rect
+          x="-6"
+          y="0"
+          width="17"
+          height="9"
+          rx="2.5"
+          fill="#B45309"
+          stroke="#78350F"
+          strokeWidth="1"
+        />
         <line x1="-3" y1="0" x2="-3" y2="9" stroke="#FDE047" strokeWidth="1.5" />
         <line x1="8" y1="0" x2="8" y2="9" stroke="#FDE047" strokeWidth="1.5" />
       </g>
@@ -127,61 +247,59 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
   onSelectLaw,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [tabFilter, setTabFilter] = useState<LawTabFilter>('chapter');
   const [copied, setCopied] = useState(false);
+
+  // 取得全庫合併本章筆記後的法條清單 (共 430+ 條)
+  const fullLawList = useMemo(() => {
+    return lawDatabaseService.mergeWithChapterCitations(citationItems);
+  }, [citationItems]);
 
   // 篩選與匹配法條清單
   const filteredList = useMemo(() => {
-    if (!searchQuery.trim()) return citationItems;
-    const q = searchQuery.trim().toLowerCase();
-    return citationItems.filter((item) => {
-      return (
-        item.lawName.toLowerCase().includes(q) ||
-        (item.articleTitle && item.articleTitle.toLowerCase().includes(q)) ||
-        (item.summary && item.summary.toLowerCase().includes(q)) ||
-        item.content.toLowerCase().includes(q)
-      );
-    });
-  }, [citationItems, searchQuery]);
+    return lawDatabaseService.filterLaws(fullLawList, searchQuery, tabFilter);
+  }, [fullLawList, searchQuery, tabFilter]);
 
   // 目前選中的條文
   const currentItem = useMemo(() => {
-    if (!citationItems || citationItems.length === 0) return null;
+    if (filteredList.length === 0) return null;
     if (activeLawId) {
-      const found = citationItems.find(
+      const found = filteredList.find(
         (it) =>
           it.id === activeLawId ||
+          it.lawNo === activeLawId ||
           it.lawName.includes(activeLawId) ||
-          (it.articleTitle && it.articleTitle.includes(activeLawId))
+          (it.shortName && it.shortName.includes(activeLawId))
       );
       if (found) return found;
     }
-    return filteredList[0] || citationItems[0];
-  }, [citationItems, activeLawId, filteredList]);
+    return filteredList[0];
+  }, [activeLawId, filteredList]);
 
   // 目前選中項目的索引
   const currentIndex = useMemo(() => {
     if (!currentItem) return -1;
-    return citationItems.findIndex((it) => it.id === currentItem.id);
-  }, [citationItems, currentItem]);
+    return filteredList.findIndex((it) => it.id === currentItem.id);
+  }, [filteredList, currentItem]);
 
   // 切換上一條
   const handlePrev = () => {
     if (currentIndex > 0) {
-      onSelectLaw(citationItems[currentIndex - 1].id);
+      onSelectLaw(filteredList[currentIndex - 1].id);
     }
   };
 
   // 切換下一條
   const handleNext = () => {
-    if (currentIndex >= 0 && currentIndex < citationItems.length - 1) {
-      onSelectLaw(citationItems[currentIndex + 1].id);
+    if (currentIndex >= 0 && currentIndex < filteredList.length - 1) {
+      onSelectLaw(filteredList[currentIndex + 1].id);
     }
   };
 
   // 複製條文全文
   const handleCopy = () => {
     if (!currentItem) return;
-    const textToCopy = `【${currentItem.lawName} ${currentItem.articleTitle || ''}】\n${currentItem.content}\n（全國法規資料庫現行條文）`;
+    const textToCopy = `【${currentItem.lawName} ${currentItem.articleTitle || ''}】\n${currentItem.content}\n（法務部全國法規資料庫）`;
     navigator.clipboard.writeText(textToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -202,10 +320,28 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
 
   // 當無項目時自動設定第一個
   useEffect(() => {
-    if (isOpen && !activeLawId && citationItems.length > 0) {
-      onSelectLaw(citationItems[0].id);
+    if (isOpen && !activeLawId && filteredList.length > 0) {
+      onSelectLaw(filteredList[0].id);
     }
-  }, [isOpen, activeLawId, citationItems, onSelectLaw]);
+  }, [isOpen, activeLawId, filteredList, onSelectLaw]);
+
+  // 外部法規快速標籤
+  const quickExternalTags = [
+    { label: '《民法》', query: '民法' },
+    { label: '《刑事訴訟法》', query: '刑事訴訟法' },
+    { label: '《行政罰法》', query: '行政罰法' },
+    { label: '《少年事件處理法》', query: '少年' },
+    { label: '《陸海空軍刑法》', query: '陸海空軍刑法' },
+    { label: '《毒品危害防制條例》', query: '毒品' },
+    { label: '《貪污治罪條例》', query: '貪污' },
+    { label: '《洗錢防制法》', query: '洗錢' },
+    { label: '《營業秘密法》', query: '營業秘密' },
+    { label: '《個人資料保護法》', query: '個資' },
+  ];
+
+  const chapterCount = useMemo(() => {
+    return fullLawList.filter((it) => it.isChapterCitation).length;
+  }, [fullLawList]);
 
   return (
     <>
@@ -217,7 +353,7 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
         <div
           onClick={onToggle}
           className="relative mb-2 cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 group"
-          title="點擊開啟浮動法律小辭典"
+          title="點擊開啟浮動法律小辭典（支援查找資料庫全部與資料外法條）"
         >
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 shadow-lg shadow-emerald-500/20 text-xs font-bold tracking-wide hover:bg-emerald-50 dark:hover:bg-slate-700 transition-colors">
             <span className="text-amber-500 text-sm animate-pulse">💡</span>
@@ -247,78 +383,149 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
       </div>
 
       {/* ============================================================ */}
-      {/* 浮動法律小辭典 (Floating Legal Dictionary Popover)           */}
+      {/* 浮動法律小辭典 (全庫法條與查找資料外法條)                    */}
       {/* ============================================================ */}
       {isOpen && (
         <>
-          {/* 背景遮罩 (手機端或需要時可輕點背景關閉) */}
+          {/* 背景遮罩 (手機端可輕點背景關閉) */}
           <div
             onClick={onClose}
             className="fixed inset-0 z-40 bg-black/20 dark:bg-black/50 backdrop-blur-xs transition-opacity sm:hidden"
           />
 
-          <div
-            className="fixed bottom-24 left-4 sm:left-6 z-50 w-[94vw] sm:w-[500px] md:w-[540px] max-h-[80vh] flex flex-col bg-white/98 dark:bg-slate-900/98 backdrop-blur-xl rounded-2xl border-2 border-emerald-500/50 shadow-2xl shadow-emerald-950/20 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200"
-          >
+          <div className="fixed bottom-24 left-3 sm:left-6 z-50 w-[96vw] sm:w-[560px] md:w-[620px] max-h-[84vh] flex flex-col bg-white/98 dark:bg-slate-900/98 backdrop-blur-xl rounded-2xl border-2 border-emerald-500/60 shadow-2xl shadow-emerald-950/25 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
             {/* 辭典頂部標題列 */}
             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 text-white shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-white/20 p-0.5 flex items-center justify-center">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-white/20 p-0.5 flex items-center justify-center shrink-0">
                   <XiezhiMascotSvg className="w-full h-full" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <h3 className="font-bold text-sm text-white tracking-wide">
                       法律小辭典
                     </h3>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-400 text-amber-950 font-bold">
+                      全庫 430+ 條文
+                    </span>
                     <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/40 text-emerald-100 font-medium">
-                      浮動即時對照
+                      含資料外法條查找
                     </span>
                   </div>
-                  <p className="text-[11px] text-emerald-200/90 font-normal">
-                    全國法規資料庫現行條文與對應法理
+                  <p className="text-[11px] text-emerald-100/90 font-normal">
+                    全國法規資料庫官方現行條文 · 研讀筆記與外連直通檢索
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <a
                   href="https://law.moj.gov.tw/Index.aspx"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/15 hover:bg-white/25 text-white text-[11px] font-medium transition-colors"
-                  title="開啟全國法規資料庫首頁"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white/15 hover:bg-white/25 text-white text-[11px] font-medium transition-colors"
+                  title="前往法務部全國法規資料庫首頁"
                 >
                   <ExternalLink className="w-3 h-3" />
-                  <span className="hidden sm:inline">法規資料庫</span>
+                  <span className="hidden sm:inline">全國法規官網</span>
                 </a>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="p-1 rounded-lg text-emerald-100 hover:text-white hover:bg-white/20 transition-colors"
-                  title="關閉小辭典"
+                  className="p-1 rounded-lg text-emerald-100 hover:text-white hover:bg-white/20 transition-colors cursor-pointer"
+                  title="關閉小辭典 (Esc)"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
+            {/* 分類導航分頁籤 (Tabs) */}
+            <div className="flex items-center gap-1 px-3 pt-2 pb-1.5 bg-emerald-50/70 dark:bg-slate-900 border-b border-emerald-100 dark:border-emerald-950 overflow-x-auto scrollbar-thin text-xs">
+              <button
+                type="button"
+                onClick={() => setTabFilter('chapter')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold transition-all shrink-0 cursor-pointer ${
+                  tabFilter === 'chapter'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-slate-700'
+                }`}
+              >
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span>本章條文 ({chapterCount})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTabFilter('general')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold transition-all shrink-0 cursor-pointer ${
+                  tabFilter === 'general'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-slate-700'
+                }`}
+              >
+                <Scale className="w-3 h-3 text-emerald-400" />
+                <span>刑法總則 (1~99條)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTabFilter('specific')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold transition-all shrink-0 cursor-pointer ${
+                  tabFilter === 'specific'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-slate-700'
+                }`}
+              >
+                <Shield className="w-3 h-3 text-emerald-400" />
+                <span>刑法分則 (100~357條)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTabFilter('external')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold transition-all shrink-0 cursor-pointer ${
+                  tabFilter === 'external'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                }`}
+              >
+                <Globe className="w-3 h-3 text-indigo-300" />
+                <span>資料外法條 (外部法規)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTabFilter('all')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-bold transition-all shrink-0 cursor-pointer ${
+                  tabFilter === 'all'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-slate-700'
+                }`}
+              >
+                <Layers className="w-3 h-3 text-slate-400" />
+                <span>全部條文 (436)</span>
+              </button>
+            </div>
+
             {/* 條號快速搜尋列 */}
-            <div className="p-3 border-b border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-slate-900 shrink-0 space-y-2">
+            <div className="p-3 border-b border-emerald-100 dark:border-emerald-900/50 bg-slate-50 dark:bg-slate-900 shrink-0 space-y-2">
               <div className="relative">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="搜尋條號（如：12、15、25）或關鍵字..."
-                  className="w-full pl-8 pr-7 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="搜尋條號（如：13、271、320）或關鍵字（如：故意、正當防衛、民法、刑訴）..."
+                  className="w-full pl-8 pr-7 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    title="清除搜尋關鍵字"
+                    aria-label="清除搜尋"
+                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -327,45 +534,114 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
 
               {/* 橫向可滾動條號快捷標籤列 */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
-                {citationItems.map((item) => {
+                {filteredList.slice(0, 60).map((item) => {
                   const isSelected = currentItem?.id === item.id;
-                  // 擷取條號文字，如 "§ 12"
-                  const shortMatch = item.lawName.match(/第\s*(\d+)\s*條/);
-                  const shortLabel = shortMatch ? `§ ${shortMatch[1]}` : item.lawName;
+                  const label = item.shortName || item.lawName;
 
                   return (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => onSelectLaw(item.id)}
-                      className={`px-2 py-1 rounded-md text-[11px] font-bold font-mono whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                      className={`px-2 py-1 rounded-md text-[11px] font-bold font-mono whitespace-nowrap shrink-0 transition-all cursor-pointer flex items-center gap-1 ${
                         isSelected
                           ? 'bg-emerald-600 text-white shadow-xs scale-105'
-                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-100 dark:hover:bg-slate-700'
+                          : item.isChapterCitation
+                          ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 hover:bg-amber-100'
+                          : item.category === 'external'
+                          ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                       title={`${item.lawName} ${item.articleTitle || ''}`}
                     >
-                      {shortLabel}
+                      {item.isChapterCitation && (
+                        <span className="text-[10px] text-amber-500">★</span>
+                      )}
+                      <span>{label}</span>
                     </button>
                   );
                 })}
+
+                {filteredList.length > 60 && (
+                  <span className="text-[10px] text-slate-400 px-1 whitespace-nowrap">
+                    還有 {filteredList.length - 60} 條...
+                  </span>
+                )}
               </div>
             </div>
 
             {/* 條文內容呈現區塊 (可垂直滾動) */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+              {/* 查找資料外法條專區 (當搜尋中或切換至 external 標籤或無匹配時突出顯示) */}
+              {(tabFilter === 'external' || searchQuery.trim() !== '') && (
+                <div className="p-3 rounded-xl bg-gradient-to-r from-indigo-50 via-sky-50 to-emerald-50 dark:from-slate-800 dark:via-indigo-950/40 dark:to-slate-800 border-2 border-indigo-300 dark:border-indigo-700/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5 text-xs">
+                      <Globe className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <span>查找資料庫外法條 · 全國法規直通車</span>
+                    </span>
+
+                    <a
+                      href={lawDatabaseService.getMojSearchUrl(searchQuery || '刑法')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors cursor-pointer shadow-2xs"
+                    >
+                      <FileSearch className="w-3 h-3" />
+                      <span>
+                        至全國法規資料庫檢索 {searchQuery ? `「${searchQuery}」` : '外部法條'}
+                      </span>
+                      <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
+                    </a>
+                  </div>
+
+                  {/* 常用資料外法規捷徑標籤 */}
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                      常用外部法規：
+                    </span>
+                    {quickExternalTags.map((t) => (
+                      <button
+                        key={t.label}
+                        type="button"
+                        onClick={() => {
+                          setTabFilter('all');
+                          setSearchQuery(t.query);
+                        }}
+                        className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-700 text-[10.5px] text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors cursor-pointer"
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {currentItem ? (
                 <>
                   {/* 當前條目標題卡片 */}
                   <div className="p-3.5 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 shadow-xs space-y-1.5">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-emerald-700 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
-                          {currentIndex + 1}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* 條目分類小膠囊 */}
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                            currentItem.isChapterCitation
+                              ? 'bg-amber-200 text-amber-900 dark:bg-amber-900 dark:text-amber-200'
+                              : currentItem.category === 'external'
+                              ? 'bg-indigo-200 text-indigo-900 dark:bg-indigo-900 dark:text-indigo-200'
+                              : 'bg-emerald-200 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-200'
+                          }`}
+                        >
+                          {currentItem.isChapterCitation
+                            ? '★ 本章重點導引'
+                            : currentItem.lawCategoryName || '全國法規'}
                         </span>
+
                         <h4 className="font-bold text-sm text-emerald-950 dark:text-emerald-100">
                           {currentItem.lawName}
                         </h4>
+
                         {currentItem.articleTitle && (
                           <span className="font-semibold text-emerald-800 dark:text-emerald-300 text-xs">
                             【{currentItem.articleTitle}】
@@ -374,14 +650,21 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
                       </div>
 
                       {currentItem.page && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-200/80 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 font-mono font-medium">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700 font-mono font-medium">
                           {currentItem.page}
                         </span>
                       )}
                     </div>
 
+                    {/* 編與章節資訊 */}
+                    {(currentItem.part || currentItem.chapter) && (
+                      <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-mono">
+                        {currentItem.part} {currentItem.chapter && `❯ ${currentItem.chapter}`}
+                      </p>
+                    )}
+
                     {currentItem.summary && (
-                      <p className="text-[11.5px] text-emerald-900/90 dark:text-emerald-200/90 font-medium pl-7">
+                      <p className="text-[11.5px] text-emerald-900/95 dark:text-emerald-200/95 font-medium pt-0.5">
                         {currentItem.summary}
                       </p>
                     )}
@@ -392,14 +675,14 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
                         <BookOpen className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span>全國法規資料庫現行條文：</span>
+                        <span>全國法規資料庫官方現行條文：</span>
                       </span>
 
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={handleCopy}
-                          className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                          className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
                           title="複製此法條條文"
                         >
                           {copied ? (
@@ -423,7 +706,7 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
                             className="inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400 hover:underline font-medium"
                             title="開啟此條的全國法規資料庫網頁"
                           >
-                            <span>線上檢索</span>
+                            <span>全國法規線上檢索</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}
@@ -450,8 +733,34 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
                   )}
                 </>
               ) : (
-                <div className="p-8 text-center text-slate-400">
-                  <p>未找到符合的法條資料</p>
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400 space-y-3">
+                  <p className="text-sm font-medium">
+                    本地資料庫未找到包含「{searchQuery}」的法條
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    可點擊下方按鈕直接連線至全國法規資料庫或司法院檢索：
+                  </p>
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <a
+                      href={lawDatabaseService.getMojSearchUrl(searchQuery)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors"
+                    >
+                      <Globe className="w-3.5 h-3.5" />
+                      <span>全國法規資料庫線上查詢</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <a
+                      href={lawDatabaseService.getJudicialSearchUrl(searchQuery)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 font-medium text-xs transition-colors"
+                    >
+                      <span>司法院裁判書系統</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
@@ -462,21 +771,26 @@ export const LegalMascotWidget: React.FC<LegalMascotWidgetProps> = ({
                 type="button"
                 onClick={handlePrev}
                 disabled={currentIndex <= 0}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span>上一條</span>
               </button>
 
-              <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                條文 {currentIndex >= 0 ? currentIndex + 1 : 0} / {citationItems.length}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+                  條文 {currentIndex >= 0 ? currentIndex + 1 : 0} / {filteredList.length}
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
+                  庫存共 {fullLawList.length} 條
+                </span>
+              </div>
 
               <button
                 type="button"
                 onClick={handleNext}
-                disabled={currentIndex < 0 || currentIndex >= citationItems.length - 1}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                disabled={currentIndex < 0 || currentIndex >= filteredList.length - 1}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
               >
                 <span>下一條</span>
                 <ChevronRight className="w-3.5 h-3.5" />

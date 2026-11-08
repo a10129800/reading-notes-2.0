@@ -50,10 +50,22 @@ export interface SectionVernacularExplanation {
 }
 
 // 05. 案例分析 (嚴格區分原書案例與自行舉例)
+export interface CaseItem {
+  id: string;
+  title: string;
+  category?: string;
+  summary: string;
+  fact?: string;
+  problem?: string;
+  analysis?: string;
+  page?: string;
+}
+
 export interface SectionCaseAnalysis {
   bookCases: string;          // 書中案例 (原作者提出)
   customCases: string;        // 自行舉例 (讀者個人延伸)
   application: string;        // 實際應用與案例理論關聯
+  caseItems?: CaseItem[];     // 完整案例折頁資料
 }
 
 // 06. 重點整理

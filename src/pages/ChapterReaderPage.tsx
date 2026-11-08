@@ -455,15 +455,98 @@ export const ChapterReaderPage: React.FC = () => {
             </div>
             <div className="space-y-4">
               {/* 原書案例 Card */}
-              <div className="p-4 rounded-xl bg-sky-50/90 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-700/60 shadow-xs space-y-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-2.5 py-0.5 rounded-md font-bold text-xs bg-academic-navy text-white shadow-xs">
-                    原書案例 (原作者論述)
-                  </span>
+              <div className="p-4 rounded-xl bg-sky-50/90 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-700/60 shadow-xs space-y-3">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-md font-bold text-xs bg-academic-navy text-white shadow-xs">
+                      原書案例 (原作者論述)
+                    </span>
+                    <span className="text-[11px] text-sky-800 dark:text-sky-300 font-medium">
+                      共 17 個案例・點開各折頁可查閱完整案例詳情
+                    </span>
+                  </div>
                 </div>
-                <p className="text-xs text-sky-950 dark:text-sky-100 font-semibold leading-relaxed whitespace-pre-line">
-                  {sections.caseAnalysis.bookCases}
-                </p>
+
+                {sections.caseAnalysis.caseItems && sections.caseAnalysis.caseItems.length > 0 ? (
+                  <div className="space-y-2 pt-1">
+                    {sections.caseAnalysis.caseItems.map((item, idx) => (
+                      <details
+                        key={item.id || idx}
+                        className="group rounded-xl border border-sky-200 dark:border-sky-800/60 bg-white/95 dark:bg-sky-950/40 overflow-hidden shadow-xs transition-all duration-200 hover:border-sky-400"
+                      >
+                        <summary className="flex items-center justify-between p-3.5 cursor-pointer list-none select-none hover:bg-sky-50/80 dark:hover:bg-sky-900/40 transition-colors">
+                          <div className="flex items-start gap-2.5 flex-1 pr-2">
+                            <span className="w-5 h-5 rounded-full bg-academic-navy text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                              {idx + 1}
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h5 className="font-bold text-sky-950 dark:text-sky-100 text-xs">
+                                  {item.title}
+                                </h5>
+                                {item.page && (
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-300 font-mono">
+                                    {item.page}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-ink-600 dark:text-academic-mutedDark mt-0.5 font-normal">
+                                {item.summary}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300 group-open:hidden px-2 py-0.5 rounded bg-sky-100/90 dark:bg-sky-900/60">
+                              點開看完整案例 ▾
+                            </span>
+                            <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300 hidden group-open:inline px-2 py-0.5 rounded bg-sky-100/90 dark:bg-sky-900/60">
+                              收合案例 ▴
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-sky-600 dark:text-sky-400 transition-transform duration-200 group-open:rotate-90" />
+                          </div>
+                        </summary>
+
+                        {/* 完整案例折頁內容 */}
+                        <div className="px-4 pb-4 pt-2.5 border-t border-sky-100 dark:border-sky-900/40 bg-sky-50/40 dark:bg-sky-950/40 space-y-2.5 text-xs">
+                          {item.fact && (
+                            <div className="p-3 rounded-lg bg-white dark:bg-ink-900/80 border border-sky-200/60 dark:border-sky-800/40 space-y-1">
+                              <span className="font-bold text-academic-navy dark:text-academic-navyLight flex items-center gap-1 text-[11px]">
+                                🗣️ 被告陳述／案件事實：
+                              </span>
+                              <p className="text-ink-800 dark:text-ink-200 italic leading-relaxed whitespace-pre-line font-serif pl-1">
+                                {item.fact}
+                              </p>
+                            </div>
+                          )}
+                          {item.problem && (
+                            <div className="p-2.5 rounded-lg bg-paper-50 dark:bg-ink-800/40 space-y-0.5">
+                              <span className="font-bold text-sky-900 dark:text-sky-200 flex items-center gap-1 text-[11px]">
+                                ⚖️ 問題導引與抗辯要件：
+                              </span>
+                              <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line pl-1">
+                                {item.problem}
+                              </p>
+                            </div>
+                          )}
+                          {item.analysis && (
+                            <div className="p-2.5 rounded-lg bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 space-y-0.5">
+                              <span className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1 text-[11px]">
+                                💡 法理分析與法律效果：
+                              </span>
+                              <p className="text-amber-950 dark:text-amber-100 leading-relaxed whitespace-pre-line pl-1">
+                                {item.analysis}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-sky-950 dark:text-sky-100 font-semibold leading-relaxed whitespace-pre-line">
+                    {sections.caseAnalysis.bookCases}
+                  </p>
+                )}
               </div>
 
               {/* 讀者自行舉例 Card */}

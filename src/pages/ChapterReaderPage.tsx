@@ -453,23 +453,27 @@ export const ChapterReaderPage: React.FC = () => {
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">05</span>
               案例分析 (嚴格界定標記)
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* 原書案例 */}
-              <div className="p-4 rounded-xl bg-paper-100 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark space-y-2">
-                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-academic-navy text-paper-50">
-                  原書案例 (原作者論述)
-                </span>
-                <p className="text-xs text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
+            <div className="space-y-4">
+              {/* 原書案例 Card */}
+              <div className="p-4 rounded-xl bg-sky-50/90 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-700/60 shadow-xs space-y-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="px-2.5 py-0.5 rounded-md font-bold text-xs bg-academic-navy text-white shadow-xs">
+                    原書案例 (原作者論述)
+                  </span>
+                </div>
+                <p className="text-xs text-sky-950 dark:text-sky-100 font-semibold leading-relaxed whitespace-pre-line">
                   {sections.caseAnalysis.bookCases}
                 </p>
               </div>
 
-              {/* 讀者自行舉例 */}
-              <div className="p-4 rounded-xl bg-paper-100 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark space-y-2">
-                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-bronze-600 text-paper-50">
-                  自行舉例 (讀者延伸實踐)
-                </span>
-                <p className="text-xs text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
+              {/* 讀者自行舉例 Card */}
+              <div className="p-4 rounded-xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 shadow-xs space-y-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="px-2.5 py-0.5 rounded-md font-bold text-xs bg-amber-600 text-white shadow-xs">
+                    自行舉例 (讀者延伸實踐)
+                  </span>
+                </div>
+                <p className="text-xs text-amber-950 dark:text-amber-100 font-semibold leading-relaxed whitespace-pre-line">
                   {sections.caseAnalysis.customCases}
                 </p>
               </div>

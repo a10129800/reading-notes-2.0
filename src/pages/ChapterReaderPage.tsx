@@ -384,23 +384,25 @@ export const ChapterReaderPage: React.FC = () => {
 
               <div className="space-y-3 pt-3 border-t border-academic-borderLight dark:border-academic-borderDark text-xs">
                 {/* 理論學說 Card */}
-                <div className="p-4 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark space-y-2">
-                  <h4 className="font-bold text-ink-900 dark:text-ink-100 flex items-center gap-1.5 text-xs">
-                    <span className="w-2 h-2 rounded-full bg-bronze-600 shrink-0" />
-                    理論學說
-                  </h4>
-                  <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line font-serif">
+                <div className="p-4 rounded-xl bg-violet-50/90 dark:bg-violet-950/40 border border-violet-300 dark:border-violet-700/60 shadow-xs space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md font-bold text-xs bg-violet-600 text-white shadow-xs">
+                      理論學說
+                    </span>
+                  </div>
+                  <p className="text-violet-950 dark:text-violet-100 font-serif font-semibold leading-relaxed whitespace-pre-line">
                     {sections.professionalKnowledge.theories}
                   </p>
                 </div>
 
                 {/* 出處 Card */}
-                <div className="p-3.5 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark space-y-1.5">
-                  <h4 className="font-bold text-ink-900 dark:text-ink-100 flex items-center gap-1.5 text-xs">
-                    <span className="w-2 h-2 rounded-full bg-academic-navy dark:bg-blue-400 shrink-0" />
-                    出處
-                  </h4>
-                  <p className="text-ink-600 dark:text-academic-mutedDark leading-relaxed font-mono whitespace-pre-line">
+                <div className="p-4 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 shadow-xs space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md font-bold text-xs bg-emerald-600 text-white shadow-xs">
+                      出處
+                    </span>
+                  </div>
+                  <p className="text-emerald-950 dark:text-emerald-100 font-mono font-semibold leading-relaxed whitespace-pre-line">
                     {sections.professionalKnowledge.citations}
                   </p>
                 </div>

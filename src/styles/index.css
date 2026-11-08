@@ -179,11 +179,11 @@
 
 .prose th {
   border: 1px solid #cbd5e1 !important;
-  padding: 0.75rem 1rem !important;
+  padding: 0.5rem 0.625rem !important;
   font-weight: 700 !important;
   color: #0f172a !important;
-  text-align: left !important;
-  white-space: nowrap !important;
+  text-align: center !important;
+  word-break: break-word !important;
 }
 
 .dark .prose th {
@@ -193,10 +193,11 @@
 
 .prose td {
   border: 1px solid #cbd5e1 !important;
-  padding: 0.75rem 1rem !important;
-  line-height: 1.6 !important;
+  padding: 0.5rem 0.625rem !important;
+  line-height: 1.5 !important;
   vertical-align: top !important;
   color: #1e293b !important;
+  word-break: break-word !important;
 }
 
 .dark .prose td {

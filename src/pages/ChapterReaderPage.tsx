@@ -167,8 +167,8 @@ export const ChapterReaderPage: React.FC = () => {
 
       {/* 3-Column Layout Canvas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: TOC (3 cols) */}
-        <aside className="no-print lg:col-span-3 sticky top-32 space-y-4 max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
+        {/* Left Column: TOC (3 cols lg, 2 cols xl) */}
+        <aside className="no-print lg:col-span-3 xl:col-span-2 sticky top-32 space-y-4 max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
           <div className="bg-paper-50 dark:bg-academic-cardDark p-4 rounded-xl border border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-academic-borderLight dark:border-academic-borderDark">
               <span className="font-serif text-xs font-bold uppercase tracking-wider text-bronze-700 dark:text-bronze-400 flex items-center gap-1.5">
@@ -221,8 +221,8 @@ export const ChapterReaderPage: React.FC = () => {
           </div>
         </aside>
 
-        {/* Center Column: 8-Section Article (6 cols) */}
-        <main className={`lg:col-span-6 space-y-10 font-scale-${fontSize} ${fontClass}`}>
+        {/* Center Column: 8-Section Article (6 cols lg, 8 cols xl) */}
+        <main className={`lg:col-span-6 xl:col-span-8 space-y-10 font-scale-${fontSize} ${fontClass}`}>
           {/* Chapter Main Header */}
           <div className="border-b border-academic-borderLight dark:border-academic-borderDark pb-6">
             <div className="flex items-center gap-2 text-xs font-mono text-bronze-700 dark:text-bronze-400 font-semibold uppercase mb-2">
@@ -619,10 +619,10 @@ export const ChapterReaderPage: React.FC = () => {
                           <tr className="hover:bg-amber-50/80 dark:hover:bg-amber-950/20 even:bg-slate-50/70 dark:even:bg-ink-900/80 transition-colors" {...props} />
                         ),
                         th: ({ node, ...props }) => (
-                          <th className="px-4 py-3 font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-ink-800 text-slate-900 dark:text-slate-100 whitespace-nowrap text-xs tracking-wide" {...props} />
+                          <th className="px-2.5 py-2.5 font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-ink-800 text-slate-900 dark:text-slate-100 text-xs tracking-tight text-center break-words" {...props} />
                         ),
                         td: ({ node, ...props }) => (
-                          <td className="px-4 py-3 border border-slate-300 dark:border-slate-700 leading-relaxed align-top text-xs text-slate-800 dark:text-slate-200" {...props} />
+                          <td className="px-2.5 py-2.5 border border-slate-300 dark:border-slate-700 leading-relaxed align-top text-xs text-slate-800 dark:text-slate-200 break-words" {...props} />
                         ),
                         strong: ({ node, ...props }) => (
                           <strong className="font-bold text-slate-950 dark:text-amber-300" {...props} />
@@ -745,8 +745,8 @@ export const ChapterReaderPage: React.FC = () => {
           </div>
         </main>
 
-        {/* Right Column: Outline & Key Highlights (3 cols) */}
-        <aside className="no-print lg:col-span-3 sticky top-32 space-y-6 max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
+        {/* Right Column: Outline & Key Highlights (3 cols lg, 2 cols xl) */}
+        <aside className="no-print lg:col-span-3 xl:col-span-2 sticky top-32 space-y-6 max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
           {/* Quick Section Jump Navigator */}
           <div className="bg-paper-50 dark:bg-academic-cardDark p-4 rounded-xl border border-academic-borderLight dark:border-academic-borderDark">
             <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-bronze-700 dark:text-bronze-400 mb-2 flex items-center gap-1.5">

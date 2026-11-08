@@ -586,12 +586,49 @@ export const ChapterReaderPage: React.FC = () => {
 
               {/* Comparison table Markdown */}
               {sections.keyTakeaways.comparisonTable && (
-                <div className="p-4 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark overflow-x-auto">
-                  <h4 className="text-xs font-bold text-ink-500 uppercase tracking-wider mb-2">
-                    比較表格
-                  </h4>
+                <div className="p-5 rounded-2xl bg-white dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark shadow-xs overflow-hidden space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-academic-borderLight dark:border-academic-borderDark">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-md font-bold text-xs bg-academic-navy text-white shadow-xs">
+                        比較表格
+                      </span>
+                      <span className="text-[11px] text-ink-500 dark:text-academic-mutedDark">
+                        雙重推定、反證阻卻體系與二階／三階論對照
+                      </span>
+                    </div>
+                  </div>
                   <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h4: ({ node, ...props }) => (
+                          <h4 className="font-bold text-xs sm:text-sm text-academic-navy dark:text-amber-300 flex items-center gap-1.5 mt-4 mb-2 pt-2 first:mt-1 first:pt-0 font-serif" {...props} />
+                        ),
+                        table: ({ node, ...props }) => (
+                          <div className="overflow-x-auto my-3 rounded-lg border-2 border-slate-300 dark:border-slate-700 shadow-xs bg-white dark:bg-ink-900/60">
+                            <table className="w-full border-collapse text-left text-xs text-ink-800 dark:text-ink-200" {...props} />
+                          </div>
+                        ),
+                        thead: ({ node, ...props }) => (
+                          <thead className="bg-slate-100 dark:bg-ink-800 border-b-2 border-slate-300 dark:border-slate-700" {...props} />
+                        ),
+                        tbody: ({ node, ...props }) => (
+                          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-ink-900/50" {...props} />
+                        ),
+                        tr: ({ node, ...props }) => (
+                          <tr className="hover:bg-amber-50/80 dark:hover:bg-amber-950/20 even:bg-slate-50/70 dark:even:bg-ink-900/80 transition-colors" {...props} />
+                        ),
+                        th: ({ node, ...props }) => (
+                          <th className="px-4 py-3 font-bold border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-ink-800 text-slate-900 dark:text-slate-100 whitespace-nowrap text-xs tracking-wide" {...props} />
+                        ),
+                        td: ({ node, ...props }) => (
+                          <td className="px-4 py-3 border border-slate-300 dark:border-slate-700 leading-relaxed align-top text-xs text-slate-800 dark:text-slate-200" {...props} />
+                        ),
+                        strong: ({ node, ...props }) => (
+                          <strong className="font-bold text-slate-950 dark:text-amber-300" {...props} />
+                        ),
+                      }}
+                    >
                       {sections.keyTakeaways.comparisonTable}
                     </ReactMarkdown>
                   </div>

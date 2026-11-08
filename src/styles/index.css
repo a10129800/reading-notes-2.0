@@ -152,4 +152,81 @@
   font-size: 13px !important;
 }
 
+/* ==========================================================================
+   Markdown Table Grid Enhancement (清楚表格格線與對齊)
+   ========================================================================== */
+.prose table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  border: 2px solid #cbd5e1 !important; /* slate-300 */
+}
+
+.dark .prose table {
+  border-color: #334155 !important; /* slate-700 */
+}
+
+.prose thead {
+  border-bottom: 2px solid #cbd5e1 !important;
+  background-color: #f1f5f9 !important; /* slate-100 */
+}
+
+.dark .prose thead {
+  border-bottom-color: #334155 !important;
+  background-color: #1e293b !important; /* slate-800 */
+}
+
+.prose th {
+  border: 1px solid #cbd5e1 !important;
+  padding: 0.75rem 1rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.dark .prose th {
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.prose td {
+  border: 1px solid #cbd5e1 !important;
+  padding: 0.75rem 1rem !important;
+  line-height: 1.6 !important;
+  vertical-align: top !important;
+  color: #1e293b !important;
+}
+
+.dark .prose td {
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+.prose strong {
+  color: #0f172a !important;
+}
+
+.dark .prose strong {
+  color: #fcd34d !important;
+}
+
+.prose tbody tr:nth-child(even) {
+  background-color: #f8fafc !important; /* slate-50 */
+}
+
+.dark .prose tbody tr:nth-child(even) {
+  background-color: rgba(30, 41, 59, 0.45) !important;
+}
+
+.prose tbody tr:hover {
+  background-color: #fef3c7 !important; /* amber-100 */
+}
+
+.dark .prose tbody tr:hover {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+
 

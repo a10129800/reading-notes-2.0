@@ -382,16 +382,25 @@ export const ChapterReaderPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-academic-borderLight dark:border-academic-borderDark text-xs">
-                <div>
-                  <h4 className="font-bold text-ink-800 dark:text-ink-200 mb-1">理論學說背景</h4>
-                  <p className="text-ink-600 dark:text-academic-mutedDark leading-relaxed whitespace-pre-line">
+              <div className="space-y-3 pt-3 border-t border-academic-borderLight dark:border-academic-borderDark text-xs">
+                {/* 理論學說 Card */}
+                <div className="p-4 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark space-y-2">
+                  <h4 className="font-bold text-ink-900 dark:text-ink-100 flex items-center gap-1.5 text-xs">
+                    <span className="w-2 h-2 rounded-full bg-bronze-600 shrink-0" />
+                    理論學說
+                  </h4>
+                  <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line font-serif">
                     {sections.professionalKnowledge.theories}
                   </p>
                 </div>
-                <div>
-                  <h4 className="font-bold text-ink-800 dark:text-ink-200 mb-1">文獻與出處依據</h4>
-                  <p className="text-ink-600 dark:text-academic-mutedDark leading-relaxed font-mono">
+
+                {/* 出處 Card */}
+                <div className="p-3.5 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark space-y-1.5">
+                  <h4 className="font-bold text-ink-900 dark:text-ink-100 flex items-center gap-1.5 text-xs">
+                    <span className="w-2 h-2 rounded-full bg-academic-navy dark:bg-blue-400 shrink-0" />
+                    出處
+                  </h4>
+                  <p className="text-ink-600 dark:text-academic-mutedDark leading-relaxed font-mono whitespace-pre-line">
                     {sections.professionalKnowledge.citations}
                   </p>
                 </div>

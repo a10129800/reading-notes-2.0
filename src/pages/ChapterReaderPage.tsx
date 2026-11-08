@@ -7,6 +7,8 @@ import { publicDataService } from '../services/publicDataService';
 import { useTheme } from '../context/ThemeContext';
 import { FontSizeControl } from '../components/FontSizeControl';
 import { LegalMascotWidget } from '../components/LegalMascotWidget';
+import { LawFloatingPopover } from '../components/LawFloatingPopover';
+import { CitationItem } from '../types';
 import {
   ArrowLeft,
   ArrowRight,
@@ -43,6 +45,15 @@ export const ChapterReaderPage: React.FC = () => {
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
   const [isDictOpen, setIsDictOpen] = useState(false);
   const [activeLawId, setActiveLawId] = useState<string | null>(null);
+  const [popoverState, setPopoverState] = useState<{
+    isOpen: boolean;
+    targetRect: DOMRect | null;
+    item: CitationItem | null;
+  }>({
+    isOpen: false,
+    targetRect: null,
+    item: null,
+  });
 
   // Load book & chapter data
   useEffect(() => {
@@ -145,7 +156,42 @@ export const ChapterReaderPage: React.FC = () => {
     setIsDictOpen(true);
   };
 
-  // 解析表格文字中法條編號（例如 §15、§13、§25 等），轉換為可點擊彈出小辭典的互動按鈕
+  // 點擊表格內法條標籤時，直接在原位置彈出浮動窗格 (Popover)
+  const handleOpenLawPopover = (lawNumberOrQuery: string, targetRect: DOMRect) => {
+    if (sections?.professionalKnowledge?.citationItems) {
+      const numMatch = lawNumberOrQuery.match(/\d+/);
+      const targetNum = numMatch ? numMatch[0] : '';
+      const items = sections.professionalKnowledge.citationItems;
+
+      const found = items.find((it) => {
+        if (targetNum) {
+          const reg = new RegExp(`第\\s*${targetNum}\\s*條`);
+          if (reg.test(it.lawName)) return true;
+          if (it.id.endsWith(`-${targetNum}`) || it.id.includes(`-${targetNum}-`)) return true;
+        }
+        return (
+          it.id === lawNumberOrQuery ||
+          it.lawName.includes(lawNumberOrQuery) ||
+          (it.articleTitle && it.articleTitle.includes(lawNumberOrQuery))
+        );
+      });
+
+      if (found) {
+        setPopoverState({
+          isOpen: true,
+          targetRect,
+          item: found,
+        });
+        setActiveLawId(found.id);
+        return;
+      }
+    }
+
+    // 若未在當前章節法條清單匹配，仍開啟全域小辭典
+    handleOpenLawDict(lawNumberOrQuery);
+  };
+
+  // 解析表格文字中法條編號（例如 §15、§13、§25 等），轉換為可點擊彈出浮動窗格的互動按鈕
   const renderTextWithLawBadges = (content: React.ReactNode): React.ReactNode => {
     if (typeof content === 'string') {
       const regex = /(§\s*\d+(?:\s*(?:I{1,3}|IV|V|但))?)/g;
@@ -165,10 +211,11 @@ export const ChapterReaderPage: React.FC = () => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleOpenLawDict(part);
+                const rect = e.currentTarget.getBoundingClientRect();
+                handleOpenLawPopover(part, rect);
               }}
               className="inline-flex items-center gap-1 px-1.5 py-0.5 mx-0.5 rounded text-[11px] font-bold font-mono bg-emerald-100 hover:bg-emerald-200 text-emerald-900 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-700/80 shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer align-baseline group"
-              title={`點擊查看全國法規第 ${num} 條條文`}
+              title={`點擊查看全國法規第 ${num} 條條文浮動窗格`}
             >
               <span>{fullDisplay}</span>
               <BookOpen className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -1023,6 +1070,17 @@ export const ChapterReaderPage: React.FC = () => {
           </button>
         </aside>
       </div>
+
+      {/* 點擊法條即時跳出的浮動窗格 (Popover) */}
+      <LawFloatingPopover
+        isOpen={popoverState.isOpen}
+        onClose={() => setPopoverState((prev) => ({ ...prev, isOpen: false }))}
+        targetRect={popoverState.targetRect}
+        item={popoverState.item}
+        onOpenFullDictionary={() => {
+          setIsDictOpen(true);
+        }}
+      />
 
       {/* 浮動法律動物（獬豸）與法律小辭典 */}
       <LegalMascotWidget

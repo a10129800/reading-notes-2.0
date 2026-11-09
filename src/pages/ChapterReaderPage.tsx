@@ -17,6 +17,7 @@ import {
   Bookmark,
   Share2,
   Check,
+  Copy,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -43,6 +44,7 @@ export const ChapterReaderPage: React.FC = () => {
   const [chapter, setChapter] = useState<ChapterDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [copiedQuoteId, setCopiedQuoteId] = useState<string | null>(null);
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
   const [isDictOpen, setIsDictOpen] = useState(false);
   const [activeLawId, setActiveLawId] = useState<string | null>(null);
@@ -129,6 +131,14 @@ export const ChapterReaderPage: React.FC = () => {
   }
 
   const sections = chapter.sections;
+
+  // 複製本章金句
+  const handleCopyQuote = (q: any) => {
+    const text = `「${q.quote}」\n——《${book?.title || '刑法總則'}》${chapter?.title || ''} (${q.page || ''})`;
+    navigator.clipboard.writeText(text);
+    setCopiedQuoteId(q.id);
+    setTimeout(() => setCopiedQuoteId(null), 2000);
+  };
 
   // 開啟浮動法律小辭典並跳轉指定條號（支援全庫 430+ 條文與外部法規）
   const handleOpenLawDict = (lawNumberOrQuery?: string) => {
@@ -910,6 +920,94 @@ export const ChapterReaderPage: React.FC = () => {
             </div>
           </section>
 
+          {/* Section 09: 本章金句 */}
+          {chapter.quotes && chapter.quotes.length > 0 && (
+            <section
+              id="section-09"
+              className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark"
+            >
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
+                  <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">
+                    09
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <Quote className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span>本章金句與法理格言 ({chapter.quotes.length})</span>
+                  </div>
+                </div>
+
+                <span className="text-xs text-amber-800/80 dark:text-amber-300/80 font-medium font-serif">
+                  精選本書論罪思維核心宣言
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {chapter.quotes.map((q, idx) => (
+                  <div
+                    key={q.id || idx}
+                    className="group relative p-5 rounded-2xl bg-gradient-to-br from-amber-50/90 via-paper-50 to-amber-50/40 dark:from-academic-cardDark dark:via-ink-800/60 dark:to-academic-cardDark border-2 border-amber-200/90 dark:border-amber-800/70 shadow-xs hover:shadow-md transition-all space-y-3"
+                  >
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-mono font-bold flex items-center justify-center shrink-0">
+                          {idx + 1}
+                        </span>
+                        {q.page && (
+                          <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-200/90 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 font-bold">
+                            {q.page}
+                          </span>
+                        )}
+                        {q.tags && q.tags.length > 0 && (
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {q.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-[11px] px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800 font-medium"
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleCopyQuote(q)}
+                        className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-slate-700 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 shadow-2xs transition-colors cursor-pointer shrink-0 font-medium"
+                        title="複製本則金句"
+                      >
+                        {copiedQuoteId === q.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="text-emerald-600 font-bold">已複製金句</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-amber-700 dark:text-amber-300" />
+                            <span>複製金句</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <p className="font-serif italic font-bold text-base sm:text-lg text-ink-950 dark:text-ink-50 leading-relaxed pl-3 border-l-4 border-amber-500">
+                      「{q.quote}」
+                    </p>
+
+                    {q.note && (
+                      <p className="text-xs sm:text-sm text-amber-950/90 dark:text-amber-200/90 pl-3 leading-relaxed">
+                        💡 <span className="font-semibold text-amber-900 dark:text-amber-300">核心意涵：</span>
+                        {q.note}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Navigation Controls between chapters */}
           <div className="no-print pt-8 border-t border-academic-borderLight dark:border-academic-borderDark flex items-center justify-between gap-4">
             {prevChapter ? (
@@ -953,7 +1051,7 @@ export const ChapterReaderPage: React.FC = () => {
           <div className="bg-paper-50 dark:bg-academic-cardDark p-4 rounded-xl border border-academic-borderLight dark:border-academic-borderDark">
             <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-bronze-700 dark:text-bronze-400 mb-2 flex items-center gap-1.5">
               <Compass className="w-3.5 h-3.5" />
-              本章 8 步筆記導航
+              {chapter.quotes && chapter.quotes.length > 0 ? '本章 9 步筆記導航' : '本章 8 步筆記導航'}
             </h4>
             <div className="space-y-1 text-xs">
               {[
@@ -965,11 +1063,18 @@ export const ChapterReaderPage: React.FC = () => {
                 { id: 'section-06', label: '06. 重點整理' },
                 { id: 'section-07', label: '07. 個人心得' },
                 { id: 'section-08', label: '08. 本章總結' },
+                ...(chapter.quotes && chapter.quotes.length > 0
+                  ? [{ id: 'section-09', label: `09. 本章金句 (${chapter.quotes.length})` }]
+                  : []),
               ].map(sec => (
                 <a
                   key={sec.id}
                   href={`#${sec.id}`}
-                  className="block px-2.5 py-1.5 rounded text-ink-600 dark:text-ink-400 hover:bg-paper-200 dark:hover:bg-ink-800 hover:text-bronze-600 transition-colors truncate"
+                  className={`block px-2.5 py-1.5 rounded transition-colors truncate ${
+                    sec.id === 'section-09'
+                      ? 'text-amber-800 dark:text-amber-300 font-semibold hover:bg-amber-100/70 dark:hover:bg-amber-950/60'
+                      : 'text-ink-600 dark:text-ink-400 hover:bg-paper-200 dark:hover:bg-ink-800 hover:text-bronze-600'
+                  }`}
                 >
                   {sec.label}
                 </a>
@@ -980,10 +1085,18 @@ export const ChapterReaderPage: React.FC = () => {
           {/* Chapter Quotes */}
           {chapter.quotes && chapter.quotes.length > 0 && (
             <div className={`bg-paper-50 dark:bg-academic-cardDark p-4 rounded-xl border border-academic-borderLight dark:border-academic-borderDark space-y-3 font-scale-${fontSize}`}>
-              <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                <Quote className="w-3.5 h-3.5" />
-                本章金句 ({chapter.quotes.length})
-              </h4>
+              <div className="flex items-center justify-between">
+                <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                  <Quote className="w-3.5 h-3.5" />
+                  本章金句 ({chapter.quotes.length})
+                </h4>
+                <a
+                  href="#section-09"
+                  className="text-[11px] text-amber-700 dark:text-amber-300 hover:underline font-serif font-medium"
+                >
+                  前往 09 詳解 ↓
+                </a>
+              </div>
               <div className="space-y-2">
                 {chapter.quotes.map(q => (
                   <div key={q.id} className="p-2.5 rounded bg-paper-100 dark:bg-ink-800/50 text-xs space-y-1">

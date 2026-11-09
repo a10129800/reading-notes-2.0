@@ -55,7 +55,7 @@ export const LawFloatingPopover: React.FC<LawFloatingPopoverProps> = ({
   if (!isOpen || !item || !targetRect) return null;
 
   // 計算浮動窗格定位
-  const POPOVER_WIDTH = Math.min(440, typeof window !== 'undefined' ? window.innerWidth - 24 : 440);
+  const POPOVER_WIDTH = Math.min(520, typeof window !== 'undefined' ? window.innerWidth - 24 : 520);
   const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
 
   // 水平置中於目標按鈕，並確保不超出螢幕左右邊界
@@ -93,19 +93,19 @@ export const LawFloatingPopover: React.FC<LawFloatingPopoverProps> = ({
       aria-label={`${item.lawName} 浮動窗格`}
     >
       {/* 窗格頂部標題列 */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 bg-gradient-to-r from-emerald-700 to-teal-800 text-white shrink-0">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-emerald-700 to-teal-800 text-white shrink-0">
         <div className="flex items-center gap-1.5 flex-wrap flex-1 mr-2">
           <span className="text-sm">⚖️</span>
-          <span className="font-bold text-xs tracking-wide">
+          <span className="font-bold text-xs sm:text-sm tracking-wide">
             {item.lawName}
           </span>
           {item.articleTitle && (
-            <span className="font-semibold text-[11px] text-emerald-100">
+            <span className="font-semibold text-xs text-emerald-100">
               【{item.articleTitle}】
             </span>
           )}
           {item.page && (
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/20 text-emerald-100 font-mono">
+            <span className="text-[11px] px-1.5 py-0.2 rounded bg-white/20 text-emerald-100 font-mono font-bold">
               {item.page}
             </span>
           )}
@@ -121,48 +121,48 @@ export const LawFloatingPopover: React.FC<LawFloatingPopoverProps> = ({
         </button>
       </div>
 
-      {/* 窗格主要內容區塊 (最多 60vh 可滾動) */}
-      <div className="p-3.5 space-y-3 max-h-[60vh] overflow-y-auto text-xs scrollbar-thin">
+      {/* 窗格主要內容區塊 (最多 65vh 可滾動) */}
+      <div className="p-4 space-y-3.5 max-h-[65vh] overflow-y-auto text-xs sm:text-sm scrollbar-thin">
         {/* 全國法規資料庫現行條文 */}
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 space-y-1.5">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1">
-              <BookOpen className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 space-y-2">
+          <div className="flex items-center justify-between text-xs sm:text-sm">
+            <span className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+              <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>全國法規資料庫現行條文：</span>
             </span>
 
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 text-[10.5px] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 text-xs transition-colors cursor-pointer"
               title="複製條文"
             >
               {copied ? (
                 <>
-                  <Check className="w-3 h-3 text-emerald-600" />
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                   <span className="text-emerald-600 font-bold">已複製</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3 h-3" />
+                  <Copy className="w-3.5 h-3.5" />
                   <span>複製</span>
                 </>
               )}
             </button>
           </div>
 
-          <p className="text-slate-900 dark:text-slate-100 font-mono text-[12px] leading-relaxed whitespace-pre-line pl-1">
+          <p className="text-slate-900 dark:text-slate-100 font-mono text-[14px] sm:text-[15px] leading-[1.8] whitespace-pre-line pl-1 select-text">
             {item.content}
           </p>
         </div>
 
         {/* 本書研讀導引與表格對應 */}
         {item.bookNote && (
-          <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 space-y-1">
-            <span className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1 text-[11px]">
+          <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 space-y-1.5">
+            <span className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 text-xs sm:text-sm">
               <span>💡 本書研讀導引與表格對應：</span>
             </span>
-            <p className="text-amber-950 dark:text-amber-100 leading-relaxed whitespace-pre-line pl-1 text-[11.5px]">
+            <p className="text-amber-950 dark:text-amber-100 leading-relaxed whitespace-pre-line pl-1 text-[13px] sm:text-[14px]">
               {item.bookNote}
             </p>
           </div>
@@ -170,7 +170,7 @@ export const LawFloatingPopover: React.FC<LawFloatingPopoverProps> = ({
       </div>
 
       {/* 窗格底部快捷列 */}
-      <div className="px-3.5 py-2 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-[11px] shrink-0">
+      <div className="px-4 py-2.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs shrink-0">
         {item.lawUrl ? (
           <a
             href={item.lawUrl}

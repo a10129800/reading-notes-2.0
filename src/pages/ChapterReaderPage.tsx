@@ -58,6 +58,38 @@ export const ChapterReaderPage: React.FC = () => {
     item: null,
   });
 
+  // Section 09 金句折疊狀態管理（預設收合）
+  const [openQuoteIds, setOpenQuoteIds] = useState<Record<string, boolean>>({});
+
+  const toggleQuote = (id: string) => {
+    setOpenQuoteIds(prev => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const handleToggleAllQuotes = () => {
+    if (!chapter?.quotes) return;
+    const allOpen = chapter.quotes.every((q, idx) => openQuoteIds[q.id || String(idx)]);
+    if (allOpen) {
+      setOpenQuoteIds({});
+    } else {
+      const newMap: Record<string, boolean> = {};
+      chapter.quotes.forEach((q, idx) => {
+        newMap[q.id || String(idx)] = true;
+      });
+      setOpenQuoteIds(newMap);
+    }
+  };
+
+  // 平滑跳轉至指定章節步驟（安全繞過 HashRouter 路由衝突）
+  const scrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   // Load book & chapter data
   useEffect(() => {
     if (!bookId || !chapterId) return;
@@ -364,7 +396,7 @@ export const ChapterReaderPage: React.FC = () => {
           </div>
 
           {/* Section 01: 章節導讀 */}
-          <section id="section-01" className="space-y-4 pt-2">
+          <section id="section-01" className="scroll-mt-24 space-y-4 pt-2">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">01</span>
               章節導讀
@@ -416,7 +448,7 @@ export const ChapterReaderPage: React.FC = () => {
           </section>
 
           {/* Section 02: 核心摘要 */}
-          <section id="section-02" className="space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
+          <section id="section-02" className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">02</span>
               核心摘要
@@ -457,7 +489,7 @@ export const ChapterReaderPage: React.FC = () => {
           </section>
 
           {/* Section 03: 專業知識 */}
-          <section id="section-03" className="space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
+          <section id="section-03" className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">03</span>
               專業知識與定義
@@ -632,7 +664,7 @@ export const ChapterReaderPage: React.FC = () => {
           </section>
 
           {/* Section 04: 白話解釋 */}
-          <section id="section-04" className="space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
+          <section id="section-04" className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">04</span>
               白話重新詮釋 (Plain-Text Explanation)
@@ -658,7 +690,7 @@ export const ChapterReaderPage: React.FC = () => {
           </section>
 
           {/* Section 05: 案例分析 (嚴格區分原書案例與讀者舉例) */}
-          <section id="section-05" className="space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
+          <section id="section-05" className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">05</span>
               案例分析 (嚴格界定標記)
@@ -777,7 +809,7 @@ export const ChapterReaderPage: React.FC = () => {
           </section>
 
           {/* Section 06: 重點整理 */}
-          <section id="section-06" className="space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
+          <section id="section-06" className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">06</span>
               重點整理與比較圖表
@@ -850,7 +882,7 @@ export const ChapterReaderPage: React.FC = () => {
           </section>
 
           {/* Section 07: 個人心得 */}
-          <section id="section-07" className="space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
+          <section id="section-07" className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">07</span>
               個人心得與批判性思考
@@ -895,7 +927,7 @@ export const ChapterReaderPage: React.FC = () => {
           </section>
 
           {/* Section 08: 本章總結 */}
-          <section id="section-08" className="space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
+          <section id="section-08" className="scroll-mt-24 space-y-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">08</span>
               本章總結與收穫
@@ -942,68 +974,143 @@ export const ChapterReaderPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
-                {chapter.quotes.map((q, idx) => (
-                  <div
-                    key={q.id || idx}
-                    className="group relative p-5 rounded-2xl bg-gradient-to-br from-amber-50/90 via-paper-50 to-amber-50/40 dark:from-academic-cardDark dark:via-ink-800/60 dark:to-academic-cardDark border-2 border-amber-200/90 dark:border-amber-800/70 shadow-xs hover:shadow-md transition-all space-y-3"
-                  >
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-mono font-bold flex items-center justify-center shrink-0">
-                          {idx + 1}
-                        </span>
-                        {q.page && (
-                          <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-200/90 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 font-bold">
-                            {q.page}
-                          </span>
-                        )}
-                        {q.tags && q.tags.length > 0 && (
-                          <div className="flex items-center gap-1 flex-wrap">
-                            {q.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-[11px] px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800 font-medium"
-                              >
-                                #{tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleCopyQuote(q)}
-                        className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-slate-700 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 shadow-2xs transition-colors cursor-pointer shrink-0 font-medium"
-                        title="複製本則金句"
-                      >
-                        {copiedQuoteId === q.id ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                            <span className="text-emerald-600 font-bold">已複製金句</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5 text-amber-700 dark:text-amber-300" />
-                            <span>複製金句</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    <p className="font-serif italic font-bold text-base sm:text-lg text-ink-950 dark:text-ink-50 leading-relaxed pl-3 border-l-4 border-amber-500">
-                      「{q.quote}」
-                    </p>
-
-                    {q.note && (
-                      <p className="text-xs sm:text-sm text-amber-950/90 dark:text-amber-200/90 pl-3 leading-relaxed">
-                        💡 <span className="font-semibold text-amber-900 dark:text-amber-300">核心意涵：</span>
-                        {q.note}
-                      </p>
-                    )}
+              {/* 金句折疊清單 Card */}
+              <div className="p-4 rounded-xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 shadow-xs space-y-3">
+                <div className="flex items-center justify-between pb-1 border-b border-amber-200/60 dark:border-amber-800/40 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-md font-bold text-xs bg-amber-600 text-white shadow-xs">
+                      本章金句 (原書精華論述)
+                    </span>
+                    <span className="text-[11px] text-amber-900/80 dark:text-amber-200/80 font-medium">
+                      共 {chapter.quotes.length} 則・點開各折頁可查閱完整名言、出處頁碼與法理解析
+                    </span>
                   </div>
-                ))}
+
+                  <button
+                    type="button"
+                    onClick={handleToggleAllQuotes}
+                    className="text-[11px] px-2.5 py-1 rounded-md bg-white dark:bg-ink-800 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-ink-700 transition-colors font-medium shadow-2xs cursor-pointer"
+                  >
+                    {chapter.quotes.every((q, idx) => openQuoteIds[q.id || String(idx)]) ? '全部收合金句 ▴' : '全部展開金句 ▾'}
+                  </button>
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  {chapter.quotes.map((q, idx) => {
+                    const qKey = q.id || String(idx);
+                    const isOpen = Boolean(openQuoteIds[qKey]);
+
+                    return (
+                      <details
+                        key={qKey}
+                        open={isOpen}
+                        className="group rounded-xl border border-amber-200 dark:border-amber-800/60 bg-white/95 dark:bg-ink-900/80 overflow-hidden shadow-xs transition-all duration-200 hover:border-amber-400"
+                      >
+                        <summary
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleQuote(qKey);
+                          }}
+                          className="flex items-center justify-between p-3.5 cursor-pointer list-none select-none hover:bg-amber-50/80 dark:hover:bg-amber-950/40 transition-colors"
+                        >
+                          <div className="flex items-start gap-2.5 flex-1 pr-2 min-w-0">
+                            <span className="quote-index-badge w-5 h-5 rounded-full bg-amber-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                              {idx + 1}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-bold text-amber-950 dark:text-amber-100 text-xs">
+                                  {q.page ? `原書 ${q.page}` : `金句 ${idx + 1}`}
+                                </span>
+                                {q.tags && q.tags.map(t => (
+                                  <span
+                                    key={t}
+                                    className="text-[10px] px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-medium"
+                                  >
+                                    #{t}
+                                  </span>
+                                ))}
+                              </div>
+                              <p className="text-[11px] text-ink-800 dark:text-slate-100 mt-1 font-serif italic truncate">
+                                「{q.quote}」
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                            <span className="text-[10px] font-bold text-amber-800 dark:text-amber-200 group-open:hidden px-2 py-0.5 rounded bg-amber-100/90 dark:bg-amber-900/70">
+                              點開看完整金句 ▾
+                            </span>
+                            <span className="text-[10px] font-bold text-amber-800 dark:text-amber-200 hidden group-open:inline px-2 py-0.5 rounded bg-amber-100/90 dark:bg-amber-900/70">
+                              收合金句 ▴
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-amber-700 dark:text-amber-400 transition-transform duration-200 group-open:rotate-90" />
+                          </div>
+                        </summary>
+
+                        {/* 完整金句折頁內容 */}
+                        <div className="px-4 pb-4 pt-2.5 border-t border-amber-100 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/30 space-y-3 text-xs">
+                          <div className="flex items-center justify-between gap-2 flex-wrap pt-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {q.page && (
+                                <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-200/90 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 font-bold">
+                                  出處頁碼：{q.page}
+                                </span>
+                              )}
+                              {q.tags && q.tags.map(tag => (
+                                <span
+                                  key={tag}
+                                  className="text-[11px] px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800 font-medium"
+                                >
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyQuote(q);
+                              }}
+                              className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-slate-700 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 shadow-2xs transition-colors cursor-pointer shrink-0 font-medium"
+                              title="複製本則金句"
+                            >
+                              {copiedQuoteId === q.id ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span className="text-emerald-600 font-bold">已複製金句</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5 text-amber-700 dark:text-amber-300" />
+                                  <span>複製金句</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          <div className="p-3.5 rounded-lg bg-white dark:bg-ink-900/90 border border-amber-200/80 dark:border-amber-700/60 space-y-2">
+                            <p className="font-serif italic font-bold text-base sm:text-lg text-ink-950 dark:text-ink-50 leading-relaxed pl-3 border-l-4 border-amber-500">
+                              「{q.quote}」
+                            </p>
+                          </div>
+
+                          {q.note && (
+                            <div className="p-2.5 rounded-lg bg-amber-100/60 dark:bg-amber-950/60 border border-amber-200/50 dark:border-amber-800/50 space-y-0.5">
+                              <span className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1 text-[11px]">
+                                💡 核心意涵與法理解析：
+                              </span>
+                              <p className="text-amber-950 dark:text-amber-100 font-medium leading-relaxed whitespace-pre-line pl-1 text-[12px]">
+                                {q.note}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    );
+                  })}
+                </div>
               </div>
             </section>
           )}
@@ -1067,50 +1174,21 @@ export const ChapterReaderPage: React.FC = () => {
                   ? [{ id: 'section-09', label: `09. 本章金句 (${chapter.quotes.length})` }]
                   : []),
               ].map(sec => (
-                <a
+                <button
                   key={sec.id}
-                  href={`#${sec.id}`}
-                  className={`block px-2.5 py-1.5 rounded transition-colors truncate ${
+                  type="button"
+                  onClick={() => scrollToSection(sec.id)}
+                  className={`w-full text-left block px-2.5 py-1.5 rounded transition-colors truncate cursor-pointer ${
                     sec.id === 'section-09'
                       ? 'text-amber-800 dark:text-amber-300 font-semibold hover:bg-amber-100/70 dark:hover:bg-amber-950/60'
                       : 'text-ink-600 dark:text-ink-400 hover:bg-paper-200 dark:hover:bg-ink-800 hover:text-bronze-600'
                   }`}
                 >
                   {sec.label}
-                </a>
+                </button>
               ))}
             </div>
           </div>
-
-          {/* Chapter Quotes */}
-          {chapter.quotes && chapter.quotes.length > 0 && (
-            <div className={`bg-paper-50 dark:bg-academic-cardDark p-4 rounded-xl border border-academic-borderLight dark:border-academic-borderDark space-y-3 font-scale-${fontSize}`}>
-              <div className="flex items-center justify-between">
-                <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                  <Quote className="w-3.5 h-3.5" />
-                  本章金句 ({chapter.quotes.length})
-                </h4>
-                <a
-                  href="#section-09"
-                  className="text-[11px] text-amber-700 dark:text-amber-300 hover:underline font-serif font-medium"
-                >
-                  前往 09 詳解 ↓
-                </a>
-              </div>
-              <div className="space-y-2">
-                {chapter.quotes.map(q => (
-                  <div key={q.id} className="p-2.5 rounded bg-paper-100 dark:bg-ink-800/50 text-xs space-y-1">
-                    <p className="font-serif italic font-medium text-ink-900 dark:text-ink-100">
-                      「{q.quote}」
-                    </p>
-                    <span className="font-mono text-[10px] text-bronze-700 dark:text-bronze-400 block text-right font-bold">
-                      {q.page}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Related Links */}
           {chapter.relatedLinks && chapter.relatedLinks.length > 0 && (

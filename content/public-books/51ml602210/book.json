@@ -79,11 +79,25 @@
       "readingTimeMinutes": 10,
       "quotesCount": 4,
       "updatedAt": "2026-11-16T19:55:00.000Z"
+    },
+    {
+      "id": "part0-chapter-1-section-1",
+      "bookId": "51ml602210",
+      "order": 6,
+      "title": "第一節 法益保護原則",
+      "subtitle": "刑法四大支柱之一：保護人類重要生活利益（內容後續補充）",
+      "level": 3,
+      "parentChapterId": "part0-chapter-1",
+      "completed": false,
+      "isPending": true,
+      "readingTimeMinutes": 0,
+      "quotesCount": 0,
+      "updatedAt": "2026-11-16T20:10:00.000Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-16T19:55:00.000Z",
+  "updatedAt": "2026-11-16T20:10:00.000Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {

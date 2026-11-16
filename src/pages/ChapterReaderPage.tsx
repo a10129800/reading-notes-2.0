@@ -276,20 +276,27 @@ export const ChapterReaderPage: React.FC = () => {
             <span className="truncate">{book.title}</span>
           </Link>
           {(() => {
-            const parentId = chapter.parentChapterId || book.chapters?.find(c => c.id === chapter.id)?.parentChapterId;
-            const parentChapter = parentId ? book.chapters?.find(c => c.id === parentId) : null;
-            if (!parentChapter) return null;
-            return (
-              <>
+            const ancestors: { id: string; title: string }[] = [];
+            let currParentId = chapter.parentChapterId || book.chapters?.find(c => c.id === chapter.id)?.parentChapterId;
+            const visited = new Set<string>();
+            while (currParentId && !visited.has(currParentId)) {
+              visited.add(currParentId);
+              const parent = book.chapters?.find(c => c.id === currParentId);
+              if (!parent) break;
+              ancestors.unshift(parent);
+              currParentId = parent.parentChapterId;
+            }
+            return ancestors.map((anc) => (
+              <React.Fragment key={anc.id}>
                 <span className="text-ink-300">/</span>
                 <Link
-                  to={`/books/${book.id}/${parentChapter.id}`}
+                  to={`/books/${book.id}/${anc.id}`}
                   className="text-ink-500 hover:text-bronze-700 dark:text-academic-mutedDark dark:hover:text-bronze-400 truncate font-serif"
                 >
-                  {parentChapter.title}
+                  {anc.title}
                 </Link>
-              </>
-            );
+              </React.Fragment>
+            ));
           })()}
           <span className="text-ink-300">/</span>
           <span className="text-ink-900 dark:text-ink-100 font-medium truncate font-serif">
@@ -336,16 +343,20 @@ export const ChapterReaderPage: React.FC = () => {
             <nav className="space-y-1.5">
               {book.chapters?.map((ch, idx) => {
                 const isActive = ch.id === chapter.id;
-                const isChild = (ch.level && ch.level > 1) || Boolean(ch.parentChapterId);
+                const chLevel = ch.level || (ch.parentChapterId ? 2 : 1);
+                const isLevel3 = chLevel >= 3;
+                const isChild = chLevel > 1;
                 const topLevelIndex = book.chapters?.slice(0, idx + 1).filter(c => !((c.level && c.level > 1) || Boolean(c.parentChapterId))).length || 1;
                 return (
                   <Link
                     key={ch.id}
                     to={`/books/${book.id}/${ch.id}`}
                     className={`block px-3 py-2 rounded-lg transition-all ${
-                      isChild
-                        ? 'ml-4 pl-3.5 border-l-2 border-academic-borderLight dark:border-academic-borderDark text-xs font-medium'
-                        : 'mt-2.5 first:mt-0 text-sm font-bold font-serif'
+                      isLevel3
+                        ? 'ml-8 pl-3 border-l-2 border-academic-borderLight dark:border-academic-borderDark text-xs font-medium'
+                        : isChild
+                          ? 'ml-4 pl-3.5 border-l-2 border-academic-borderLight dark:border-academic-borderDark text-xs font-medium'
+                          : 'mt-2.5 first:mt-0 text-sm font-bold font-serif'
                     } ${
                       isActive
                         ? 'bg-bronze-50 dark:bg-bronze-950/60 text-bronze-800 dark:text-bronze-300 border-l-2 border-bronze-600 font-semibold shadow-xs'
@@ -387,7 +398,13 @@ export const ChapterReaderPage: React.FC = () => {
               const currentTopLevelIndex = book.chapters?.slice(0, currentIndex + 1).filter(c => !((c.level && c.level > 1) || Boolean(c.parentChapterId))).length || 1;
               return (
                 <div className="flex items-center gap-2 text-xs font-mono text-bronze-700 dark:text-bronze-400 font-semibold uppercase mb-2">
-                  <span>{isCurrentChild ? `子篇章 (${currentIndex + 1}/${book.chapters?.length || 0})` : `第 ${currentTopLevelIndex} 篇章`}</span>
+                  <span>
+                    {effectiveLevel >= 3
+                      ? `子章節 (${currentIndex + 1}/${book.chapters?.length || 0})`
+                      : isCurrentChild
+                        ? `子篇章 (${currentIndex + 1}/${book.chapters?.length || 0})`
+                        : `第 ${currentTopLevelIndex} 篇章`}
+                  </span>
                   {chapter.readingTimeMinutes && chapter.readingTimeMinutes > 0 ? (
                     <>
                       <span>·</span>

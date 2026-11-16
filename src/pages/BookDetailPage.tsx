@@ -250,19 +250,27 @@ export const BookDetailPage: React.FC = () => {
             </div>
           ) : (
             book.chapters.map((ch, idx) => {
-              const isChild = (ch.level && ch.level > 1) || Boolean(ch.parentChapterId);
+              const chLevel = ch.level || (ch.parentChapterId ? 2 : 1);
+              const isChild = chLevel > 1;
+              const isLevel3 = chLevel >= 3;
               const topLevelIndex = book.chapters?.slice(0, idx + 1).filter(c => !((c.level && c.level > 1) || Boolean(c.parentChapterId))).length || 1;
               return (
                 <Link
                   key={ch.id}
                   to={`/books/${book.id}/${ch.id}`}
                   className={`group flex items-center justify-between p-4 sm:p-5 rounded-xl bg-paper-50 dark:bg-academic-cardDark border border-academic-borderLight dark:border-academic-borderDark hover:border-bronze-500 dark:hover:border-bronze-500 hover:shadow-sm transition-all ${
-                    isChild ? 'ml-6 sm:ml-8 border-l-4 border-l-bronze-500/70' : ''
+                    isLevel3
+                      ? 'ml-10 sm:ml-14 border-l-4 border-l-bronze-400/60'
+                      : isChild
+                        ? 'ml-6 sm:ml-8 border-l-4 border-l-bronze-500/70'
+                        : ''
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     {isChild ? (
-                      <div className="w-8 h-8 rounded-full bg-paper-200 dark:bg-ink-800 text-bronze-600 dark:text-bronze-400 flex items-center justify-center font-mono text-sm font-bold shrink-0">
+                      <div className={`rounded-full bg-paper-200 dark:bg-ink-800 text-bronze-600 dark:text-bronze-400 flex items-center justify-center font-mono font-bold shrink-0 ${
+                        isLevel3 ? 'w-7 h-7 text-xs' : 'w-8 h-8 text-sm'
+                      }`}>
                         └─
                       </div>
                     ) : (
@@ -272,14 +280,16 @@ export const BookDetailPage: React.FC = () => {
                     )}
                     <div>
                       <h3 className={`font-serif font-bold transition-colors flex items-center gap-2 ${
-                        isChild
-                          ? 'text-sm text-ink-800 dark:text-ink-200 group-hover:text-bronze-700'
-                          : 'text-lg text-ink-950 dark:text-ink-50 group-hover:text-bronze-700'
+                        isLevel3
+                          ? 'text-xs sm:text-sm text-ink-800 dark:text-ink-200 group-hover:text-bronze-700'
+                          : isChild
+                            ? 'text-sm text-ink-800 dark:text-ink-200 group-hover:text-bronze-700'
+                            : 'text-lg text-ink-950 dark:text-ink-50 group-hover:text-bronze-700'
                       }`}>
                         {ch.title}
                         {isChild && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-bronze-50 dark:bg-bronze-950/60 text-bronze-700 dark:text-bronze-300 font-sans font-normal">
-                            子篇章
+                            {isLevel3 ? '子章節' : '子篇章'}
                           </span>
                         )}
                       </h3>

@@ -123,6 +123,7 @@ export interface ChapterMeta {
   level?: number;                     // 1: 篇/導論 (頂層), 2: 章 (子篇章), 3: 節
   parentChapterId?: string;           // 父章節 ID，用於樹狀階層目錄
   completed?: boolean;
+  isPending?: boolean;                // 是否為待補充筆記之預留章節
   readingTimeMinutes?: number;
   quotesCount?: number;
   updatedAt: string;

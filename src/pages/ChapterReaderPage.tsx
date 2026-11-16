@@ -275,17 +275,22 @@ export const ChapterReaderPage: React.FC = () => {
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{book.title}</span>
           </Link>
-          {chapter.parentChapterId && book.chapters?.find(c => c.id === chapter.parentChapterId) && (
-            <>
-              <span className="text-ink-300">/</span>
-              <Link
-                to={`/books/${book.id}/${chapter.parentChapterId}`}
-                className="text-ink-500 hover:text-bronze-700 dark:text-academic-mutedDark dark:hover:text-bronze-400 truncate font-serif"
-              >
-                {book.chapters.find(c => c.id === chapter.parentChapterId)?.title}
-              </Link>
-            </>
-          )}
+          {(() => {
+            const parentId = chapter.parentChapterId || book.chapters?.find(c => c.id === chapter.id)?.parentChapterId;
+            const parentChapter = parentId ? book.chapters?.find(c => c.id === parentId) : null;
+            if (!parentChapter) return null;
+            return (
+              <>
+                <span className="text-ink-300">/</span>
+                <Link
+                  to={`/books/${book.id}/${parentChapter.id}`}
+                  className="text-ink-500 hover:text-bronze-700 dark:text-academic-mutedDark dark:hover:text-bronze-400 truncate font-serif"
+                >
+                  {parentChapter.title}
+                </Link>
+              </>
+            );
+          })()}
           <span className="text-ink-300">/</span>
           <span className="text-ink-900 dark:text-ink-100 font-medium truncate font-serif">
             {chapter.title}
@@ -375,12 +380,15 @@ export const ChapterReaderPage: React.FC = () => {
           {/* Chapter Main Header */}
           <div className="border-b border-academic-borderLight dark:border-academic-borderDark pb-6">
             {(() => {
-              const isCurrentChild = (chapter.level && chapter.level > 1) || Boolean(chapter.parentChapterId);
+              const metaCh = book.chapters?.find(c => c.id === chapter.id);
+              const effectiveLevel = chapter.level || metaCh?.level || 1;
+              const effectiveParentId = chapter.parentChapterId || metaCh?.parentChapterId;
+              const isCurrentChild = (effectiveLevel > 1) || Boolean(effectiveParentId);
               const currentTopLevelIndex = book.chapters?.slice(0, currentIndex + 1).filter(c => !((c.level && c.level > 1) || Boolean(c.parentChapterId))).length || 1;
               return (
                 <div className="flex items-center gap-2 text-xs font-mono text-bronze-700 dark:text-bronze-400 font-semibold uppercase mb-2">
                   <span>{isCurrentChild ? `子篇章 (${currentIndex + 1}/${book.chapters?.length || 0})` : `第 ${currentTopLevelIndex} 篇章`}</span>
-                  {chapter.readingTimeMinutes && (
+                  {chapter.readingTimeMinutes && chapter.readingTimeMinutes > 0 ? (
                     <>
                       <span>·</span>
                       <span className="flex items-center gap-1">
@@ -388,7 +396,7 @@ export const ChapterReaderPage: React.FC = () => {
                         預計閱讀 {chapter.readingTimeMinutes} 分鐘
                       </span>
                     </>
-                  )}
+                  ) : null}
                 </div>
               );
             })()}
@@ -403,6 +411,30 @@ export const ChapterReaderPage: React.FC = () => {
           </div>
 
           {/* Section 01: 章節導讀 */}
+          {chapter.isPending ? (
+            <div className="p-10 sm:p-14 text-center rounded-2xl bg-paper-50 dark:bg-academic-cardDark border-2 border-dashed border-academic-borderLight dark:border-academic-borderDark space-y-4 my-6">
+              <div className="w-14 h-14 mx-auto rounded-full bg-bronze-100 dark:bg-bronze-950/80 text-bronze-700 dark:text-bronze-400 flex items-center justify-center">
+                <Clock className="w-7 h-7" />
+              </div>
+              <h3 className="font-serif text-xl font-bold text-ink-900 dark:text-ink-100">
+                本章筆記內容待補充
+              </h3>
+              <p className="text-sm text-ink-600 dark:text-academic-mutedDark max-w-md mx-auto leading-relaxed">
+                此章節為預留篇章結構，後續研讀進度將陸續補充 8 步結構化筆記、法理分析與精選案例。
+              </p>
+              {chapter.parentChapterId && (
+                <div className="pt-2">
+                  <Link
+                    to={`/books/${book.id}/${chapter.parentChapterId}`}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-academic-navy text-paper-50 text-xs font-medium hover:bg-bronze-700 transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> 返回上層篇章
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
           <section id="section-01" className="scroll-mt-24 space-y-4 pt-2">
             <div className="flex items-center gap-2 text-sm font-bold font-serif text-bronze-700 dark:text-bronze-400 uppercase tracking-wide">
               <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-bronze-100 dark:bg-bronze-950/80">01</span>
@@ -1121,6 +1153,8 @@ export const ChapterReaderPage: React.FC = () => {
               </div>
             </section>
           )}
+          </>
+          )}
 
           {/* Navigation Controls between chapters */}
           <div className="no-print pt-8 border-t border-academic-borderLight dark:border-academic-borderDark flex items-center justify-between gap-4">
@@ -1167,34 +1201,41 @@ export const ChapterReaderPage: React.FC = () => {
               <Compass className="w-3.5 h-3.5" />
               {chapter.quotes && chapter.quotes.length > 0 ? '本章 9 步筆記導航' : '本章 8 步筆記導航'}
             </h4>
-            <div className="space-y-1 text-xs">
-              {[
-                { id: 'section-01', label: '01. 章節導讀' },
-                { id: 'section-02', label: '02. 核心摘要' },
-                { id: 'section-03', label: '03. 專業知識' },
-                { id: 'section-04', label: '04. 白話解釋' },
-                { id: 'section-05', label: '05. 案例分析' },
-                { id: 'section-06', label: '06. 重點整理' },
-                { id: 'section-07', label: '07. 個人心得' },
-                { id: 'section-08', label: '08. 本章總結' },
-                ...(chapter.quotes && chapter.quotes.length > 0
-                  ? [{ id: 'section-09', label: `09. 本章金句 (${chapter.quotes.length})` }]
-                  : []),
-              ].map(sec => (
-                <button
-                  key={sec.id}
-                  type="button"
-                  onClick={() => scrollToSection(sec.id)}
-                  className={`w-full text-left block px-2.5 py-1.5 rounded transition-colors truncate cursor-pointer ${
-                    sec.id === 'section-09'
-                      ? 'text-amber-800 dark:text-amber-300 font-semibold hover:bg-amber-100/70 dark:hover:bg-amber-950/60'
-                      : 'text-ink-600 dark:text-ink-400 hover:bg-paper-200 dark:hover:bg-ink-800 hover:text-bronze-600'
-                  }`}
-                >
-                  {sec.label}
-                </button>
-              ))}
-            </div>
+            {chapter.isPending ? (
+              <div className="p-3 text-center rounded-lg bg-paper-100 dark:bg-ink-800/40 text-xs text-ink-500 dark:text-academic-mutedDark space-y-1">
+                <p className="font-serif font-medium">內容後續補充中</p>
+                <p className="text-[11px] text-ink-400">目前尚無結構化筆記節點</p>
+              </div>
+            ) : (
+              <div className="space-y-1 text-xs">
+                {[
+                  { id: 'section-01', label: '01. 章節導讀' },
+                  { id: 'section-02', label: '02. 核心摘要' },
+                  { id: 'section-03', label: '03. 專業知識' },
+                  { id: 'section-04', label: '04. 白話解釋' },
+                  { id: 'section-05', label: '05. 案例分析' },
+                  { id: 'section-06', label: '06. 重點整理' },
+                  { id: 'section-07', label: '07. 個人心得' },
+                  { id: 'section-08', label: '08. 本章總結' },
+                  ...(chapter.quotes && chapter.quotes.length > 0
+                    ? [{ id: 'section-09', label: `09. 本章金句 (${chapter.quotes.length})` }]
+                    : []),
+                ].map(sec => (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    onClick={() => scrollToSection(sec.id)}
+                    className={`w-full text-left block px-2.5 py-1.5 rounded transition-colors truncate cursor-pointer ${
+                      sec.id === 'section-09'
+                        ? 'text-amber-800 dark:text-amber-300 font-semibold hover:bg-amber-100/70 dark:hover:bg-amber-950/60'
+                        : 'text-ink-600 dark:text-ink-400 hover:bg-paper-200 dark:hover:bg-ink-800 hover:text-bronze-600'
+                    }`}
+                  >
+                    {sec.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Related Links */}

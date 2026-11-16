@@ -66,6 +66,20 @@
       "readingTimeMinutes": 15,
       "quotesCount": 3,
       "updatedAt": "2026-11-16T18:00:00.000Z"
+    },
+    {
+      "id": "part0-chapter-1",
+      "bookId": "51ml602210",
+      "order": 5,
+      "title": "第一章",
+      "subtitle": "內容後續補充",
+      "level": 2,
+      "parentChapterId": "part0-preface",
+      "completed": false,
+      "isPending": true,
+      "readingTimeMinutes": 0,
+      "quotesCount": 0,
+      "updatedAt": "2026-11-16T19:25:00.000Z"
     }
   ],
   "startDate": "2026-11-05",

@@ -88,20 +88,19 @@
           "id": "part0-chapter-1",
           "bookId": "51ml602210",
           "order": 5,
-          "title": "第一章",
-          "subtitle": "內容後續補充",
+          "title": "第一章 刑法的運作原理",
+          "subtitle": "篇首導讀：四大支柱（法益保護、最後手段性、罪刑法定、罪責原則）",
           "level": 2,
           "parentChapterId": "part0-preface",
           "completed": false,
-          "isPending": true,
-          "readingTimeMinutes": 0,
-          "quotesCount": 0,
-          "updatedAt": "2026-11-16T19:25:00.000Z"
+          "readingTimeMinutes": 10,
+          "quotesCount": 4,
+          "updatedAt": "2026-11-16T19:55:00.000Z"
         }
       ],
       "startDate": "2026-11-05",
       "coverImage": "content/public-books/51ml602210/cover.jpg",
-      "updatedAt": "2026-11-16T18:00:00.000Z",
+      "updatedAt": "2026-11-16T19:55:00.000Z",
       "createdAt": "2026-11-05T10:27:22.287Z",
       "quotes": [
         {
@@ -127,6 +126,20 @@
             "謹思慎刑",
             "最後手段性",
             "刑罰理論提前"
+          ]
+        },
+        {
+          "id": "q-51ml-03",
+          "quote": "基於應報，刑罰不允許超出行為人的責任範圍，亦即小罪不能大罰；基於預防，刑罰的依據必須明確，不能有任何含糊使人民無所安其手足。",
+          "sourceChapterId": "part0-chapter-1",
+          "sourceChapterTitle": "第一章 刑法的運作原理",
+          "page": "第零篇第一章導讀",
+          "note": "四大支柱核心：罪責原則與罪刑法定原則之思想來源。",
+          "tags": [
+            "小罪不能大罰",
+            "罪責原則",
+            "罪刑法定",
+            "安措手足"
           ]
         }
       ]

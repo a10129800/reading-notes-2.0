@@ -332,6 +332,7 @@ export const ChapterReaderPage: React.FC = () => {
               {book.chapters?.map((ch, idx) => {
                 const isActive = ch.id === chapter.id;
                 const isChild = (ch.level && ch.level > 1) || Boolean(ch.parentChapterId);
+                const topLevelIndex = book.chapters?.slice(0, idx + 1).filter(c => !((c.level && c.level > 1) || Boolean(c.parentChapterId))).length || 1;
                 return (
                   <Link
                     key={ch.id}
@@ -355,7 +356,7 @@ export const ChapterReaderPage: React.FC = () => {
                         </span>
                       ) : (
                         <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-bronze-100/80 dark:bg-bronze-950/80 text-bronze-800 dark:text-bronze-300 shrink-0">
-                          {String(idx + 1).padStart(2, '0')}
+                          {String(topLevelIndex).padStart(2, '0')}
                         </span>
                       )}
                       <span className={`truncate ${isChild ? 'text-xs font-medium' : 'text-sm font-bold'}`}>
@@ -373,18 +374,24 @@ export const ChapterReaderPage: React.FC = () => {
         <main className={`lg:col-span-6 xl:col-span-8 space-y-10 font-scale-${fontSize} ${fontClass}`}>
           {/* Chapter Main Header */}
           <div className="border-b border-academic-borderLight dark:border-academic-borderDark pb-6">
-            <div className="flex items-center gap-2 text-xs font-mono text-bronze-700 dark:text-bronze-400 font-semibold uppercase mb-2">
-              <span>第 {currentIndex + 1} 篇章</span>
-              {chapter.readingTimeMinutes && (
-                <>
-                  <span>·</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    預計閱讀 {chapter.readingTimeMinutes} 分鐘
-                  </span>
-                </>
-              )}
-            </div>
+            {(() => {
+              const isCurrentChild = (chapter.level && chapter.level > 1) || Boolean(chapter.parentChapterId);
+              const currentTopLevelIndex = book.chapters?.slice(0, currentIndex + 1).filter(c => !((c.level && c.level > 1) || Boolean(c.parentChapterId))).length || 1;
+              return (
+                <div className="flex items-center gap-2 text-xs font-mono text-bronze-700 dark:text-bronze-400 font-semibold uppercase mb-2">
+                  <span>{isCurrentChild ? `子篇章 (${currentIndex + 1}/${book.chapters?.length || 0})` : `第 ${currentTopLevelIndex} 篇章`}</span>
+                  {chapter.readingTimeMinutes && (
+                    <>
+                      <span>·</span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        預計閱讀 {chapter.readingTimeMinutes} 分鐘
+                      </span>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
             <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-ink-950 dark:text-ink-50 leading-tight">
               {chapter.title}
             </h1>
@@ -835,7 +842,7 @@ export const ChapterReaderPage: React.FC = () => {
                         比較表格
                       </span>
                       <span className="text-[11px] text-ink-500 dark:text-academic-mutedDark">
-                        雙重推定、反證阻卻體系與二階／三階論對照
+                        {sections.keyTakeaways.comparisonTitle || (chapter.id === 'part0-preface' ? '傳統教科書編排 vs. 易律師第零篇提前整理刑罰效果對照' : '雙重推定、反證阻卻體系與二階／三階論對照')}
                       </span>
                     </div>
                   </div>

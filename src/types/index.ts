@@ -83,6 +83,7 @@ export interface SectionCaseAnalysis {
 // 06. 重點整理
 export interface SectionKeyTakeaways {
   takeaways: string[];        // 條列式重點
+  comparisonTitle?: string;   // 比較表格標題/副標題說明
   comparisonTable?: string;   // 比較表格 (Markdown 格式)
   diagramMarkdown?: string;   // 流程圖 / 心智圖 (Mermaid 或文字心智圖)
 }

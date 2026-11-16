@@ -71,11 +71,23 @@
           "readingTimeMinutes": 20,
           "quotesCount": 4,
           "updatedAt": "2026-11-08T06:10:00.000Z"
+        },
+        {
+          "id": "part0-preface",
+          "bookId": "51ml602210",
+          "order": 4,
+          "title": "第零篇 刑法的運作、操作原理與法律效果",
+          "subtitle": "篇首導讀：四大支柱、操作前理解與「謹思慎刑」法律效果",
+          "level": 1,
+          "completed": false,
+          "readingTimeMinutes": 15,
+          "quotesCount": 3,
+          "updatedAt": "2026-11-16T18:00:00.000Z"
         }
       ],
       "startDate": "2026-11-05",
       "coverImage": "content/public-books/51ml602210/cover.jpg",
-      "updatedAt": "2026-11-07T12:39:41.789Z",
+      "updatedAt": "2026-11-16T18:00:00.000Z",
       "createdAt": "2026-11-05T10:27:22.287Z",
       "quotes": [
         {
@@ -88,6 +100,19 @@
           "tags": [
             "法理基礎",
             "生活經驗"
+          ]
+        },
+        {
+          "id": "q-51ml-02",
+          "quote": "至於刑法的法律效果，筆者挪移到本篇提前整理，旨在提醒大家「謹思慎刑」的核心理念，也與刑法最後手段性原則接軌。",
+          "sourceChapterId": "part0-preface",
+          "sourceChapterTitle": "第零篇 刑法的運作、操作原理與法律效果",
+          "page": "第零篇導讀",
+          "note": "全書最關鍵之價值宣言：先知慎刑，而後論罪。",
+          "tags": [
+            "謹思慎刑",
+            "最後手段性",
+            "刑罰理論提前"
           ]
         }
       ]

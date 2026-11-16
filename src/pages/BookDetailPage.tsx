@@ -251,6 +251,7 @@ export const BookDetailPage: React.FC = () => {
           ) : (
             book.chapters.map((ch, idx) => {
               const isChild = (ch.level && ch.level > 1) || Boolean(ch.parentChapterId);
+              const topLevelIndex = book.chapters?.slice(0, idx + 1).filter(c => !((c.level && c.level > 1) || Boolean(c.parentChapterId))).length || 1;
               return (
                 <Link
                   key={ch.id}
@@ -266,7 +267,7 @@ export const BookDetailPage: React.FC = () => {
                       </div>
                     ) : (
                       <div className="w-9 h-9 rounded-xl bg-bronze-100 dark:bg-bronze-950/80 text-bronze-800 dark:text-bronze-300 flex items-center justify-center font-mono text-xs font-bold shrink-0">
-                        {String(idx + 1).padStart(2, '0')}
+                        {String(topLevelIndex).padStart(2, '0')}
                       </div>
                     )}
                     <div>

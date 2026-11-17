@@ -84,20 +84,19 @@
       "id": "part0-chapter-1-section-1",
       "bookId": "51ml602210",
       "order": 6,
-      "title": "第一節 法益保護原則",
-      "subtitle": "刑法四大支柱之一：保護人類重要生活利益（內容後續補充）",
+      "title": "第一節 法益保護原則——何謂法益？",
+      "subtitle": "法益概念、體系分類、三大功能與構成要件解釋之指導（原書 p.2-1 ~ 2-4）",
       "level": 3,
       "parentChapterId": "part0-chapter-1",
       "completed": false,
-      "isPending": true,
-      "readingTimeMinutes": 0,
-      "quotesCount": 0,
-      "updatedAt": "2026-11-16T20:10:00.000Z"
+      "readingTimeMinutes": 15,
+      "quotesCount": 4,
+      "updatedAt": "2026-11-17T15:20:00.000Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-16T20:10:00.000Z",
+  "updatedAt": "2026-11-17T15:20:00.000Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {
@@ -137,6 +136,19 @@
         "罪責原則",
         "罪刑法定",
         "安措手足"
+      ]
+    },
+    {
+      "id": "q-51ml-04",
+      "quote": "凡是以法律手段而加以保護之重要生活利益，即稱為法益。法益源於社會倫理價值觀念，係先於法律規範而存在，並在法律制度發展後確認保護。",
+      "sourceChapterId": "part0-chapter-1-section-1",
+      "sourceChapterTitle": "第一節 法益保護原則——何謂法益？",
+      "page": "p. 2-1",
+      "note": "刑法法益之根本定義與起源定位。",
+      "tags": [
+        "法益定義",
+        "生活利益",
+        "社會倫理"
       ]
     }
   ]

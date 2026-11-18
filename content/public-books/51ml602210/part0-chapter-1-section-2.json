@@ -1,0 +1,85 @@
+{
+  "id": "part0-chapter-1-section-2",
+  "bookId": "51ml602210",
+  "order": 7,
+  "title": "第二節 罪刑法定原則",
+  "subtitle": "刑法四大支柱之二：使人民安措其手足（內容後續補充）",
+  "level": 3,
+  "parentChapterId": "part0-chapter-1",
+  "completed": false,
+  "isPending": true,
+  "readingTimeMinutes": 0,
+  "sections": {
+    "introduction": {
+      "overview": "【本節筆記待補充】\n本節為《刑法總則（圖說）》第零篇第一章之「第二節 罪刑法定原則」（併同探討最後手段性原則之光影互動）。\n基於預防思想，刑罰的依據必須明確，不能有任何含糊使人民無所安其手足。詳細研讀筆記、衍生子原則、學說精華與案例剖析後續補充。",
+      "learningGoals": [
+        "待補充研讀目標"
+      ],
+      "coreQuestions": [
+        "待補充核心探討問題"
+      ]
+    },
+    "summary": {
+      "mainArgument": "待補充主要論述。",
+      "contentDigest": "待補充章節內容摘要。",
+      "keyPoints": [
+        "待補充"
+      ]
+    },
+    "professionalKnowledge": {
+      "definitions": "待補充定義。",
+      "terminology": [
+        "罪刑法定原則",
+        "最後手段性原則"
+      ],
+      "theories": "待補充學說理論。",
+      "citations": "待補充法條引用。"
+    },
+    "vernacularExplanation": {
+      "plainText": "待補充白話解釋。",
+      "everydayExamples": "待補充生活化譬喻。"
+    },
+    "caseAnalysis": {
+      "bookCases": "待補充原書案例。",
+      "customCases": "待補充讀者自行舉例。",
+      "application": "待補充案例與理論關聯。"
+    },
+    "keyTakeaways": {
+      "takeaways": [
+        "待補充重點整理"
+      ]
+    },
+    "personalInsights": {
+      "reflections": "待補充個人心得。",
+      "agreedPoints": "待補充認同觀點。",
+      "disagreedPoints": "待補充存疑之處。"
+    },
+    "chapterSummary": {
+      "coreKnowledge": "待補充核心知識結語。",
+      "conclusions": "待補充重要結論。"
+    }
+  },
+  "quotes": [],
+  "relatedLinks": [
+    {
+      "id": "rel-p0-ch1-sec2-01",
+      "conceptName": "第一章 刑法的運作原理",
+      "description": "返回第一章篇首導讀與四大支柱全貌。",
+      "targetBookId": "51ml602210",
+      "targetBookTitle": "刑法總則（圖說）",
+      "targetChapterId": "part0-chapter-1",
+      "targetChapterTitle": "第一章 刑法的運作原理"
+    },
+    {
+      "id": "rel-p0-ch1-sec2-02",
+      "conceptName": "第一節 法益保護原則——何謂法益？",
+      "description": "回顧四大支柱第一節：法益本質、量相關說與構成要件解釋指導。",
+      "targetBookId": "51ml602210",
+      "targetBookTitle": "刑法總則（圖說）",
+      "targetChapterId": "part0-chapter-1-section-1",
+      "targetChapterTitle": "第一節 法益保護原則——何謂法益？"
+    }
+  ],
+  "createdAt": "2026-11-18T15:03:00.000Z",
+  "updatedAt": "2026-11-18T15:03:00.000Z"
+}

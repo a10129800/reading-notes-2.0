@@ -218,7 +218,16 @@
       "targetBookId": "51ml602210",
       "targetBookTitle": "刑法總則（圖說）",
       "targetChapterId": "part0-chapter-1-section-1",
-      "targetChapterTitle": "第一節 法益保護原則"
+      "targetChapterTitle": "第一節 法益保護原則——何謂法益？"
+    },
+    {
+      "id": "rel-p0-ch1-04",
+      "conceptName": "第二節 罪刑法定原則",
+      "description": "進入四大支柱第二節專題研讀：使人民安措其手足之明確性與罪刑法定防線。",
+      "targetBookId": "51ml602210",
+      "targetBookTitle": "刑法總則（圖說）",
+      "targetChapterId": "part0-chapter-1-section-2",
+      "targetChapterTitle": "第二節 罪刑法定原則"
     }
   ],
   "createdAt": "2026-11-16T19:55:00.000Z",

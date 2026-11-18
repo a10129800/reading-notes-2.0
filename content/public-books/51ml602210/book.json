@@ -92,11 +92,25 @@
       "readingTimeMinutes": 15,
       "quotesCount": 4,
       "updatedAt": "2026-11-17T15:20:00.000Z"
+    },
+    {
+      "id": "part0-chapter-1-section-2",
+      "bookId": "51ml602210",
+      "order": 7,
+      "title": "第二節 罪刑法定原則",
+      "subtitle": "刑法四大支柱之二：使人民安措其手足（內容後續補充）",
+      "level": 3,
+      "parentChapterId": "part0-chapter-1",
+      "completed": false,
+      "isPending": true,
+      "readingTimeMinutes": 0,
+      "quotesCount": 0,
+      "updatedAt": "2026-11-18T15:03:00.000Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-17T15:20:00.000Z",
+  "updatedAt": "2026-11-18T15:03:00.000Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {

@@ -18,7 +18,7 @@ class PublicDataService {
 
     try {
       const url = `${this.getBaseUrl()}content/public-books/books-manifest.json?t=${Date.now()}`;
-      const res = await fetch(url);
+      const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) {
         throw new Error(`Failed to load manifest: ${res.status} ${res.statusText}`);
       }
@@ -55,8 +55,8 @@ class PublicDataService {
 
     // Direct fetch fallback
     try {
-      const url = `${this.getBaseUrl()}content/public-books/${encodeURIComponent(bookId)}/book.json`;
-      const res = await fetch(url);
+      const url = `${this.getBaseUrl()}content/public-books/${encodeURIComponent(bookId)}/book.json?t=${Date.now()}`;
+      const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) return null;
       const book: Book = await res.json();
       if (book.status !== 'public') return null; // Safety check
@@ -74,8 +74,8 @@ class PublicDataService {
     }
 
     try {
-      const url = `${this.getBaseUrl()}content/public-books/${encodeURIComponent(bookId)}/${encodeURIComponent(chapterId)}.json`;
-      const res = await fetch(url);
+      const url = `${this.getBaseUrl()}content/public-books/${encodeURIComponent(bookId)}/${encodeURIComponent(chapterId)}.json?t=${Date.now()}`;
+      const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) return null;
       const chapter: ChapterDetail = await res.json();
       this.chapterCache.set(cacheKey, chapter);

@@ -24,7 +24,7 @@ export interface RelatedLink {
 // 01. 章節導讀
 export interface OverviewTreeItem {
   label: string;              // 橘色框核心概念名稱
-  description: string;        // 右側對應說明文字
+  description?: string;       // 右側對應說明文字（可省略）
 }
 
 export interface OverviewTreeDiagram {
@@ -33,8 +33,9 @@ export interface OverviewTreeDiagram {
 }
 
 export interface SectionIntroduction {
-  overview: string;           // 本章介紹 (支援 {{TREE_DIAGRAM}} 內嵌樹狀圖解)
+  overview: string;           // 本章介紹 (支援 {{TREE_DIAGRAM}} 或 {{TREE_DIAGRAM:0}} 內嵌樹狀圖解)
   overviewTree?: OverviewTreeDiagram;
+  overviewTrees?: OverviewTreeDiagram[];
   learningGoals: string[];    // 學習目標
   coreQuestions: string[];    // 核心問題
 }

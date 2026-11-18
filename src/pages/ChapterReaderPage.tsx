@@ -461,14 +461,20 @@ export const ChapterReaderPage: React.FC = () => {
               <h3 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100 mb-2">
                 【本章背景介紹】
               </h3>
-              {(sections.introduction.overview.includes('• ') || sections.introduction.overview.includes('{{TREE_DIAGRAM}}')) ? (
+              {(sections.introduction.overview.includes('• ') || sections.introduction.overview.includes('{{TREE_DIAGRAM')) ? (
                 <div className="text-ink-700 dark:text-ink-300 leading-relaxed mb-4 space-y-1">
                   {sections.introduction.overview.split('\n').map((line, i) => {
                     if (line.trim() === '') {
                       return <div key={i} className="h-4" aria-hidden="true" />;
                     }
-                    if (line.trim() === '{{TREE_DIAGRAM}}' && sections.introduction.overviewTree) {
-                      const tree = sections.introduction.overviewTree;
+                    const treeMatch = line.trim().match(/^\{\{TREE_DIAGRAM(?::(\d+))?\}\}$/);
+                    if (treeMatch) {
+                      const treeIdx = treeMatch[1] ? parseInt(treeMatch[1], 10) : 0;
+                      const tree =
+                        sections.introduction.overviewTrees?.[treeIdx] ??
+                        (treeIdx === 0 ? sections.introduction.overviewTree : undefined);
+                      if (!tree) return null;
+                      const hasDescriptions = tree.items.some((it) => Boolean(it.description));
                       return (
                         <div key={i} className="my-4 py-2 overflow-x-auto">
                           <div className="inline-flex items-stretch min-w-fit">
@@ -509,14 +515,22 @@ export const ChapterReaderPage: React.FC = () => {
                                       <div className="w-full h-[3px] bg-[#4472C4] dark:bg-blue-400" />
                                     </div>
 
-                                    {/* 橘色子原則方框 + 右側文字說明 */}
-                                    <div className="flex items-center gap-3.5 sm:gap-4 py-2">
-                                      <div className="w-40 sm:w-48 shrink-0 px-3 py-2 bg-[#F4B183] dark:bg-orange-900/65 border border-ink-900 dark:border-orange-400 text-ink-950 dark:text-orange-50 font-serif font-bold text-center shadow-2xs">
+                                    {/* 橘色方框 + 右側文字說明（若有） */}
+                                    <div className="flex items-center gap-3.5 sm:gap-4 py-2 flex-1">
+                                      <div
+                                        className={`px-4 py-2 bg-[#F4B183] dark:bg-orange-900/65 border border-ink-900 dark:border-orange-400 text-ink-950 dark:text-orange-50 font-serif font-bold shadow-2xs whitespace-nowrap ${
+                                          hasDescriptions
+                                            ? 'w-40 sm:w-48 shrink-0 text-center'
+                                            : 'w-full text-left'
+                                        }`}
+                                      >
                                         {item.label}
                                       </div>
-                                      <span className="text-ink-800 dark:text-ink-200 font-medium whitespace-nowrap">
-                                        {item.description}
-                                      </span>
+                                      {item.description && (
+                                        <span className="text-ink-800 dark:text-ink-200 font-medium whitespace-nowrap">
+                                          {item.description}
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
                                 );

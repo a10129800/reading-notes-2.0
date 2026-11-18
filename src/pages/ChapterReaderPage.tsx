@@ -650,14 +650,31 @@ export const ChapterReaderPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <h4 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100">
-                  章節內容整理
-                </h4>
-                <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
-                  {sections.summary.contentDigest}
-                </p>
-              </div>
+              {(() => {
+                const digestLines = (sections.summary.contentDigest || '').split('\n');
+                const firstLine = digestLines[0]?.trim() || '';
+                const hasInlineTitle = firstLine.startsWith('【') && firstLine.endsWith('】');
+                const restDigest = hasInlineTitle
+                  ? digestLines.slice(1).join('\n').replace(/^\n+/, '')
+                  : sections.summary.contentDigest;
+                return (
+                  <div className="space-y-3 pt-1">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h4 className="inline-block px-4 py-1.5 bg-[#CCCCCC] dark:bg-ink-700 border border-ink-900 dark:border-ink-400 font-serif font-bold text-sm text-ink-950 dark:text-ink-50 shadow-2xs shrink-0">
+                        章節內容整理
+                      </h4>
+                      {hasInlineTitle && (
+                        <span className="font-serif font-bold text-base text-ink-900 dark:text-ink-100">
+                          {firstLine}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
+                      {restDigest}
+                    </p>
+                  </div>
+                );
+              })()}
 
               <div>
                 <h4 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100 mb-2">

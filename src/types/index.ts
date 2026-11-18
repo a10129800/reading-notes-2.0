@@ -22,8 +22,19 @@ export interface RelatedLink {
 }
 
 // 01. 章節導讀
+export interface OverviewTreeItem {
+  label: string;              // 橘色框核心概念名稱
+  description: string;        // 右側對應說明文字
+}
+
+export interface OverviewTreeDiagram {
+  rootLabel: string;          // 左側直式綠色主標題
+  items: OverviewTreeItem[];  // 右側分支項目清單
+}
+
 export interface SectionIntroduction {
-  overview: string;           // 本章介紹
+  overview: string;           // 本章介紹 (支援 {{TREE_DIAGRAM}} 內嵌樹狀圖解)
+  overviewTree?: OverviewTreeDiagram;
   learningGoals: string[];    // 學習目標
   coreQuestions: string[];    // 核心問題
 }

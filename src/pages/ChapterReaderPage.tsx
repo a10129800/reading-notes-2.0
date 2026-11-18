@@ -461,11 +461,70 @@ export const ChapterReaderPage: React.FC = () => {
               <h3 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100 mb-2">
                 【本章背景介紹】
               </h3>
-              {sections.introduction.overview.includes('• ') ? (
+              {(sections.introduction.overview.includes('• ') || sections.introduction.overview.includes('{{TREE_DIAGRAM}}')) ? (
                 <div className="text-ink-700 dark:text-ink-300 leading-relaxed mb-4 space-y-1">
                   {sections.introduction.overview.split('\n').map((line, i) => {
                     if (line.trim() === '') {
                       return <div key={i} className="h-4" aria-hidden="true" />;
+                    }
+                    if (line.trim() === '{{TREE_DIAGRAM}}' && sections.introduction.overviewTree) {
+                      const tree = sections.introduction.overviewTree;
+                      return (
+                        <div key={i} className="my-4 py-2 overflow-x-auto">
+                          <div className="inline-flex items-stretch min-w-fit">
+                            {/* 左側直式綠色主框 */}
+                            <div className="flex items-center justify-center px-3 py-4 bg-[#A9D18E] dark:bg-emerald-900/70 border border-ink-900 dark:border-emerald-400 text-ink-950 dark:text-emerald-50 font-serif font-bold shrink-0">
+                              <div className="flex flex-col items-center justify-center gap-0.5 leading-snug">
+                                {Array.from(tree.rootLabel).map((char, cIdx) => (
+                                  <span key={cIdx}>{char}</span>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* 中間藍色水平主幹 */}
+                            <div className="flex items-center shrink-0">
+                              <div className="w-4 sm:w-5 h-[3px] bg-[#4472C4] dark:bg-blue-400" />
+                            </div>
+
+                            {/* 右側分支項目清單 */}
+                            <div className="flex flex-col justify-center">
+                              {tree.items.map((item, itemIdx) => {
+                                const isFirst = itemIdx === 0;
+                                const isLast = itemIdx === tree.items.length - 1;
+                                return (
+                                  <div key={itemIdx} className="flex items-stretch">
+                                    {/* 藍色垂直支幹 + 水平分枝 */}
+                                    <div className="relative w-5 sm:w-6 shrink-0 flex items-center">
+                                      {tree.items.length > 1 && (
+                                        <div
+                                          className={`absolute left-0 w-[3px] bg-[#4472C4] dark:bg-blue-400 ${
+                                            isFirst
+                                              ? 'top-1/2 bottom-0'
+                                              : isLast
+                                                ? 'top-0 bottom-1/2'
+                                                : 'top-0 bottom-0'
+                                          }`}
+                                        />
+                                      )}
+                                      <div className="w-full h-[3px] bg-[#4472C4] dark:bg-blue-400" />
+                                    </div>
+
+                                    {/* 橘色子原則方框 + 右側文字說明 */}
+                                    <div className="flex items-center gap-3.5 sm:gap-4 py-2">
+                                      <div className="w-40 sm:w-48 shrink-0 px-3 py-2 bg-[#F4B183] dark:bg-orange-900/65 border border-ink-900 dark:border-orange-400 text-ink-950 dark:text-orange-50 font-serif font-bold text-center shadow-2xs">
+                                        {item.label}
+                                      </div>
+                                      <span className="text-ink-800 dark:text-ink-200 font-medium whitespace-nowrap">
+                                        {item.description}
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
                     }
                     if (line.startsWith('• ')) {
                       return (

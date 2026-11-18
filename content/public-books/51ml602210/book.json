@@ -97,20 +97,19 @@
       "id": "part0-chapter-1-section-2",
       "bookId": "51ml602210",
       "order": 7,
-      "title": "第二節 罪刑法定原則",
-      "subtitle": "刑法四大支柱之二：使人民安措其手足（內容後續補充）",
+      "title": "第二節 罪刑法定原則——付出代價的根據何在？",
+      "subtitle": "四大衍生子原則（習慣法禁止、類推禁止、明確性、不溯既往）與憲法法治國連結（原書 p.2-5 ~ 2-7）",
       "level": 3,
       "parentChapterId": "part0-chapter-1",
       "completed": false,
-      "isPending": true,
-      "readingTimeMinutes": 0,
-      "quotesCount": 0,
-      "updatedAt": "2026-11-18T15:03:00.000Z"
+      "readingTimeMinutes": 15,
+      "quotesCount": 4,
+      "updatedAt": "2026-11-18T17:26:00.000Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-18T15:03:00.000Z",
+  "updatedAt": "2026-11-18T17:26:00.000Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {
@@ -163,6 +162,19 @@
         "法益定義",
         "生活利益",
         "社會倫理"
+      ]
+    },
+    {
+      "id": "q-51ml-05",
+      "quote": "刑法因涉及生命權與身體自由的基本權干預，至少屬於「絕對法律保留」的範圍，必須由立法者以制定法律的方式來發動。故而，不能以習慣法（社會造法）或類推適用（法官造法）的方法作為處罰之依據。",
+      "sourceChapterId": "part0-chapter-1-section-2",
+      "sourceChapterTitle": "第二節 罪刑法定原則——付出代價的根據何在？",
+      "page": "p. 2-7",
+      "note": "以憲法「層級化法律保留」貫通刑法禁止習慣法與禁止類推適用。",
+      "tags": [
+        "絕對法律保留",
+        "罪刑法定",
+        "憲法法治國"
       ]
     }
   ]

@@ -461,9 +461,31 @@ export const ChapterReaderPage: React.FC = () => {
               <h3 className="font-serif font-bold text-sm text-ink-900 dark:text-ink-100 mb-2">
                 【本章背景介紹】
               </h3>
-              <p className="text-ink-700 dark:text-ink-300 leading-relaxed mb-4 whitespace-pre-line">
-                {sections.introduction.overview}
-              </p>
+              {sections.introduction.overview.includes('• ') ? (
+                <div className="text-ink-700 dark:text-ink-300 leading-relaxed mb-4 space-y-1">
+                  {sections.introduction.overview.split('\n').map((line, i) => {
+                    if (line.trim() === '') {
+                      return <div key={i} className="h-4" aria-hidden="true" />;
+                    }
+                    if (line.startsWith('• ')) {
+                      return (
+                        <div key={i} className="flex items-start gap-3 pl-5">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full bg-ink-900 dark:bg-ink-100 shrink-0 mt-[0.65em]"
+                            aria-hidden="true"
+                          />
+                          <span>{line.slice(2)}</span>
+                        </div>
+                      );
+                    }
+                    return <p key={i}>{line}</p>;
+                  })}
+                </div>
+              ) : (
+                <p className="text-ink-700 dark:text-ink-300 leading-relaxed mb-4 whitespace-pre-line">
+                  {sections.introduction.overview}
+                </p>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-academic-borderLight dark:border-academic-borderDark text-xs">
                 {/* 🎯 學習目標 Card */}

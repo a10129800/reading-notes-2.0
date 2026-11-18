@@ -41,10 +41,16 @@ export interface SectionIntroduction {
 }
 
 // 02. 核心摘要
+export interface MainArgumentItem {
+  text: string;                   // 支援 __底線強調__ 與 \n 換行
+  italic?: boolean;               // 是否以斜體呈現
+}
+
 export interface SectionSummary {
-  mainArgument: string;       // 作者主要論述
-  contentDigest: string;      // 章節內容整理
-  keyPoints: string[];        // 重要觀點
+  mainArgument: string;           // 作者主要論述
+  mainArgumentItems?: MainArgumentItem[]; // 選擇性條列式作者主要論述（黃框標題＋列點底線）
+  contentDigest: string;          // 章節內容整理
+  keyPoints: string[];            // 重要觀點
 }
 
 // 03. 專業知識

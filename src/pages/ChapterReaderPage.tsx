@@ -605,13 +605,49 @@ export const ChapterReaderPage: React.FC = () => {
               核心摘要
             </div>
             <div className="space-y-4 text-ink-800 dark:text-ink-200">
-              <div className="bg-amber-50/70 dark:bg-amber-950/20 p-4 rounded-lg border-l-4 border-amber-600">
-                <h4 className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase mb-1">
-                  作者主要論述 (Main Thesis)
-                </h4>
-                <p className="font-serif italic font-medium text-ink-900 dark:text-ink-100 whitespace-pre-line">
-                  {sections.summary.mainArgument}
-                </p>
+              <div className="bg-amber-50/70 dark:bg-amber-950/20 p-5 rounded-lg border-l-4 border-amber-600">
+                {sections.summary.mainArgumentItems && sections.summary.mainArgumentItems.length > 0 ? (
+                  <>
+                    <div className="mb-4">
+                      <h4 className="inline-block px-4 py-1.5 bg-[#FFD966] dark:bg-amber-900/75 border border-ink-900 dark:border-amber-400 text-sm font-serif font-bold text-ink-950 dark:text-amber-50 shadow-2xs">
+                        作者主要論述 (Main Thesis)
+                      </h4>
+                    </div>
+                    <ul className="space-y-3 text-ink-900 dark:text-ink-100 leading-relaxed">
+                      {sections.summary.mainArgumentItems.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <span
+                            className="w-2 h-2 rounded-full bg-ink-950 dark:bg-ink-100 shrink-0 mt-[0.55em]"
+                            aria-hidden="true"
+                          />
+                          <span className={`font-serif font-medium whitespace-pre-line ${item.italic ? 'italic' : 'not-italic'}`}>
+                            {item.text.split(/(__[^_]+__)/g).map((part, pIdx) =>
+                              part.startsWith('__') && part.endsWith('__') ? (
+                                <span
+                                  key={pIdx}
+                                  className="underline underline-offset-4 decoration-ink-900 dark:decoration-amber-300"
+                                >
+                                  {part.slice(2, -2)}
+                                </span>
+                              ) : (
+                                <React.Fragment key={pIdx}>{part}</React.Fragment>
+                              )
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <h4 className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase mb-1">
+                      作者主要論述 (Main Thesis)
+                    </h4>
+                    <p className="font-serif italic font-medium text-ink-900 dark:text-ink-100 whitespace-pre-line">
+                      {sections.summary.mainArgument}
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="space-y-2">

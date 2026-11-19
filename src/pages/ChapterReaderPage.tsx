@@ -654,11 +654,41 @@ export const ChapterReaderPage: React.FC = () => {
                 const digestLines = (sections.summary.contentDigest || '').split('\n');
                 const firstLine = digestLines[0]?.trim() || '';
                 const hasInlineTitle = firstLine.startsWith('【') && firstLine.endsWith('】');
-                const restDigest = hasInlineTitle
-                  ? digestLines.slice(1).join('\n').replace(/^\n+/, '')
-                  : sections.summary.contentDigest;
+                const contentLines = hasInlineTitle ? digestLines.slice(1) : digestLines;
+
+                const renderFormattedInlineText = (text: string) => {
+                  const parts = text.split(/(__[^_]+__|\*\*[^*]+\*\*|\*[^*]+\*)/g);
+                  return parts.map((part, idx) => {
+                    if (part.startsWith('__') && part.endsWith('__') && part.length >= 4) {
+                      return (
+                        <span
+                          key={idx}
+                          className="underline underline-offset-4 decoration-ink-900 dark:decoration-amber-300"
+                        >
+                          {part.slice(2, -2)}
+                        </span>
+                      );
+                    }
+                    if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+                      return (
+                        <strong key={idx} className="font-bold text-ink-950 dark:text-ink-50">
+                          {part.slice(2, -2)}
+                        </strong>
+                      );
+                    }
+                    if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+                      return (
+                        <span key={idx} className="italic">
+                          {part.slice(1, -1)}
+                        </span>
+                      );
+                    }
+                    return <React.Fragment key={idx}>{part}</React.Fragment>;
+                  });
+                };
+
                 return (
-                  <div className="space-y-3 pt-1">
+                  <div className="mt-8 pt-3 space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
                       <h4 className="inline-block px-4 py-1.5 bg-[#CCCCCC] dark:bg-ink-700 border border-ink-900 dark:border-ink-400 font-serif font-bold text-sm text-ink-950 dark:text-ink-50 shadow-2xs shrink-0">
                         章節內容整理
@@ -669,9 +699,80 @@ export const ChapterReaderPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <p className="text-ink-700 dark:text-ink-300 leading-relaxed whitespace-pre-line">
-                      {restDigest}
-                    </p>
+                    <div className="space-y-1 text-ink-800 dark:text-ink-200">
+                      {contentLines.map((line, idx) => {
+                        const trimmed = line.trim();
+                        if (!trimmed) {
+                          return <div key={idx} className="h-3" aria-hidden="true" />;
+                        }
+
+                        // 1. Numbered main heading, e.g. "1. 罪刑法定原則定義與條文（p.2-5）："
+                        if (/^\d+\.\s+/.test(trimmed)) {
+                          return (
+                            <div
+                              key={idx}
+                              className="font-serif font-bold text-base text-ink-900 dark:text-ink-100 pt-3 pb-1"
+                            >
+                              {renderFormattedInlineText(trimmed)}
+                            </div>
+                          );
+                        }
+
+                        // 2. Primary bullet item, e.g. "● 刑事處罰必以..."
+                        if (/^[●•]\s*/.test(trimmed)) {
+                          const content = trimmed.replace(/^[●•]\s*/, '');
+                          return (
+                            <div key={idx} className="flex items-start gap-2.5 my-1.5 pl-1">
+                              <span
+                                className="text-ink-950 dark:text-ink-100 text-sm select-none mt-[0.1em] shrink-0"
+                                aria-hidden="true"
+                              >
+                                ●
+                              </span>
+                              <span className="font-serif leading-relaxed text-ink-900 dark:text-ink-100">
+                                {renderFormattedInlineText(content)}
+                              </span>
+                            </div>
+                          );
+                        }
+
+                        // 3. Sub-item with dash, e.g. "- 一、習慣法禁止原則..."
+                        if (/^-\s+/.test(trimmed)) {
+                          const content = trimmed.replace(/^-\s+/, '');
+                          return (
+                            <div key={idx} className="flex items-start gap-2 my-1 pl-3 font-serif">
+                              <span className="text-ink-500 dark:text-ink-400 select-none shrink-0" aria-hidden="true">-</span>
+                              <span className="leading-relaxed text-ink-800 dark:text-ink-200">
+                                {renderFormattedInlineText(content)}
+                              </span>
+                            </div>
+                          );
+                        }
+
+                        // 4. Nested sub-item with star/bullet, e.g. "  * 案例 1-4：..."
+                        if (/^\s*[*•]\s+/.test(line)) {
+                          const content = line.trim().replace(/^[*•]\s+/, '');
+                          return (
+                            <div key={idx} className="flex items-start gap-2 my-0.5 pl-7 text-sm font-serif">
+                              <span className="text-ink-400 select-none shrink-0" aria-hidden="true">•</span>
+                              <span className="leading-relaxed text-ink-700 dark:text-ink-300">
+                                {renderFormattedInlineText(content)}
+                              </span>
+                            </div>
+                          );
+                        }
+
+                        // 5. Default paragraph or continuation line (e.g. italic citation notes)
+                        return (
+                          <div
+                            key={idx}
+                            className="pl-1 font-serif leading-relaxed text-ink-800 dark:text-ink-200 my-0.5"
+                          >
+                            {renderFormattedInlineText(trimmed)}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })()}

@@ -687,6 +687,71 @@ export const ChapterReaderPage: React.FC = () => {
                   });
                 };
 
+                interface DigestGroup {
+                  type: 'spacer' | 'section-heading' | 'bullet' | 'box-orange' | 'box-green' | 'box-yellow' | 'sub-dash' | 'sub-nested' | 'default';
+                  text?: string;
+                  items?: string[];
+                }
+
+                const digestGroups: DigestGroup[] = [];
+                let currentYellowGroup: DigestGroup | null = null;
+
+                for (const line of contentLines) {
+                  const trimmed = line.trim();
+                  if (!trimmed) {
+                    currentYellowGroup = null;
+                    digestGroups.push({ type: 'spacer' });
+                    continue;
+                  }
+
+                  let boxColor: 'orange' | 'green' | 'yellow' | null = null;
+                  let boxText = trimmed;
+
+                  const boxMatch = trimmed.match(/^\[BOX:(orange|green|yellow)\]\s*(.*)$/);
+                  if (boxMatch) {
+                    boxColor = boxMatch[1] as 'orange' | 'green' | 'yellow';
+                    boxText = boxMatch[2];
+                  } else if (/^[一二三四]、.*原則/.test(trimmed) || /^-\s*[一二三四]、.*原則/.test(trimmed)) {
+                    boxColor = 'orange';
+                    boxText = trimmed.replace(/^-\s*/, '');
+                  } else if (/^構成要件解釋必須限縮/.test(trimmed) || /^\*\s*構成要件解釋必須限縮/.test(trimmed)) {
+                    boxColor = 'green';
+                    boxText = trimmed.replace(/^[*•]\s*/, '');
+                  } else if (/^\s*[*•]?\s*案例\s*1-[4567]/.test(trimmed)) {
+                    boxColor = 'yellow';
+                    boxText = trimmed.replace(/^[*•]\s*/, '');
+                  }
+
+                  if (boxColor) {
+                    if (boxColor === 'yellow') {
+                      if (currentYellowGroup) {
+                        currentYellowGroup.items?.push(boxText);
+                      } else {
+                        currentYellowGroup = { type: 'box-yellow', items: [boxText] };
+                        digestGroups.push(currentYellowGroup);
+                      }
+                    } else {
+                      currentYellowGroup = null;
+                      digestGroups.push({ type: `box-${boxColor}` as any, text: boxText });
+                    }
+                    continue;
+                  }
+
+                  currentYellowGroup = null;
+
+                  if (/^\d+\.\s+/.test(trimmed)) {
+                    digestGroups.push({ type: 'section-heading', text: trimmed });
+                  } else if (/^[●•]\s*/.test(trimmed)) {
+                    digestGroups.push({ type: 'bullet', text: trimmed.replace(/^[●•]\s*/, '') });
+                  } else if (/^-\s+/.test(trimmed)) {
+                    digestGroups.push({ type: 'sub-dash', text: trimmed.replace(/^-\s+/, '') });
+                  } else if (/^\s*[*•]\s+/.test(line)) {
+                    digestGroups.push({ type: 'sub-nested', text: line.trim().replace(/^[*•]\s+/, '') });
+                  } else {
+                    digestGroups.push({ type: 'default', text: trimmed });
+                  }
+                }
+
                 return (
                   <div className="mt-8 pt-3 space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
@@ -700,29 +765,25 @@ export const ChapterReaderPage: React.FC = () => {
                       )}
                     </div>
                     <div className="space-y-1 text-ink-800 dark:text-ink-200">
-                      {contentLines.map((line, idx) => {
-                        const trimmed = line.trim();
-                        if (!trimmed) {
-                          return <div key={idx} className="h-3" aria-hidden="true" />;
+                      {digestGroups.map((group, gIdx) => {
+                        if (group.type === 'spacer') {
+                          return <div key={gIdx} className="h-3" aria-hidden="true" />;
                         }
 
-                        // 1. Numbered main heading, e.g. "1. 罪刑法定原則定義與條文（p.2-5）："
-                        if (/^\d+\.\s+/.test(trimmed)) {
+                        if (group.type === 'section-heading') {
                           return (
                             <div
-                              key={idx}
+                              key={gIdx}
                               className="font-serif font-bold text-base text-ink-900 dark:text-ink-100 pt-3 pb-1"
                             >
-                              {renderFormattedInlineText(trimmed)}
+                              {renderFormattedInlineText(group.text || '')}
                             </div>
                           );
                         }
 
-                        // 2. Primary bullet item, e.g. "● 刑事處罰必以..."
-                        if (/^[●•]\s*/.test(trimmed)) {
-                          const content = trimmed.replace(/^[●•]\s*/, '');
+                        if (group.type === 'bullet') {
                           return (
-                            <div key={idx} className="flex items-start gap-2.5 my-1.5 pl-1">
+                            <div key={gIdx} className="flex items-start gap-2.5 my-1.5 pl-1">
                               <span
                                 className="text-ink-950 dark:text-ink-100 text-sm select-none mt-[0.1em] shrink-0"
                                 aria-hidden="true"
@@ -730,45 +791,75 @@ export const ChapterReaderPage: React.FC = () => {
                                 ●
                               </span>
                               <span className="font-serif leading-relaxed text-ink-900 dark:text-ink-100">
-                                {renderFormattedInlineText(content)}
+                                {renderFormattedInlineText(group.text || '')}
                               </span>
                             </div>
                           );
                         }
 
-                        // 3. Sub-item with dash, e.g. "- 一、習慣法禁止原則..."
-                        if (/^-\s+/.test(trimmed)) {
-                          const content = trimmed.replace(/^-\s+/, '');
+                        if (group.type === 'box-orange') {
                           return (
-                            <div key={idx} className="flex items-start gap-2 my-1 pl-3 font-serif">
+                            <div key={gIdx} className="pt-2">
+                              <div className="inline-block px-3.5 py-1.5 bg-[#EEB38B] dark:bg-[#8A3B14] border border-ink-950 dark:border-ink-200 font-serif font-bold text-sm text-ink-950 dark:text-ink-50 shadow-2xs -mb-px relative z-10">
+                                {renderFormattedInlineText(group.text || '')}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (group.type === 'box-green') {
+                          return (
+                            <div key={gIdx}>
+                              <div className="inline-block px-3.5 py-1.5 bg-[#C9D38E] dark:bg-[#2D4A1D] border border-ink-950 dark:border-ink-200 font-serif font-medium text-sm text-ink-950 dark:text-ink-50 shadow-2xs -mb-px relative z-5">
+                                {renderFormattedInlineText(group.text || '')}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (group.type === 'box-yellow') {
+                          return (
+                            <div
+                              key={gIdx}
+                              className="block w-full bg-[#FDDD8B] dark:bg-[#684206] border border-ink-950 dark:border-ink-200 p-3 sm:p-3.5 font-serif text-sm text-ink-950 dark:text-ink-50 leading-relaxed shadow-2xs space-y-2.5 relative"
+                            >
+                              {group.items?.map((it, itIdx) => (
+                                <p key={itIdx} className="leading-relaxed whitespace-pre-line">
+                                  {renderFormattedInlineText(it)}
+                                </p>
+                              ))}
+                            </div>
+                          );
+                        }
+
+                        if (group.type === 'sub-dash') {
+                          return (
+                            <div key={gIdx} className="flex items-start gap-2 my-1 pl-3 font-serif">
                               <span className="text-ink-500 dark:text-ink-400 select-none shrink-0" aria-hidden="true">-</span>
                               <span className="leading-relaxed text-ink-800 dark:text-ink-200">
-                                {renderFormattedInlineText(content)}
+                                {renderFormattedInlineText(group.text || '')}
                               </span>
                             </div>
                           );
                         }
 
-                        // 4. Nested sub-item with star/bullet, e.g. "  * 案例 1-4：..."
-                        if (/^\s*[*•]\s+/.test(line)) {
-                          const content = line.trim().replace(/^[*•]\s+/, '');
+                        if (group.type === 'sub-nested') {
                           return (
-                            <div key={idx} className="flex items-start gap-2 my-0.5 pl-7 text-sm font-serif">
+                            <div key={gIdx} className="flex items-start gap-2 my-0.5 pl-7 text-sm font-serif">
                               <span className="text-ink-400 select-none shrink-0" aria-hidden="true">•</span>
                               <span className="leading-relaxed text-ink-700 dark:text-ink-300">
-                                {renderFormattedInlineText(content)}
+                                {renderFormattedInlineText(group.text || '')}
                               </span>
                             </div>
                           );
                         }
 
-                        // 5. Default paragraph or continuation line (e.g. italic citation notes)
                         return (
                           <div
-                            key={idx}
+                            key={gIdx}
                             className="pl-1 font-serif leading-relaxed text-ink-800 dark:text-ink-200 my-0.5"
                           >
-                            {renderFormattedInlineText(trimmed)}
+                            {renderFormattedInlineText(group.text || '')}
                           </div>
                         );
                       })}

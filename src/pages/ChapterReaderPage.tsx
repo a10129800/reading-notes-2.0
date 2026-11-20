@@ -688,7 +688,7 @@ export const ChapterReaderPage: React.FC = () => {
                 };
 
                 interface DigestGroup {
-                  type: 'spacer' | 'section-heading' | 'bullet' | 'box-orange' | 'box-green' | 'box-yellow' | 'sub-dash' | 'sub-nested' | 'default';
+                  type: 'spacer' | 'section-heading' | 'bullet' | 'box-orange' | 'box-green' | 'box-yellow' | 'box-gray' | 'box-white-center' | 'arrow-down' | 'sub-dash' | 'sub-nested' | 'default';
                   text?: string;
                   items?: string[];
                 }
@@ -704,12 +704,18 @@ export const ChapterReaderPage: React.FC = () => {
                     continue;
                   }
 
-                  let boxColor: 'orange' | 'green' | 'yellow' | null = null;
+                  if (/^[↓▼]\s*$/.test(trimmed)) {
+                    currentYellowGroup = null;
+                    digestGroups.push({ type: 'arrow-down' });
+                    continue;
+                  }
+
+                  let boxColor: 'orange' | 'green' | 'yellow' | 'gray' | 'white-center' | null = null;
                   let boxText = trimmed;
 
-                  const boxMatch = trimmed.match(/^\[BOX:(orange|green|yellow)\]\s*(.*)$/);
+                  const boxMatch = trimmed.match(/^\[BOX:(orange|green|yellow|gray|white-center)\]\s*(.*)$/);
                   if (boxMatch) {
-                    boxColor = boxMatch[1] as 'orange' | 'green' | 'yellow';
+                    boxColor = boxMatch[1] as 'orange' | 'green' | 'yellow' | 'gray' | 'white-center';
                     boxText = boxMatch[2];
                   } else if (/^[一二三四]、.*原則/.test(trimmed) || /^-\s*[一二三四]、.*原則/.test(trimmed)) {
                     boxColor = 'orange';
@@ -720,6 +726,9 @@ export const ChapterReaderPage: React.FC = () => {
                   } else if (/^\s*[*•]?\s*案例\s*1-[4567]/.test(trimmed)) {
                     boxColor = 'yellow';
                     boxText = trimmed.replace(/^[*•]\s*/, '');
+                  } else if (/^\d+\.\s*作者叮嚀/.test(trimmed)) {
+                    boxColor = 'gray';
+                    boxText = trimmed;
                   }
 
                   if (boxColor) {
@@ -793,6 +802,34 @@ export const ChapterReaderPage: React.FC = () => {
                               <span className="font-serif leading-relaxed text-ink-900 dark:text-ink-100">
                                 {renderFormattedInlineText(group.text || '')}
                               </span>
+                            </div>
+                          );
+                        }
+
+                        if (group.type === 'box-gray') {
+                          return (
+                            <div key={gIdx} className="pt-4 pb-1">
+                              <div className="inline-block px-4 py-1.5 bg-[#D9D9D9] dark:bg-ink-700 border border-ink-950 dark:border-ink-200 font-serif font-bold text-sm text-ink-950 dark:text-ink-50 shadow-2xs">
+                                {renderFormattedInlineText(group.text || '')}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (group.type === 'arrow-down') {
+                          return (
+                            <div key={gIdx} className="flex justify-center my-1 text-ink-800 dark:text-ink-200 text-lg font-bold select-none">
+                              ↓
+                            </div>
+                          );
+                        }
+
+                        if (group.type === 'box-white-center') {
+                          return (
+                            <div key={gIdx} className="flex justify-center my-1.5">
+                              <div className="inline-block px-6 py-2 bg-paper-50 dark:bg-ink-800 border border-ink-950 dark:border-ink-200 font-serif font-bold text-sm text-ink-950 dark:text-ink-50 shadow-2xs text-center">
+                                {renderFormattedInlineText(group.text || '')}
+                              </div>
                             </div>
                           );
                         }

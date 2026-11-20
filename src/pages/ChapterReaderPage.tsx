@@ -688,7 +688,7 @@ export const ChapterReaderPage: React.FC = () => {
                 };
 
                 interface DigestGroup {
-                  type: 'spacer' | 'section-heading' | 'bullet' | 'box-orange' | 'box-green' | 'box-yellow' | 'box-gray' | 'box-white-center' | 'arrow-down' | 'sub-dash' | 'sub-nested' | 'default';
+                  type: 'spacer' | 'section-heading' | 'bullet' | 'box-orange' | 'box-green' | 'box-yellow' | 'box-gray' | 'box-white-center' | 'flow-target' | 'arrow-down' | 'sub-dash' | 'sub-nested' | 'default';
                   text?: string;
                   items?: string[];
                 }
@@ -696,7 +696,8 @@ export const ChapterReaderPage: React.FC = () => {
                 const digestGroups: DigestGroup[] = [];
                 let currentYellowGroup: DigestGroup | null = null;
 
-                for (const line of contentLines) {
+                for (let i = 0; i < contentLines.length; i++) {
+                  const line = contentLines[i];
                   const trimmed = line.trim();
                   if (!trimmed) {
                     currentYellowGroup = null;
@@ -706,6 +707,13 @@ export const ChapterReaderPage: React.FC = () => {
 
                   if (/^[↓▼]\s*$/.test(trimmed)) {
                     currentYellowGroup = null;
+                    const nextLine = contentLines[i + 1]?.trim() || '';
+                    const nextMatch = nextLine.match(/^\[BOX:white-center\]\s*(.*)$/);
+                    if (nextMatch) {
+                      digestGroups.push({ type: 'flow-target', text: nextMatch[1] });
+                      i++;
+                      continue;
+                    }
                     digestGroups.push({ type: 'arrow-down' });
                     continue;
                   }
@@ -732,7 +740,10 @@ export const ChapterReaderPage: React.FC = () => {
                   }
 
                   if (boxColor) {
-                    if (boxColor === 'yellow') {
+                    if (boxColor === 'white-center') {
+                      currentYellowGroup = null;
+                      digestGroups.push({ type: 'flow-target', text: boxText });
+                    } else if (boxColor === 'yellow') {
                       if (currentYellowGroup) {
                         currentYellowGroup.items?.push(boxText);
                       } else {
@@ -816,20 +827,23 @@ export const ChapterReaderPage: React.FC = () => {
                           );
                         }
 
-                        if (group.type === 'arrow-down') {
+                        if (group.type === 'flow-target' || group.type === 'box-white-center') {
                           return (
-                            <div key={gIdx} className="flex justify-center my-1 text-ink-800 dark:text-ink-200 text-lg font-bold select-none">
-                              ↓
+                            <div key={gIdx} className="ml-6 sm:ml-10 my-2 flex flex-col items-center w-fit">
+                              <span className="text-ink-700 dark:text-ink-300 font-bold text-lg select-none leading-none mb-1.5">
+                                ↓
+                              </span>
+                              <div className="px-5 py-1.5 bg-paper-50 dark:bg-ink-800 border border-ink-950 dark:border-ink-200 font-serif font-bold text-sm text-ink-950 dark:text-ink-50 shadow-2xs text-center">
+                                {renderFormattedInlineText(group.text || '')}
+                              </div>
                             </div>
                           );
                         }
 
-                        if (group.type === 'box-white-center') {
+                        if (group.type === 'arrow-down') {
                           return (
-                            <div key={gIdx} className="flex justify-center my-1.5">
-                              <div className="inline-block px-6 py-2 bg-paper-50 dark:bg-ink-800 border border-ink-950 dark:border-ink-200 font-serif font-bold text-sm text-ink-950 dark:text-ink-50 shadow-2xs text-center">
-                                {renderFormattedInlineText(group.text || '')}
-                              </div>
+                            <div key={gIdx} className="ml-6 sm:ml-10 my-1 text-ink-800 dark:text-ink-200 text-lg font-bold select-none">
+                              ↓
                             </div>
                           );
                         }

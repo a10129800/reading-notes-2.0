@@ -520,7 +520,7 @@ export const ChapterReaderPage: React.FC = () => {
                                       <div
                                         className={`px-4 py-2 bg-[#F4B183] dark:bg-orange-900/65 border border-ink-900 dark:border-orange-400 text-ink-950 dark:text-orange-50 font-serif font-bold shadow-2xs whitespace-nowrap ${
                                           hasDescriptions
-                                            ? 'w-40 sm:w-48 shrink-0 text-center'
+                                            ? 'min-w-40 sm:min-w-48 w-fit shrink-0 text-center'
                                             : 'w-full text-left'
                                         }`}
                                       >

@@ -110,20 +110,19 @@
       "id": "part0-chapter-1-section-3",
       "bookId": "51ml602210",
       "order": 8,
-      "title": "第三節 罪責原則",
-      "subtitle": "刑法四大支柱之四：小罪不能大罰（內容後續補充）",
+      "title": "第三節 罪責原則——付出代價的極限何在？",
+      "subtitle": "兩大面向（無罪責即無刑罰、罪刑相當）、釋字第 630 號（準強盜罪 §329 限縮）與有利行為人容許原則（原書 p.2-8）",
       "level": 3,
       "parentChapterId": "part0-chapter-1",
       "completed": false,
-      "isPending": true,
-      "readingTimeMinutes": 0,
-      "quotesCount": 0,
-      "updatedAt": "2026-11-20T12:45:00.000Z"
+      "readingTimeMinutes": 15,
+      "quotesCount": 4,
+      "updatedAt": "2026-11-21T12:00:00.000Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-20T12:45:00.000Z",
+  "updatedAt": "2026-11-21T12:00:00.000Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {
@@ -189,6 +188,20 @@
         "絕對法律保留",
         "罪刑法定",
         "憲法法治國"
+      ]
+    },
+    {
+      "id": "q-51ml-06",
+      "quote": "罪責原則是指刑事處罰必須以行為人具有罪責為限，並與其罪責相當（釋630號解釋理由書揭櫫，同時也是最後手段性原則的體現）。",
+      "sourceChapterId": "part0-chapter-1-section-3",
+      "sourceChapterTitle": "第三節 罪責原則——付出代價的極限何在？",
+      "page": "p. 2-8",
+      "note": "原書第三節開宗明義：罪責原則核心定義與最後手段性之內在貫通。",
+      "tags": [
+        "罪責原則",
+        "釋字630號",
+        "最後手段性",
+        "核心定義"
       ]
     }
   ]

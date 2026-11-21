@@ -135,11 +135,25 @@
           "readingTimeMinutes": 15,
           "quotesCount": 4,
           "updatedAt": "2026-11-21T12:00:00.000Z"
+        },
+        {
+          "id": "part0-chapter-2",
+          "bookId": "51ml602210",
+          "order": 9,
+          "title": "第二章 刑法的操作原理",
+          "subtitle": "刑法操作的前理解：適用效力與解釋方法（內容後續補充）",
+          "level": 2,
+          "parentChapterId": "part0-preface",
+          "completed": false,
+          "isPending": true,
+          "readingTimeMinutes": 0,
+          "quotesCount": 0,
+          "updatedAt": "2026-11-21T12:28:00.000Z"
         }
       ],
       "startDate": "2026-11-05",
       "coverImage": "content/public-books/51ml602210/cover.jpg",
-      "updatedAt": "2026-11-21T12:00:00.000Z",
+      "updatedAt": "2026-11-21T12:28:00.000Z",
       "createdAt": "2026-11-05T10:27:22.287Z",
       "quotes": [
         {

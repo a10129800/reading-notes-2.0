@@ -1,0 +1,97 @@
+{
+  "id": "part0-chapter-2-section-1",
+  "bookId": "51ml602210",
+  "order": 10,
+  "title": "第一節 刑法的適用效力",
+  "subtitle": "刑法操作的前理解：時之效力與地之效力（內容後續補充）",
+  "level": 3,
+  "parentChapterId": "part0-chapter-2",
+  "completed": false,
+  "isPending": true,
+  "readingTimeMinutes": 0,
+  "sections": {
+    "introduction": {
+      "overview": "【本節筆記待補充】\n本節為《刑法總則（圖說）》第零篇「第二章 刑法的操作原理：第一節 刑法的適用效力」。\n在正式進入三階層犯罪論之前，必須先確立國家刑罰權發動之時間與空間界限（§1、§2從舊從輕原則，以及§3~§8地之效力）。詳細研讀筆記與分析內容後續補充。",
+      "learningGoals": [
+        "待補充研讀目標"
+      ],
+      "coreQuestions": [
+        "待補充核心探討問題"
+      ]
+    },
+    "summary": {
+      "mainArgument": "待補充主要論述。",
+      "contentDigest": "待補充章節內容摘要。",
+      "keyPoints": [
+        "待補充"
+      ]
+    },
+    "professionalKnowledge": {
+      "definitions": "待補充定義。",
+      "terminology": [
+        "第一節",
+        "適用效力",
+        "時之效力",
+        "地之效力",
+        "從舊從輕"
+      ],
+      "theories": "待補充學說理論。",
+      "citations": "待補充法條引用。"
+    },
+    "vernacularExplanation": {
+      "plainText": "待補充白話解釋。",
+      "everydayExamples": "待補充生活化譬喻。"
+    },
+    "caseAnalysis": {
+      "bookCases": "待補充原書案例。",
+      "customCases": "待補充讀者自行舉例。",
+      "application": "待補充案例與理論關聯。"
+    },
+    "keyTakeaways": {
+      "takeaways": [
+        "待補充重點整理"
+      ]
+    },
+    "personalInsights": {
+      "reflections": "待補充個人心得。",
+      "agreedPoints": "待補充認同觀點。",
+      "disagreedPoints": "待補充存疑之處。"
+    },
+    "chapterSummary": {
+      "coreKnowledge": "待補充核心知識結語。",
+      "conclusions": "待補充重要結論。"
+    }
+  },
+  "quotes": [],
+  "relatedLinks": [
+    {
+      "id": "rel-p0-ch2-sec1-01",
+      "conceptName": "第二章 刑法的操作原理",
+      "description": "返回第二章篇首：刑法操作之前理解、適用效力與解釋方法。",
+      "targetBookId": "51ml602210",
+      "targetBookTitle": "刑法總則（圖說）",
+      "targetChapterId": "part0-chapter-2",
+      "targetChapterTitle": "第二章 刑法的操作原理"
+    },
+    {
+      "id": "rel-p0-ch2-sec1-02",
+      "conceptName": "第三節 罪責原則——付出代價的極限何在？",
+      "description": "回顧第一章四大支柱之末節：罪責原則與刑法發動之極限。",
+      "targetBookId": "51ml602210",
+      "targetBookTitle": "刑法總則（圖說）",
+      "targetChapterId": "part0-chapter-1-section-3",
+      "targetChapterTitle": "第三節 罪責原則——付出代價的極限何在？"
+    },
+    {
+      "id": "rel-p0-ch2-sec1-03",
+      "conceptName": "第零篇 篇首導讀",
+      "description": "返回第零篇篇首導讀與四大支柱全貌。",
+      "targetBookId": "51ml602210",
+      "targetBookTitle": "刑法總則（圖說）",
+      "targetChapterId": "part0-preface",
+      "targetChapterTitle": "第零篇 刑法的運作、操作原理與法律效果"
+    }
+  ],
+  "createdAt": "2026-11-25T17:05:00.000Z",
+  "updatedAt": "2026-11-25T17:05:00.000Z"
+}

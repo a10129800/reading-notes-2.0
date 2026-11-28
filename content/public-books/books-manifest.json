@@ -175,11 +175,25 @@
           "readingTimeMinutes": 20,
           "quotesCount": 4,
           "updatedAt": "2026-11-28T18:40:00.000Z"
+        },
+        {
+          "id": "part0-chapter-3",
+          "bookId": "51ml602210",
+          "order": 12,
+          "title": "第三章 刑法的法律效果",
+          "subtitle": "刑罰理論、謹思慎刑與法律效果提前部署（內容後續補充）",
+          "level": 2,
+          "parentChapterId": "part0-preface",
+          "completed": false,
+          "isPending": true,
+          "readingTimeMinutes": 0,
+          "quotesCount": 0,
+          "updatedAt": "2026-11-28T18:52:00.000Z"
         }
       ],
       "startDate": "2026-11-05",
       "coverImage": "content/public-books/51ml602210/cover.jpg",
-      "updatedAt": "2026-11-28T18:40:00.000Z",
+      "updatedAt": "2026-11-28T18:52:00.000Z",
       "createdAt": "2026-11-05T10:27:22.287Z",
       "quotes": [
         {

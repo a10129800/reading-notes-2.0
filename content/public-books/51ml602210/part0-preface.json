@@ -197,11 +197,20 @@
     {
       "id": "rel-51ml-0-03",
       "conceptName": "第零篇 第二章 刑法的操作原理",
-      "description": "進入第零篇第二章：刑法操作之前理解、效力與解釋方法（內容後續補充）。",
+      "description": "進入第零篇第二章：刑法操作之前理解、適用效力與解釋方法。",
       "targetBookId": "51ml602210",
       "targetBookTitle": "刑法總則（圖說）",
       "targetChapterId": "part0-chapter-2",
       "targetChapterTitle": "第二章 刑法的操作原理"
+    },
+    {
+      "id": "rel-51ml-0-04",
+      "conceptName": "第零篇 第三章 刑法的法律效果",
+      "description": "進入第零篇第三章：刑罰理論、謹思慎刑與法律效果提前部署（內容後續補充）。",
+      "targetBookId": "51ml602210",
+      "targetBookTitle": "刑法總則（圖說）",
+      "targetChapterId": "part0-chapter-3",
+      "targetChapterTitle": "第三章 刑法的法律效果"
     },
     {
       "id": "rel-51ml-0-01",

@@ -145,11 +145,25 @@
       "readingTimeMinutes": 15,
       "quotesCount": 4,
       "updatedAt": "2026-11-27T19:25:00.000Z"
+    },
+    {
+      "id": "part0-chapter-2-section-2",
+      "bookId": "51ml602210",
+      "order": 11,
+      "title": "第二節 刑法的解釋方法",
+      "subtitle": "刑法操作的前理解：文義、體系、歷史與目的解釋（內容後續補充）",
+      "level": 3,
+      "parentChapterId": "part0-chapter-2",
+      "completed": false,
+      "isPending": true,
+      "readingTimeMinutes": 0,
+      "quotesCount": 0,
+      "updatedAt": "2026-11-28T17:48:00.000Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-27T19:25:00.000Z",
+  "updatedAt": "2026-11-28T17:48:00.000Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {

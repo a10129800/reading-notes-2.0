@@ -151,19 +151,18 @@
       "bookId": "51ml602210",
       "order": 11,
       "title": "第二節 刑法的解釋方法",
-      "subtitle": "刑法操作的前理解：文義、體系、歷史與目的解釋（內容後續補充）",
+      "subtitle": "司法解釋（文義與目的拉扯、合憲與憲法取向）與立法解釋（§10 公務員、重傷、性交）（原書 p.2-14 ~ 2-24）",
       "level": 3,
       "parentChapterId": "part0-chapter-2",
       "completed": false,
-      "isPending": true,
-      "readingTimeMinutes": 0,
-      "quotesCount": 0,
-      "updatedAt": "2026-11-28T17:48:00.000Z"
+      "readingTimeMinutes": 20,
+      "quotesCount": 4,
+      "updatedAt": "2026-11-28T18:40:00.000Z"
     }
   ],
   "startDate": "2026-11-05",
   "coverImage": "content/public-books/51ml602210/cover.jpg",
-  "updatedAt": "2026-11-28T17:48:00.000Z",
+  "updatedAt": "2026-11-28T18:40:00.000Z",
   "createdAt": "2026-11-05T10:27:22.287Z",
   "quotes": [
     {
@@ -299,6 +298,62 @@
         "言論免責權",
         "訴訟障礙事由",
         "實體免責權"
+      ]
+    },
+    {
+      "id": "q-51ml-11",
+      "quote": "文義解釋是一切法律解釋的起點，並構成解釋的最外延；目的解釋則是確認規範的當代目的，法益保護為刑法的終極目的。",
+      "sourceChapterId": "part0-chapter-2-section-2",
+      "sourceChapterTitle": "第二節 刑法的解釋方法",
+      "page": "p. 2-14 ~ 2-15",
+      "note": "全節最核心之法學方法論宣言：確立文義與目的之動態拉扯體系。",
+      "tags": [
+        "文義解釋",
+        "目的解釋",
+        "罪刑法定",
+        "最外延邊界"
+      ]
+    },
+    {
+      "id": "q-51ml-12",
+      "quote": "合憲性解釋並非在解釋憲法，而是在解釋憲法以外的法律，且不得逾越文字可能合理理解的範圍，不能偏離法律明顯可辨的基本價值決定。",
+      "sourceChapterId": "part0-chapter-2-section-2",
+      "sourceChapterTitle": "第二節 刑法的解釋方法",
+      "page": "p. 2-16 ~ 2-17",
+      "note": "合憲性解釋之雙重憲政邊界（引自釋字 585 號許宗力大法官意見書）。",
+      "tags": [
+        "合憲性解釋",
+        "憲法取向解釋",
+        "文義界限",
+        "釋字585號"
+      ]
+    },
+    {
+      "id": "q-51ml-13",
+      "quote": "重傷應該採客觀一般性標準，不能因人而異。小提琴家切斷食指雖終身無法演奏，但在客觀上指握功能健在，仍應評價為普通傷害。",
+      "sourceChapterId": "part0-chapter-2-section-2",
+      "sourceChapterTitle": "第二節 刑法的解釋方法",
+      "page": "p. 2-23 ~ 2-24",
+      "note": "重傷客觀生理機能通說：排斥個人職業特殊功能，貫徹罪刑法定。",
+      "tags": [
+        "重傷定義",
+        "生理機能客觀標準",
+        "小提琴家斷指",
+        "通說見解"
+      ]
+    },
+    {
+      "id": "q-51ml-14",
+      "quote": "刑法性交定義明定主觀上必須『非基於正當目的』，旨在自始將正當醫療行為排除於構成要件之外，體現法規範之周延性。",
+      "sourceChapterId": "part0-chapter-2-section-2",
+      "sourceChapterTitle": "第二節 刑法的解釋方法",
+      "page": "p. 2-24",
+      "note": "性交定義之立法智慧：以主觀目的之不正當性直接自始阻卻構成要件該當性。",
+      "tags": [
+        "性交定義",
+        "非基於正當目的",
+        "醫療行為排除",
+        "立法解釋"
       ]
     }
   ]
